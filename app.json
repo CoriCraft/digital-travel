@@ -1,0 +1,49 @@
+{
+  "tabBar": {
+    "custom": true,
+    "list": [
+      {
+        "text": "创意模板",
+        "iconPath": "/static/tab-template.png",
+        "pagePath": "pages/template/template"
+      },
+      {
+        "text": "线下体验",
+        "iconPath": "/static/tab-experience.png",
+        "pagePath": "pages/experience/experience"
+      },
+      {
+        "text": "产品购买",
+        "iconPath": "/static/tab-purchase.png",
+        "pagePath": "pages/purchase/purchase"
+      },
+      {
+        "text": "电子相册",
+        "iconPath": "/static/tab-album.png",
+        "pagePath": "pages/album/album"
+      },
+      {
+        "text": "我的",
+        "iconPath": "/static/tab-my.png",
+        "pagePath": "pages/my/my"
+      }
+    ]
+  },
+  "pages": [
+    "pages/template/template",
+    "pages/experience/experience",
+    "pages/purchase/purchase",
+    "pages/album/album",
+    "pages/my/my"
+  ],
+  "window": {
+    "navigationStyle": "custom",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "Weixin",
+    "navigationBarBackgroundColor": "#ffffff"
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}
