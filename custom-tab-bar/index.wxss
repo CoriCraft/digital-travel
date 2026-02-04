@@ -1,0 +1,39 @@
+/* icon 占位容器 */
+.icon-wrapper {
+  width: 100rpx;
+  height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* icon 尺寸 */
+.tab-icon {
+  width: 90rpx;
+  height: 90rpx;
+}
+
+/* 文本基础样式（未选中默认） */
+.tab-text {
+  font-size: 20rpx;
+  line-height: 1;
+  color: #666;
+  transition: opacity 0.1s ease, font-size 0.1s ease, color 0.1s ease;
+}
+
+/* 选中态（icon + text 共用） */
+.is-active {
+  opacity: 1;
+}
+
+/* 未选中态 */
+.is-inactive {
+  opacity: 0.55;
+}
+
+/* ✅ 只作用在「文字 + 选中态」 */
+.tab-text.is-active {
+  font-size: 24rpx;
+  color: #07c160;
+  font-weight: 500;
+}

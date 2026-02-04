@@ -1,0 +1,31 @@
+<t-tab-bar
+  value="{{ value }}"
+  defaultValue="template"
+  split="{{ false }}"
+  bind:change="onChange"
+>
+  <t-tab-bar-item
+    wx:for="{{ list }}"
+    wx:key="value"
+    value="{{ item.value }}"
+  >
+    <!-- 图标 -->
+    <view
+      slot="icon"
+      class="icon-wrapper {{ value === item.value ? 'is-active' : 'is-inactive' }}"
+    >
+      <image
+        src="{{ item.icon }}"
+        class="tab-icon"
+        mode="aspectFit"
+      />
+    </view>
+
+    <!-- 文字 -->
+    <view
+      class="tab-text {{ value === item.value ? 'is-active' : 'is-inactive' }}"
+    >
+      {{ item.label }}
+    </view>
+  </t-tab-bar-item>
+</t-tab-bar>

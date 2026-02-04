@@ -1,0 +1,43 @@
+<view class="custom-nav" style="
+    --status-bar-height: {{statusBarHeight}}px;
+    --nav-bar-height: {{navBarHeight}}px;
+  ">
+  <view class="nav-left" bindtap="onLocationTap">
+    <image class="location-icon" src="/static/pages/template/location.png" />
+    <text class="location-text">{{location}} ></text>
+  </view>
+</view>
+
+<!-- 页面内容，需要顶下来 -->
+<view class="page-content">
+  <view class="search-bar">
+    <!-- 左侧图标容器 -->
+    <view class="search-icon">
+      <t-icon name="search" size="40rpx" />
+    </view>
+
+    <!-- 右侧输入框 -->
+    <view class="search-input">
+      <view class="search-input-wrapper">
+        <t-input class="search-input-inner" placeholder="模板搜索" borderless>
+          <view slot="suffix" class="search-btn" bindtap="onSearch">
+            搜索
+          </view>
+        </t-input>
+      </view>
+    </view>
+  </view>
+
+
+  <view class="divider">
+    <t-divider class="custom-divider" />
+  </view>
+
+  <!-- tab筛选模板主题 -->
+  <view class="template-filter">
+    <t-tabs value="{{currentTemplateFilter}}" theme="tag" scroll bind:change="onTabChange" defaultValue="{{0}}">
+      <t-tab-panel wx:for="{{templateFilterList}}" wx:key="value" label="{{item.label}}" value="{{item.value}}"/>
+    </t-tabs>
+  </view>
+
+</view>

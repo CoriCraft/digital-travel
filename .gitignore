@@ -1,0 +1,6 @@
+# 依赖工具
+node_modules/
+miniprogram_npm/
+
+# project.config.json
+project.config.json

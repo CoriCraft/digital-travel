@@ -1,0 +1,138 @@
+/* 整个自定义导航栏 */
+.custom-nav {
+  /* position: fixed; */
+  top: 0;
+  left: 0;
+  right: 0;
+
+  /* 状态栏高度 + 导航栏高度 */
+  /* padding-top: var(--status-bar-height); */
+  height: var(--nav-bar-height);
+
+  background-color: #ffffff;
+  z-index: 999;
+}
+
+/* 左侧区域 */
+.nav-left {
+  margin-top: var(--status-bar-height);
+  height: var(--nav-bar-height);
+  display: flex;
+  align-items: center;
+  padding-left: 24rpx;
+  max-width: 60%;
+}
+
+/* 图标 */
+.location-icon {
+  width: var(--nav-bar-height);
+  height: var(--nav-bar-height);
+  margin-right: 8rpx;
+}
+
+/* 文本 */
+.location-text {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #333;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.page-content {
+  /* padding-top: calc(var(--status-bar-height) + var(--nav-bar-height)); */
+  min-height: 100vh;
+}
+
+/* 横向搜索栏 */
+.search-bar {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 24rpx;
+  background: #fff;
+}
+
+/* 图标容器（控制大小 + 居中） */
+.search-icon {
+  width: 56rpx;
+  height: 56rpx;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: 16rpx; /* 和输入框的距离 */
+}
+
+/* 控制 t-icon 尺寸 */
+.search-icon t-icon {
+  font-size: 36rpx; /* 核心：控制图标大小 */
+}
+
+/* 输入框占满剩余空间 */
+.search-input {
+  flex: 1;
+}
+
+/* 外层：画胶囊形状 */
+.search-input-wrapper {
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+
+  border: 5rpx solid #3b82f6;
+  border-radius: 33rpx;
+  background-color: #fff;
+
+  padding: 0 16rpx;
+  overflow: hidden;
+}
+
+/* 输入框本体 */
+.search-input-inner {
+  flex: 1;
+
+  --td-input-vertical-padding: 0;
+  --td-input-horizontal-padding: 0;
+
+  font-size: 28rpx;
+}
+
+/* 右侧搜索按钮 */
+.search-btn {
+  width: 44rpx;
+  height: 44rpx;
+  padding: 0 24rpx;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 22rpx;
+  background-color: #22c55e;
+  color: #fff;
+
+  font-size: 22rpx;
+  box-shadow: 4rpx 4rpx 8rpx rgba(0, 0, 0, 0.18);
+}
+
+.divider {
+  width: 100%;
+}
+
+.custom-divider {
+  height: 2rpx;        /* 分割线粗细 */
+  background-color: #e6e6e6;
+}
+
+.template-filter {
+  width: 100%;
+  height: 80rpx;
+
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0 24rpx;
+}
