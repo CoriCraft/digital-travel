@@ -1,4 +1,12 @@
 /**app.wxss**/
+
+/* Disable TDesign external font loading to prevent CDN errors */
+@font-face {
+  font-family: 't-icon';
+  src: local('Arial');
+  unicode-range: U+0000-FFFF;
+}
+
 .container {
   height: 100%;
   display: flex;
