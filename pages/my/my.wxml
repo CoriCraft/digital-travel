@@ -1,2 +1,82 @@
 <!--pages/my/my.wxml-->
-<text>pages/my/my.wxml</text>
+<view class="page-container">
+  <!-- Custom Navigation Bar -->
+  <view class="custom-navbar" style="padding-top: {{app.globalData.statusBarHeight}}px;">
+    <view class="navbar-content" style="height: {{app.globalData.navBarHeight}}px;">
+      <text class="navbar-title">我的</text>
+    </view>
+  </view>
+
+  <!-- Loading State -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- User Profile Content -->
+  <view wx:else class="profile-content">
+    <!-- Avatar Section with Asymmetric Positioning -->
+    <view class="avatar-section">
+      <view class="avatar-container">
+        <view class="avatar-circle">
+          <text class="avatar-icon">人</text>
+        </view>
+        <view class="avatar-badge"></view>
+      </view>
+    </view>
+
+    <!-- User Info Cards with Diagonal Flow -->
+    <view class="info-cards">
+      <!-- Primary Info Card -->
+      <view class="info-card primary-card">
+        <view class="card-header">
+          <text class="card-title">用户身份</text>
+          <view class="card-decoration"></view>
+        </view>
+        <view class="card-content">
+          <view class="info-row">
+            <text class="info-label">OpenID</text>
+            <text class="info-value">{{openid}}</text>
+          </view>
+          <view wx:if="{{userInfo.unionid}}" class="info-row">
+            <text class="info-label">UnionID</text>
+            <text class="info-value">{{userInfo.unionid}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- Secondary Info Card -->
+      <view class="info-card secondary-card">
+        <view class="card-content">
+          <view class="stat-item">
+            <text class="stat-number">0</text>
+            <text class="stat-label">创意作品</text>
+          </view>
+          <view class="stat-divider"></view>
+          <view class="stat-item">
+            <text class="stat-number">0</text>
+            <text class="stat-label">线下体验</text>
+          </view>
+          <view class="stat-divider"></view>
+          <view class="stat-item">
+            <text class="stat-number">0</text>
+            <text class="stat-label">电子相册</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- Authentication Status Card -->
+      <view class="info-card status-card">
+        <view class="status-indicator">
+          <view class="status-dot"></view>
+          <text class="status-text">已认证</text>
+        </view>
+        <text class="status-description">通过微信安全认证</text>
+      </view>
+    </view>
+
+    <!-- Decorative Elements -->
+    <view class="decorative-pattern pattern-1"></view>
+    <view class="decorative-pattern pattern-2"></view>
+  </view>
+</view>

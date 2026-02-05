@@ -1,9 +1,6 @@
-<view class="custom-nav" style="
-    --status-bar-height: {{statusBarHeight}}px;
-    --nav-bar-height: {{navBarHeight}}px;
-  ">
+<view class="custom-nav" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
   <view class="nav-left" bindtap="onLocationTap">
-    <image class="location-icon" src="/static/pages/template/location.png" />
+    <image class="location-icon" src="/static/pages/template/location.svg" />
     <text class="location-text">{{location}} ></text>
   </view>
 </view>
