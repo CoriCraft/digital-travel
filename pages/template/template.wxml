@@ -1,7 +1,15 @@
 <view class="custom-nav" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
-  <view class="nav-left" bindtap="onLocationTap">
-    <image class="location-icon" src="/static/pages/template/location.svg" />
-    <text class="location-text">{{location}} ></text>
+  <view class="nav-content">
+    <view class="nav-left" bindtap="onLocationTap">
+      <image class="location-icon" src="/static/pages/template/location.svg" />
+      <text class="location-text">{{location}} ></text>
+    </view>
+    <view class="nav-right">
+      <t-icon name="ellipsis" size="48rpx" class="nav-icon" />
+      <view class="nav-circle-icon">
+        <t-icon name="user-circle" size="48rpx" />
+      </view>
+    </view>
   </view>
 </view>
 
@@ -35,6 +43,65 @@
     <t-tabs value="{{currentTemplateFilter}}" theme="tag" scroll bind:change="onTabChange" defaultValue="{{0}}">
       <t-tab-panel wx:for="{{templateFilterList}}" wx:key="value" label="{{item.label}}" value="{{item.value}}"/>
     </t-tabs>
+  </view>
+
+  <!-- 创作画框按钮 -->
+  <view class="create-canvas-btn">
+    <view class="canvas-icon">
+      <t-icon name="image" size="48rpx" />
+    </view>
+    <text class="canvas-text">创作画框</text>
+  </view>
+
+  <!-- 模板列表标签 -->
+  <view class="template-category">
+    <view class="category-left">
+      <text class="category-title">模板列表</text>
+    </view>
+    <view class="category-right">
+      <text class="sort-label">热度</text>
+      <t-icon name="caret-down-small" size="32rpx" color="#ff6b35" />
+      <text class="sort-label">发布时间</text>
+      <t-icon name="caret-down-small" size="32rpx" color="#999" />
+    </view>
+  </view>
+
+  <!-- 模板列表 -->
+  <view class="template-list">
+    <!-- 热门标签 -->
+    <view class="hot-tag">
+      <image class="hot-tag-icon" src="/static/pages/template/hot-tag.svg" mode="aspectFit" />
+      <text class="hot-tag-text">热门</text>
+    </view>
+
+    <!-- 模板卡片示例 -->
+    <view class="template-card">
+      <view class="template-image-wrapper">
+        <image class="template-image" src="" mode="aspectFill" />
+        <view class="official-badge">官方</view>
+      </view>
+      <view class="template-info">
+        <text class="template-title">方山特产</text>
+        <view class="template-meta">
+          <view class="author-info">
+            <t-icon name="user" size="28rpx" color="#ff6b35" />
+            <text class="author-name">旅拍大师</text>
+          </view>
+          <view class="stats-info">
+            <t-icon name="download" size="28rpx" color="#666" />
+            <text class="stat-text">1580</text>
+            <t-icon name="heart" size="28rpx" color="#ff6b35" />
+            <text class="stat-text">856</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 提示消息 -->
+    <view class="template-tip">
+      <t-icon name="info-circle" size="28rpx" color="#999" />
+      <text class="tip-text">快来选择你喜欢的模板吧</text>
+    </view>
   </view>
 
 </view>

@@ -1,2 +1,119 @@
-<!--pages/experience/experience.wxml-->
-<text>pages/experience/experience.wxml</text>
+<view class="custom-nav" style="padding-top:{{statusBarHeight}}px; height:{{navBarHeight}}px;">
+  <view class="nav-left">
+    <t-icon name="home" size="48rpx" color="#000" />
+  </view>
+  <view class="nav-center">
+    <text class="nav-title">线下体验</text>
+  </view>
+  <view class="nav-right">
+    <t-icon name="ellipsis" size="48rpx" color="#000" style="margin-right: 20rpx;" />
+    <view class="avatar-circle">
+      <image class="avatar-img" src="https://tdesign.gtimg.com/mobile/demos/avatar1.png" mode="aspectFill" />
+    </view>
+  </view>
+</view>
+
+<view class="page-container" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+  
+  <view class="search-section">
+    <view class="search-capsule">
+      <view class="search-left">
+        <t-icon name="scan" size="40rpx" color="#666" />
+        <text class="location-text">方山风景区</text>
+      </view>
+      <view class="search-btn">
+        <text>搜索</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="grid-section">
+    <view class="grid-col left-col">
+      <view class="bento-card card-leisure">
+        <view class="card-tag-hot">HOT</view>
+        <view class="card-header">
+          <text class="card-title">休闲玩乐</text>
+          <text class="card-sub">精品推荐/吃喝玩乐</text>
+        </view>
+        <view class="leisure-imgs">
+          <view class="img-placeholder left"></view>
+          <view class="img-placeholder right"></view>
+        </view>
+      </view>
+
+      <view class="bento-card card-scenic">
+        <view class="scenic-header">
+          <text class="card-title">景点游玩</text>
+          <view class="action-pill">马上看看 ></view>
+        </view>
+        <view class="scenic-imgs">
+          <view class="img-mini"></view>
+          <view class="img-mini"></view>
+          <view class="img-mini"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="grid-col right-col">
+      <view class="bento-card card-hotel">
+        <view class="card-header">
+          <text class="card-title">酒店民宿</text>
+          <text class="card-sub-blue">精品民宿/舒适酒店</text>
+        </view>
+        <view class="hotel-imgs">
+          <view class="img-tall"></view>
+          <view class="img-tall"></view>
+        </view>
+      </view>
+      
+      <view class="bento-card card-food">
+          <text class="food-title">特色农家菜</text>
+          <view class="food-imgs">
+            <view class="img-food"></view>
+            <view class="img-food"></view>
+          </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="tab-section">
+    <view class="tab-item">关注</view>
+    <view class="tab-item active">推荐</view>
+    <view class="tab-item">附近</view>
+    <view class="tab-item">美食</view>
+    <view class="tab-item">出片点</view>
+    <view class="tab-item">玩乐</view>
+  </view>
+
+  <view class="feed-list">
+  <view class="feed-card">
+    <view class="feed-img-box">
+      </view>
+    
+    <view class="feed-info">
+      <view class="info-top">
+        <text class="feed-title">方山风景区</text>
+      </view>
+      <view class="feed-desc">方山风景区位于山西省，以独特的自然风光和人文景观闻名...</view>
+      
+      <view class="feed-loc">
+        <image class="icon-location" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM4LjEzIDIgNSA1LjEzIDUgOUM1IDE0LjI1IDEyIDIyIDEyIDIyQzEyIDIyIDE5IDE0LjI1IDE5IDlDMTkgNS4xMyAxNS44NyAyIDEyIDJaTTEyIDExLjVDMTAuNjIgMTEuNSA5LjUgMTAuMzggOS41IDlDOS41IDcuNjIgMTAuNjIgNi41IDEyIDYuNUMxMy4zOCA2LjUgMTQuNSA3LjYyIDE0LjUgOUMxNC41IDEwLjM4IDEzLjM4IDExLjUgMTIgMTEuNVoiIGZpbGw9IiNGRjU3MjIiLz48L3N2Zz4=" />
+        <text class="loc-text">山西省吕梁市方山县</text>
+      </view>
+      
+      <view class="float-help-bubble">
+        <image class="help-icon-svg" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8IS0tIOawlOaXoTIgLS0+CiAgPHBhdGggZD0iTTIwIDM2QzguOTU0MyAzNiAzIDI5LjI4NDMgMyAyMEMzIDEwLjcxNTcgOC45NTQzIDQgMjAgNEMzMS4wNDU3IDQgMzcgMTAuNzE1NyAzNyAyMEMzNyAyMy4wOTIxIDM2LjEyMjYgMjYuMDIzNCAzNC41NTA4IDI4LjYyNjlMMzcgMzZMMjkuNjI2OSAzMy41NTA4QzI3LjAyMzQgMzUuMTIyNiAyNC4wOTIxIDM2IDIwIDM2WiIgc3Ryb2tlPSIjOEVDOTREIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPCEtLSDljYzljacgLS0+CiAgPHBhdGggZD0iTTIwIDE0VjI2IiBzdHJva2U9IiM4RUM5NEQiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNMTQgMjBIMjYiIHN0cm9rZT0iIzhFQzk0RCIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4=" />
+        <text class="help-text">帮助</text>
+      </view>
+
+      <view class="bottom-action-area">
+        <view class="action-btn btn-nav-full">
+          <text>拍摄点导航</text>
+        </view>
+      </view>
+
+    </view>
+  </view>
+</view>
+
+</view>
