@@ -1,26 +1,54 @@
 /* 整个自定义导航栏 */
 .custom-nav {
-  /* position: fixed; */
+  position: relative;
   top: 0;
   left: 0;
   right: 0;
-
-  /* 状态栏高度 + 导航栏高度 */
-  /* padding-top: var(--status-bar-height); */
-  height: var(--nav-bar-height);
-
-  background-color: #ffffff;
+  height: calc(var(--status-bar-height) + var(--nav-bar-height));
+  background-color: #d4f4dd;
   z-index: 999;
+}
+
+/* 导航内容容器 */
+.nav-content {
+  position: absolute;
+  top: var(--status-bar-height);
+  left: 0;
+  right: 0;
+  height: var(--nav-bar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24rpx;
 }
 
 /* 左侧区域 */
 .nav-left {
-  margin-top: var(--status-bar-height);
-  height: var(--nav-bar-height);
   display: flex;
   align-items: center;
-  padding-left: 24rpx;
   max-width: 60%;
+}
+
+/* 右侧区域 */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.nav-icon {
+  color: #333;
+}
+
+.nav-circle-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid #e0e0e0;
 }
 
 /* 图标 */
@@ -44,6 +72,7 @@
 .page-content {
   /* padding-top: calc(var(--status-bar-height) + var(--nav-bar-height)); */
   min-height: 100vh;
+  background-color: #d4f4dd;
 }
 
 /* 横向搜索栏 */
@@ -51,7 +80,7 @@
   display: flex;
   align-items: center;
   padding: 16rpx 24rpx;
-  background: #fff;
+  background: #d4f4dd;
 }
 
 /* 图标容器（控制大小 + 居中） */
@@ -135,4 +164,185 @@
   align-items: center;
   box-sizing: border-box;
   padding: 0 24rpx;
+  background-color: #d4f4dd;
+}
+
+/* 创作画框按钮 */
+.create-canvas-btn {
+  margin: 24rpx;
+  padding: 32rpx;
+  background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 100%);
+  border-radius: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+.canvas-icon {
+  width: 96rpx;
+  height: 96rpx;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #2d5016;
+}
+
+/* 模板分类标签 */
+.template-category {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  background-color: #d4f4dd;
+}
+
+.category-left {
+  display: flex;
+  align-items: center;
+}
+
+.category-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333;
+}
+
+.category-right {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.sort-label {
+  font-size: 28rpx;
+  color: #666;
+  margin-left: 16rpx;
+}
+
+/* 模板列表 */
+.template-list {
+  padding: 0 24rpx 24rpx;
+  background-color: #d4f4dd;
+}
+
+/* 热门标签 */
+.hot-tag {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 24rpx 8rpx 16rpx;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-radius: 0 16rpx 16rpx 0;
+  margin-bottom: 16rpx;
+  margin-left: -24rpx;
+}
+
+.hot-tag-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.hot-tag-text {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* 模板卡片 */
+.template-card {
+  background-color: #fff;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+.template-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 400rpx;
+}
+
+.template-image {
+  width: 100%;
+  height: 100%;
+}
+
+.official-badge {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  padding: 8rpx 16rpx;
+  background-color: #22c55e;
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 8rpx;
+}
+
+.template-info {
+  padding: 24rpx;
+}
+
+.template-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.template-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.author-name {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.stats-info {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.stat-text {
+  font-size: 24rpx;
+  color: #666;
+  margin-right: 16rpx;
+}
+
+/* 提示消息 */
+.template-tip {
+  margin: 24rpx 0;
+  padding: 16rpx 24rpx;
+  background-color: transparent;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  justify-content: center;
+}
+
+.tip-text {
+  font-size: 26rpx;
+  color: #999;
 }

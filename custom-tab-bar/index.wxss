@@ -5,6 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: -10rpx;
 }
 
 /* icon 尺寸 */
@@ -19,6 +20,7 @@
   line-height: 1;
   color: #666;
   transition: opacity 0.1s ease, font-size 0.1s ease, color 0.1s ease;
+  margin-top: -8rpx;
 }
 
 /* 选中态（icon + text 共用） */
