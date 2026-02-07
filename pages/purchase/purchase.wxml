@@ -1,304 +1,117 @@
-<!-- pages/purchase/purchase.wxml -->
-<view class="custom-nav" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
-  <!-- 占位状态栏 -->
-  <view class="status-bar"></view>
+<view class="page-container">
+  <view class="top-bg-layer"></view>
 
-  <!-- 导航栏主体 -->
-  <view class="nav-content">
-    <!-- 左侧 Home -->
-    <view class="nav-left" bindtap="onHomeTap">
-      <t-icon name="home" size="{{navBarHeight}}" />
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onHomeTap">
+        <t-icon name="home" size="48rpx" color="#333" />
+      </view>
+      <view class="nav-title">产品购买</view>
+      <view class="nav-right-placeholder"></view>
     </view>
-
-    <!-- 中间标题 -->
-    <view class="nav-title">
-      <text>产品购买</text>
-    </view>
-
-    <!-- 右侧占位（保证标题真正居中） -->
-    <view class="nav-right"></view>
   </view>
 
-  <!-- 推荐产品 -->
-  <t-swiper class="scale-card-theme" current="{{current}}" autoplay="{{autoplay}}" duration="{{duration}}" interval="{{interval}}" list="{{recommendList}}" bindchange="onSwiperChange" navigation="{{ { type: 'dots' } }}" image-props="{{ { shape: 'round' } }}" previousMargin="34px" nextMargin="34px" t-class-nav="card-theme-nav" t-class-prev-image="scale-candidate" t-class-next-image="scale-candidate" t-class-image="scale-current" />
-
-  <!-- 产品搜索 -->
-  <view class="search-bar">
-    <!-- 左侧图标容器 -->
-    <view class="search-icon">
-      <t-icon name="search" size="40rpx" />
+  <scroll-view type="list" scroll-y class="main-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+    
+    <view class="banner-section">
+      <t-swiper
+        current="{{current}}"
+        autoplay="{{autoplay}}"
+        duration="{{500}}"
+        interval="{{5000}}"
+        list="{{recommendList}}"
+        navigation="{{ { type: 'dots' } }}"
+        image-props="{{ { mode: 'aspectFill' } }}"
+        t-class="banner-swiper"
+        t-class-image="banner-image"
+      />
     </view>
 
-    <!-- 右侧输入框 -->
-    <view class="search-input">
-      <view class="search-input-wrapper">
-        <t-input class="search-input-inner" placeholder="模板搜索" borderless>
-          <view slot="suffix" class="search-btn" bindtap="onSearch">
-            搜索
+    <view class="search-section">
+      <view class="search-input-box">
+        <t-icon name="search" size="36rpx" color="#999" class="search-icon-inside" />
+        <input class="real-input" placeholder="猜你喜欢..." placeholder-class="placeholder-style" confirm-type="search" bindconfirm="onSearch" />
+      </view>
+      <view class="search-btn-block" bindtap="onSearch">搜索</view>
+    </view>
+
+    <view class="tabs-section">
+      <view class="tabs-row">
+        <view class="tabs-list">
+          <view class="tab-item active">
+            <text class="tab-text">推荐</text>
+            <view class="tab-line"></view>
           </view>
-        </t-input>
+          <view class="tab-item">土特产</view>
+          <view class="tab-item">文创产品</view>
+        </view>
+        
+        <view class="tab-arrow">
+          <t-icon name="chevron-down" size="40rpx" color="#666" />
+        </view>
       </view>
     </view>
+
+    <view class="waterfall-container">
+      <view class="column">
+        <block wx:for="{{leftList}}" wx:key="id">
+          <view class="goods-card">
+            <view class="card-img-box">
+              <image src="{{item.img}}" mode="widthFix" class="goods-img" />
+              <view class="ai-badge" wx:if="{{index === 0}}">AI定制</view>
+            </view>
+            <view class="goods-info">
+              <view class="goods-name">{{item.name}}</view>
+              
+              <view class="goods-tags" wx:if="{{item.tags.length > 0}}">
+                <block wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">
+                  <view wx:if="{{item.tagType === 'hot'}}" class="tag-hot">{{tag}}</view>
+                  <view wx:elif="{{item.tagType === 'discount-text'}}" class="tag-discount-text">{{tag}}</view>
+                  <view wx:elif="{{item.tagType === 'green'}}" class="tag-green">{{tag}}</view>
+                  <view wx:else class="tag-plain">{{tag}}</view>
+                </block>
+              </view>
+
+              <view class="goods-bottom">
+                <text class="goods-sold">已售 {{item.sold}}</text>
+              </view>
+            </view>
+          </view>
+        </block>
+      </view>
+
+      <view class="column">
+        <block wx:for="{{rightList}}" wx:key="id">
+          <view class="goods-card">
+            <view class="card-img-box">
+              <image src="{{item.img}}" mode="widthFix" class="goods-img" />
+            </view>
+            <view class="goods-info">
+              <view class="goods-name">{{item.name}}</view>
+              
+              <view class="goods-tags" wx:if="{{item.tags.length > 0}}">
+                <block wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">
+                  <view wx:if="{{item.tagType === 'hot'}}" class="tag-hot">{{tag}}</view>
+                  <view wx:elif="{{item.tagType === 'discount-text'}}" class="tag-discount-text">{{tag}}</view>
+                  <view wx:elif="{{item.tagType === 'green'}}" class="tag-green">{{tag}}</view>
+                  <view wx:else class="tag-plain">{{tag}}</view>
+                </block>
+              </view>
+
+              <view class="goods-bottom">
+                <text class="goods-sold">已售 {{item.sold}}</text>
+              </view>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+    
+    <view style="height: 120rpx;"></view>
+  </scroll-view>
+
+  <view class="float-help">
+    <image src="/static/icons/help.svg" class="help-icon"></image>
+    <text>帮助</text>
   </view>
-
-  <!-- 产品分类 -->
-  <t-tabs defaultValue="recommend" scroll bind:change="onTabsChange" bind:click="onTabsClick" t-class="custom-tabs">
-    <t-tab-panel label="推荐" value="recommend">
-      <t-pull-down-refresh value="{{enable}}" bind:refresh="onRefresh">
-        <view class="waterfall">
-          <!-- 左列 -->
-          <view class="column">
-            <block wx:for="{{leftList}}" wx:key="id">
-              <view class="goods-card">
-                <image src="{{item.img}}" mode="widthFix" />
-
-                <view class="goods-info">
-                  <view class="goods-name">{{item.name}}</view>
-
-                  <view class="goods-tags">
-                    <view wx:for="{{item.tags}}" wx:key="tag" class="tag">
-                      {{tag}}
-                    </view>
-                  </view>
-
-                  <view class="goods-sold">
-                    已售 {{item.sold}}
-                  </view>
-                </view>
-              </view>
-            </block>
-          </view>
-
-          <!-- 右列 -->
-          <view class="column">
-            <block wx:for="{{rightList}}" wx:key="id">
-              <view class="goods-card">
-                <image src="{{item.img}}" mode="widthFix" />
-
-                <view class="goods-info">
-                  <view class="goods-name">{{item.name}}</view>
-
-                  <view class="goods-tags">
-                    <view wx:for="{{item.tags}}" wx:key="tag" class="tag">
-                      {{tag}}
-                    </view>
-                  </view>
-
-                  <view class="goods-sold">
-                    已售 {{item.sold}}
-                  </view>
-                </view>
-              </view>
-            </block>
-          </view>
-        </view>
-      </t-pull-down-refresh>
-    </t-tab-panel>
-    <t-tab-panel label="特产" value="special">
-      <t-pull-down-refresh value="{{enable}}" bind:refresh="onRefresh">
-        <view class="waterfall">
-          <!-- 左列 -->
-          <view class="column">
-            <block wx:for="{{leftList}}" wx:key="id">
-              <view class="goods-card">
-                <image src="{{item.img}}" mode="widthFix" />
-
-                <view class="goods-info">
-                  <view class="goods-name">{{item.name}}</view>
-
-                  <view class="goods-tags">
-                    <view wx:for="{{item.tags}}" wx:key="tag" class="tag">
-                      {{tag}}
-                    </view>
-                  </view>
-
-                  <view class="goods-sold">
-                    已售 {{item.sold}}
-                  </view>
-                </view>
-              </view>
-            </block>
-          </view>
-
-          <!-- 右列 -->
-          <view class="column">
-            <block wx:for="{{rightList}}" wx:key="id">
-              <view class="goods-card">
-                <image src="{{item.img}}" mode="widthFix" />
-
-                <view class="goods-info">
-                  <view class="goods-name">{{item.name}}</view>
-
-                  <view class="goods-tags">
-                    <view wx:for="{{item.tags}}" wx:key="tag" class="tag">
-                      {{tag}}
-                    </view>
-                  </view>
-
-                  <view class="goods-sold">
-                    已售 {{item.sold}}
-                  </view>
-                </view>
-              </view>
-            </block>
-          </view>
-        </view>
-      </t-pull-down-refresh>
-    </t-tab-panel>
-    <t-tab-panel label="文创" value="cultural">
-      <t-pull-down-refresh value="{{enable}}" bind:refresh="onRefresh">
-        <view class="waterfall">
-          <!-- 左列 -->
-          <view class="column">
-            <block wx:for="{{leftList}}" wx:key="id">
-              <view class="goods-card">
-                <image src="{{item.img}}" mode="widthFix" />
-
-                <view class="goods-info">
-                  <view class="goods-name">{{item.name}}</view>
-
-                  <view class="goods-tags">
-                    <view wx:for="{{item.tags}}" wx:key="tag" class="tag">
-                      {{tag}}
-                    </view>
-                  </view>
-
-                  <view class="goods-sold">
-                    已售 {{item.sold}}
-                  </view>
-                </view>
-              </view>
-            </block>
-          </view>
-
-          <!-- 右列 -->
-          <view class="column">
-            <block wx:for="{{rightList}}" wx:key="id">
-              <view class="goods-card">
-                <image src="{{item.img}}" mode="widthFix" />
-
-                <view class="goods-info">
-                  <view class="goods-name">{{item.name}}</view>
-
-                  <view class="goods-tags">
-                    <view wx:for="{{item.tags}}" wx:key="tag" class="tag">
-                      {{tag}}
-                    </view>
-                  </view>
-
-                  <view class="goods-sold">
-                    已售 {{item.sold}}
-                  </view>
-                </view>
-              </view>
-            </block>
-          </view>
-        </view>
-      </t-pull-down-refresh>
-    </t-tab-panel>
-    <t-tab-panel label="新品" value="new">
-      <t-pull-down-refresh value="{{enable}}" bind:refresh="onRefresh">
-        <view class="waterfall">
-          <!-- 左列 -->
-          <view class="column">
-            <block wx:for="{{leftList}}" wx:key="id">
-              <view class="goods-card">
-                <image src="{{item.img}}" mode="widthFix" />
-
-                <view class="goods-info">
-                  <view class="goods-name">{{item.name}}</view>
-
-                  <view class="goods-tags">
-                    <view wx:for="{{item.tags}}" wx:key="tag" class="tag">
-                      {{tag}}
-                    </view>
-                  </view>
-
-                  <view class="goods-sold">
-                    已售 {{item.sold}}
-                  </view>
-                </view>
-              </view>
-            </block>
-          </view>
-
-          <!-- 右列 -->
-          <view class="column">
-            <block wx:for="{{rightList}}" wx:key="id">
-              <view class="goods-card">
-                <image src="{{item.img}}" mode="widthFix" />
-
-                <view class="goods-info">
-                  <view class="goods-name">{{item.name}}</view>
-
-                  <view class="goods-tags">
-                    <view wx:for="{{item.tags}}" wx:key="tag" class="tag">
-                      {{tag}}
-                    </view>
-                  </view>
-
-                  <view class="goods-sold">
-                    已售 {{item.sold}}
-                  </view>
-                </view>
-              </view>
-            </block>
-          </view>
-        </view>
-      </t-pull-down-refresh>
-    </t-tab-panel>
-    <t-tab-panel label="公益售卖" value="welfare">
-      <t-pull-down-refresh value="{{enable}}" bind:refresh="onRefresh">
-        <view class="waterfall">
-          <!-- 左列 -->
-          <view class="column">
-            <block wx:for="{{leftList}}" wx:key="id">
-              <view class="goods-card">
-                <image src="{{item.img}}" mode="widthFix" />
-
-                <view class="goods-info">
-                  <view class="goods-name">{{item.name}}</view>
-
-                  <view class="goods-tags">
-                    <view wx:for="{{item.tags}}" wx:key="tag" class="tag">
-                      {{tag}}
-                    </view>
-                  </view>
-
-                  <view class="goods-sold">
-                    已售 {{item.sold}}
-                  </view>
-                </view>
-              </view>
-            </block>
-          </view>
-
-          <!-- 右列 -->
-          <view class="column">
-            <block wx:for="{{rightList}}" wx:key="id">
-              <view class="goods-card">
-                <image src="{{item.img}}" mode="widthFix" />
-
-                <view class="goods-info">
-                  <view class="goods-name">{{item.name}}</view>
-
-                  <view class="goods-tags">
-                    <view wx:for="{{item.tags}}" wx:key="tag" class="tag">
-                      {{tag}}
-                    </view>
-                  </view>
-
-                  <view class="goods-sold">
-                    已售 {{item.sold}}
-                  </view>
-                </view>
-              </view>
-            </block>
-          </view>
-        </view>
-      </t-pull-down-refresh>
-    </t-tab-panel>
-  </t-tabs>
-
-  <!-- 产品瀑布列表 -->
 </view>
