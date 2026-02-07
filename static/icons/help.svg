@@ -1,0 +1,7 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 气泡外框 -->
+  <path d="M20 36C8.9543 36 3 29.2843 3 20C3 10.7157 8.9543 4 20 4C31.0457 4 37 10.7157 37 20C37 23.0921 36.1226 26.0234 34.5508 28.6269L37 36L29.6269 33.5508C27.0234 35.1226 24.0921 36 20 36Z" stroke="#8EC94D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 加号 -->
+  <path d="M20 14V26" stroke="#8EC94D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M14 20H26" stroke="#8EC94D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

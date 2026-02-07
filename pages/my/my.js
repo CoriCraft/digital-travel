@@ -5,80 +5,83 @@ Page({
    * 页面的初始数据
    */
   data: {
-    userInfo: null,
-    openid: '',
-    loading: true
+    statusBarHeight: 0,
+    navBarHeight: 0,
+    userAvatar: '/static/images/default-avatar.png',
+    userName: '爱旅拍的小女孩',
+    userPhone: '13887906785',
+    templateCount: 5,
+    experienceCount: 1
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad(options) {
-    this.loadUserInfo()
-  },
-
-  /**
-   * 加载用户信息
-   */
-  loadUserInfo() {
     const app = getApp()
-
-    // 从全局数据获取用户信息
-    const globalUserInfo = app.globalData.userInfo
-
-    if (globalUserInfo && globalUserInfo.openid) {
-      this.setData({
-        userInfo: globalUserInfo,
-        openid: globalUserInfo.openid,
-        loading: false
-      })
-    } else {
-      // 如果全局数据还没有,等待一段时间后重试
-      setTimeout(() => {
-        const retryUserInfo = app.globalData.userInfo
-        if (retryUserInfo && retryUserInfo.openid) {
-          this.setData({
-            userInfo: retryUserInfo,
-            openid: retryUserInfo.openid,
-            loading: false
-          })
-        } else {
-          // 仍然没有,手动调用云函数获取
-          this.fetchUserInfo()
-        }
-      }, 1000)
-    }
+    this.setData({
+      statusBarHeight: app.globalData.statusBarHeight,
+      navBarHeight: app.globalData.navBarHeight
+    })
   },
 
   /**
-   * 手动调用云函数获取用户信息
+   * 导航到订单页面
    */
-  fetchUserInfo() {
-    wx.cloud.callFunction({
-      name: 'getUserInfo',
-      success: res => {
-        console.log('用户信息获取成功:', res.result)
-        const userInfo = {
-          openid: res.result.openid,
-          unionid: res.result.unionid
-        }
+  navigateToOrders() {
+    wx.showToast({
+      title: '订单功能开发中',
+      icon: 'none'
+    })
+  },
 
-        // 更新全局数据
-        getApp().globalData.userInfo = userInfo
+  /**
+   * 导航到作品页面
+   */
+  navigateToProducts() {
+    wx.showToast({
+      title: '作品功能开发中',
+      icon: 'none'
+    })
+  },
 
-        // 更新页面数据
-        this.setData({
-          userInfo: userInfo,
-          openid: res.result.openid,
-          loading: false
-        })
-      },
-      fail: err => {
-        console.error('用户信息获取失败:', err)
-        this.setData({
-          loading: false
-        })
-      }
+  /**
+   * 导航到收藏页面
+   */
+  navigateToCollect() {
+    wx.showToast({
+      title: '收藏功能开发中',
+      icon: 'none'
+    })
+  },
+
+  /**
+   * 导航到帮助中心
+   */
+  navigateToHelp() {
+    wx.showToast({
+      title: '帮助中心开发中',
+      icon: 'none'
+    })
+  },
+
+  /**
+   * 导航到服务改进
+   */
+  navigateToService() {
+    wx.showToast({
+      title: '服务改进开发中',
+      icon: 'none'
+    })
+  },
+
+  /**
+   * 导航到设置
+   */
+  navigateToSettings() {
+    wx.showToast({
+      title: '设置功能开发中',
+      icon: 'none'
     })
   },
 

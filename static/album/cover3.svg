@@ -1,0 +1,6 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#E3F2FD"/>
+  <circle cx="100" cy="70" r="25" fill="#42A5F5"/>
+  <path d="M50 150 L150 150 L125 100 L100 125 L75 100 Z" fill="#64B5F6"/>
+  <text x="100" y="180" font-family="Arial" font-size="14" fill="#1565C0" text-anchor="middle">古建之美</text>
+</svg>

@@ -1,2 +1,47 @@
-<!--pages/album/album.wxml-->
-<text>pages/album/album.wxml</text>
+<view class="album-page">
+  <view class="nav-bar" style="height: {{statusBarHeight + navBarHeight}}px; padding-top: {{statusBarHeight}}px;">
+    <view class="nav-content" style="height: {{navBarHeight}}px;">
+      <view class="nav-left">
+        <view class="nav-icon" bindtap="goBack">
+          <image src="/static/icons/home.svg" class="icon-img"></image>
+        </view>
+      </view>
+      <view class="nav-title">电子相册</view>
+      <view class="nav-right">
+        <view class="nav-icon" bindtap="showMore">
+          <image src="/static/icons/more.svg" class="icon-img"></image>
+        </view>
+        <view class="nav-icon" bindtap="showSearch">
+          <image src="/static/icons/search.svg" class="icon-img"></image>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="album-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+    <view class="album-list">
+      <view class="album-card" wx:for="{{albumList}}" wx:key="id" bindtap="viewAlbum" data-id="{{item.id}}">
+        <view class="card-stack-bg"></view>
+        <view class="card-main">
+          <view class="card-image">
+            <image src="{{item.coverImage}}" mode="aspectFill" class="cover-img"></image>
+          </view>
+          <view class="card-footer">
+            <view class="card-info">
+              <text class="card-meta">{{item.location}} · {{item.date}}</text>
+            </view>
+            <view class="card-right">
+              <text class="photo-count">{{item.views}}张</text>
+              <image src="/static/icons/arrow-right.svg" class="arrow-icon"></image>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="float-help">
+    <image src="/static/icons/help.svg" class="help-icon"></image>
+    <text>帮助</text>
+  </view>
+</view>

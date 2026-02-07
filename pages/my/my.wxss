@@ -1,395 +1,217 @@
 /* pages/my/my.wxss */
 
-/* Design Specification:
-   - Aesthetic: Organic/natural with Art deco/geometric accents
-   - Colors: Forest green (#2C5530), Golden sand (#D4A574), Natural linen (#F5F1E8)
-   - Typography: Noto Serif SC, Source Han Sans CN
-   - Layout: Asymmetric diagonal flow with overlapping cards
-*/
-
-.page-container {
-  min-height: 100vh;
-  background: linear-gradient(165deg, #F5F1E8 0%, #E8DCC8 100%);
-  position: relative;
-  overflow: hidden;
+/* --- 全局锁死：禁止滚动 --- */
+page {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden; /* 物理禁止滚动 */
+  background-color: #F7F8FA;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif;
+  box-sizing: border-box;
 }
 
-/* Custom Navigation Bar */
-.custom-navbar {
+.container {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部光晕 */
+.bg-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 500rpx;
+  background: linear-gradient(180deg, #E6F7ED 0%, #F7F8FA 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* --- 导航栏 --- */
+.nav-bar {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  background: rgba(44, 85, 48, 0.95);
-  backdrop-filter: blur(10px);
+  width: 100%;
   z-index: 1000;
-  border-bottom: 1px solid rgba(212, 165, 116, 0.3);
-}
-
-.navbar-content {
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
 }
 
-.navbar-title {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 18px;
-  font-weight: 500;
-  color: #F5F1E8;
-  letter-spacing: 2px;
-}
-
-/* Loading State */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
-  padding-top: 100px;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(44, 85, 48, 0.2);
-  border-top-color: #2C5530;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-text {
-  margin-top: 16px;
-  font-family: 'Source Han Sans CN', sans-serif;
-  font-size: 14px;
-  color: #2C5530;
-  opacity: 0.7;
-}
-
-/* Profile Content */
-.profile-content {
-  padding: 100px 24px 100px;
-  position: relative;
-  z-index: 1;
-}
-
-/* Avatar Section - Asymmetric positioning */
-.avatar-section {
-  display: flex;
-  justify-content: flex-start;
-  margin-left: 40px;
-  margin-bottom: 48px;
-  transform: translateX(-10px);
-}
-
-.avatar-container {
-  position: relative;
-  transform: rotate(-3deg);
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: rotate(-3deg) translateY(0px); }
-  50% { transform: rotate(-3deg) translateY(-8px); }
-}
-
-.avatar-circle {
-  width: 100px;
-  height: 100px;
-  background: linear-gradient(135deg, #2C5530 0%, #3D7040 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow:
-    0 8px 24px rgba(44, 85, 48, 0.25),
-    0 0 0 4px rgba(212, 165, 116, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.avatar-circle::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transform: rotate(45deg);
-  animation: shimmer 3s linear infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-}
-
-.avatar-icon {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 36px;
-  font-weight: 500;
-  color: #F5F1E8;
-  position: relative;
-  z-index: 1;
-}
-
-.avatar-badge {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 24px;
-  height: 24px;
-  background: #D4A574;
-  border-radius: 50%;
-  border: 3px solid #F5F1E8;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Info Cards - Diagonal flow with overlap */
-.info-cards {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.info-card {
-  background: #FFFFFF;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow:
-    0 4px 20px rgba(44, 85, 48, 0.08),
-    0 1px 4px rgba(0, 0, 0, 0.04);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Primary Card - Rotated and offset */
-.primary-card {
-  transform: rotate(-1deg) translateX(-8px);
-  border-left: 4px solid #D4A574;
-  animation: slideInLeft 0.6s ease-out;
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: rotate(-1deg) translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(-1deg) translateX(-8px);
-  }
-}
-
-.card-header {
+.nav-content {
+  width: 100%;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
-  position: relative;
+  padding: 0 32rpx;
+  box-sizing: border-box;
 }
 
-.card-title {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 16px;
+.nav-left { width: 48rpx; height: 48rpx; display: flex; align-items: center; }
+.nav-right-placeholder { width: 48rpx; }
+
+.nav-title {
+  font-size: 34rpx;
   font-weight: 600;
-  color: #2C5530;
-  letter-spacing: 1px;
+  color: #333;
 }
 
-.card-decoration {
-  width: 40px;
-  height: 3px;
-  background: linear-gradient(90deg, #D4A574 0%, transparent 100%);
-  border-radius: 2px;
+.icon-home {
+  width: 48rpx;
+  height: 48rpx;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'%3E%3C/path%3E%3Cpolyline points='9 22 9 12 15 12 15 22'%3E%3C/polyline%3E%3C/svg%3E");
+  background-size: cover;
 }
 
-.card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.info-row {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(44, 85, 48, 0.1);
-}
-
-.info-row:last-child {
-  border-bottom: none;
-}
-
-.info-label {
-  font-family: 'Source Han Sans CN', sans-serif;
-  font-size: 12px;
-  color: #8B8B8B;
-  letter-spacing: 0.5px;
-}
-
-.info-value {
-  font-family: 'Source Han Sans CN', sans-serif;
-  font-size: 13px;
-  color: #1A1A1A;
-  word-break: break-all;
-  line-height: 1.6;
-}
-
-/* Secondary Card - Stats with dividers */
-.secondary-card {
-  transform: rotate(0.5deg) translateX(8px);
-  animation: slideInRight 0.6s ease-out 0.1s both;
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: rotate(0.5deg) translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(0.5deg) translateX(8px);
-  }
-}
-
-.secondary-card .card-content {
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
-  gap: 0;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+/* --- 主内容布局 --- */
+.main-content {
   flex: 1;
+  width: 100%; /* 强制宽度 100% */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding-bottom: 20rpx;
+  align-items: stretch; /* 关键：强制子元素拉伸填满横向空间 */
 }
 
-.stat-number {
-  font-family: 'Source Han Sans CN', sans-serif;
-  font-size: 28px;
-  font-weight: 600;
-  color: #2C5530;
+/* --- 1. 用户卡片 --- */
+.user-card-wrap {
+  width: 100%; /* 强制宽度 */
+  box-sizing: border-box; /* 包含 padding */
+  padding: 0 32rpx;
+  margin-top: 10rpx; 
+  margin-bottom: 20rpx;
+  position: relative;
+  z-index: 1;
 }
 
-.stat-label {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 11px;
-  color: #8B8B8B;
-  letter-spacing: 0.5px;
+.user-card {
+  width: 100%; /* 强制宽度 */
+  box-sizing: border-box;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.02);
 }
 
-.stat-divider {
-  width: 1px;
-  height: 40px;
-  background: linear-gradient(180deg, transparent 0%, rgba(44, 85, 48, 0.2) 50%, transparent 100%);
-}
-
-/* Status Card */
-.status-card {
-  transform: rotate(-0.5deg) translateX(-4px);
-  background: linear-gradient(135deg, #2C5530 0%, #3D7040 100%);
-  animation: slideInUp 0.6s ease-out 0.2s both;
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: rotate(-0.5deg) translateX(-4px) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(-0.5deg) translateX(-4px) translateY(0);
-  }
-}
-
-.status-indicator {
+.user-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 20rpx;
 }
 
-.status-dot {
-  width: 10px;
-  height: 10px;
-  background: #D4A574;
+.avatar {
+  width: 100rpx;
+  height: 100rpx;
   border-radius: 50%;
-  box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.3);
-  animation: pulse 2s ease-in-out infinite;
+  background: #f0f0f0;
+  margin-right: 24rpx;
+  flex-shrink: 0; /* 防止头像被压缩 */
 }
 
-@keyframes pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(212, 165, 116, 0.1);
-  }
+.user-meta { display: flex; flex-direction: column; }
+.nickname { font-size: 34rpx; font-weight: bold; color: #333; margin-bottom: 4rpx; }
+.user-id { font-size: 24rpx; color: #999; }
+
+.card-divider {
+  height: 1rpx;
+  background: #F5F5F5;
+  margin-bottom: 20rpx;
 }
 
-.status-text {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: #F5F1E8;
-  letter-spacing: 1px;
+.stats-row { display: flex; align-items: center; }
+.stat-box { flex: 1; display: flex; flex-direction: column; align-items: center; }
+.stat-num { font-size: 36rpx; font-weight: bold; color: #333; }
+.stat-label { font-size: 22rpx; color: #999; margin-top: 4rpx; }
+.stat-vertical-line { width: 1rpx; height: 30rpx; background: #EEE; }
+
+/* --- 2. 菜单卡片 --- */
+.menu-section {
+  width: 100%; /* 强制宽度 */
+  box-sizing: border-box;
+  padding: 0 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx; 
+  margin-bottom: 20rpx;
 }
 
-.status-description {
-  font-family: 'Source Han Sans CN', sans-serif;
-  font-size: 12px;
-  color: rgba(245, 241, 232, 0.7);
-  margin-left: 18px;
+.menu-card {
+  width: 100%; /* 强制宽度 */
+  box-sizing: border-box;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 24rpx 30rpx; 
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.01);
 }
 
-/* Decorative Patterns - Art deco geometric elements */
-.decorative-pattern {
-  position: absolute;
-  border: 2px solid rgba(212, 165, 116, 0.15);
-  pointer-events: none;
-  z-index: 0;
+.icon-box {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
 }
 
-.pattern-1 {
-  top: 140px;
-  right: 20px;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  transform: rotate(15deg);
-  animation: rotatePattern 20s linear infinite;
+.bg-pale-green { background-color: #F2F9F5; }
+
+.icon-img {
+  width: 40rpx;
+  height: 40rpx;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
-.pattern-2 {
-  bottom: 100px;
-  left: 30px;
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  transform: rotate(-25deg);
-  animation: rotatePattern 15s linear infinite reverse;
+/* 图标数据 */
+.icon-truck { background-image: url("data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 80 80' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60.1 27.2H54.4V14.5C54.4 11.2 51.7 8.5 48.4 8.5H6.1C2.8 8.5 0.1 11.2 0.1 14.5V54.4C0.1 57.7 2.8 60.4 6.1 60.4H8.4C9.5 66.8 15.1 71.7 21.8 71.7C28.5 71.7 34.1 66.8 35.2 60.4H44.8C45.9 66.8 51.5 71.7 58.2 71.7C64.9 71.7 70.5 66.8 71.6 60.4H74C77.3 60.4 80 57.7 80 54.4V42.3C80 34 73.3 27.2 65.1 27.2H60.1ZM21.8 64.6C18.6 64.6 16 62 16 58.8C16 55.6 18.6 53 21.8 53C25 53 27.6 55.6 27.6 58.8C27.6 62 25 64.6 21.8 64.6ZM58.2 64.6C55 64.6 52.4 62 52.4 58.8C52.4 55.6 55 53 58.2 53C61.4 53 64 55.6 64 58.8C64 62 61.4 64.6 58.2 64.6ZM71.2 46.5H60.1V34.2H65C68.4 34.2 71.2 37 71.2 40.4V46.5Z' fill='%233Ece79'/%3E%3C/svg%3E"); }
+.icon-photo { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233Ece79'%3E%3Cpath d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/%3E%3C/svg%3E"); }
+.icon-heart { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233Ece79'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E"); }
+.icon-arrow { width: 28rpx; height: 28rpx; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23D0D0D0'%3E%3Cpath d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z'/%3E%3C/svg%3E"); background-size: cover; }
+
+.menu-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.menu-title { font-size: 28rpx; font-weight: 600; color: #333; }
+.menu-desc { font-size: 22rpx; color: #999; margin-top: 2rpx; }
+
+/* --- 3. 底部列表区 --- */
+.list-section {
+  width: 100%; /* 强制宽度 */
+  box-sizing: border-box;
+  padding: 0 32rpx;
+  flex: 1; 
 }
 
-@keyframes rotatePattern {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.list-card {
+  width: 100%; /* 强制宽度 */
+  box-sizing: border-box;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 0 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.01);
 }
 
-/* Ensure content is above decorative elements */
-.info-cards {
-  position: relative;
-  z-index: 2;
+.list-row {
+  display: flex;
+  align-items: center;
+  height: 90rpx; 
+  border-bottom: 1rpx solid #F8F8F8;
 }
+
+.list-row.no-border { border-bottom: none; }
+
+.list-icon { width: 36rpx; height: 36rpx; margin-right: 20rpx; background-size: cover; }
+.list-name { flex: 1; font-size: 28rpx; color: #333; }
+.icon-arrow-small { width: 24rpx; height: 24rpx; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23DDDDDD'%3E%3Cpath d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z'/%3E%3C/svg%3E"); background-size: cover; }
+
+.icon-help { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666666'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z'/%3E%3C/svg%3E"); }
+.icon-feedback { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666666'%3E%3Cpath d='M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V7h2v3z'/%3E%3C/svg%3E"); }
+.icon-settings { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666666'%3E%3Cpath d='M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z'/%3E%3C/svg%3E"); }
