@@ -7,7 +7,7 @@ Page({
   data: {
     statusBarHeight: 0,
     navBarHeight: 0,
-    userAvatar: '/static/images/default-avatar.png',
+    userAvatar: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="50" fill="%23E8F5E9"/%3E%3Cpath d="M50 45c8.284 0 15-6.716 15-15s-6.716-15-15-15-15 6.716-15 15 6.716 15 15 15zm0 5c-13.807 0-25 11.193-25 25v10h50V75c0-13.807-11.193-25-25-25z" fill="%233ECE79"/%3E%3C/svg%3E',
     userName: '爱旅拍的小女孩',
     userPhone: '13887906785',
     templateCount: 5,

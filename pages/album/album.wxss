@@ -1,8 +1,8 @@
 /* pages/album/album.wxss */
 .album-page {
   min-height: 100vh;
-  /* 调整为设计稿的淡绿色渐变 */
-  background: linear-gradient(180deg, #E2F7E5 0%, #FFFFFF 40%);
+  position: relative;
+  z-index: 1;
 }
 
 /* 导航栏透明化，适配背景 */
@@ -129,5 +129,5 @@
 
 .float-help text {
   font-size: 20rpx;
-  color: #52C41A; /* 匹配绿色系 */
+  color: #82F45F;
 }

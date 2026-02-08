@@ -24,7 +24,7 @@
     <!-- 右侧输入框 -->
     <view class="search-input">
       <view class="search-input-wrapper">
-        <t-input class="search-input-inner" placeholder="模板搜索" borderless>
+        <t-input class="search-input-inner" placeholder="模板搜索" borderless value="{{searchKeyword}}" bind:change="onSearchInput">
           <view slot="suffix" class="search-btn" bindtap="onSearch">
             搜索
           </view>
@@ -45,12 +45,12 @@
     </t-tabs>
   </view>
 
-  <!-- 创作画框按钮 -->
-  <view class="create-canvas-btn">
+  <!-- 创作模板按钮 -->
+  <view class="create-canvas-btn" bindtap="onCreateTemplate">
     <view class="canvas-icon">
-      <t-icon name="image" size="48rpx" />
+      <t-icon name="add" size="48rpx" />
     </view>
-    <text class="canvas-text">创作画框</text>
+    <text class="canvas-text">创作模板</text>
   </view>
 
   <!-- 模板列表标签 -->
@@ -59,46 +59,63 @@
       <text class="category-title">模板列表</text>
     </view>
     <view class="category-right">
-      <text class="sort-label">热度</text>
-      <t-icon name="caret-down-small" size="32rpx" color="#ff6b35" />
-      <text class="sort-label">发布时间</text>
-      <t-icon name="caret-down-small" size="32rpx" color="#999" />
+      <text class="sort-label" data-type="hot" bindtap="onSortChange" style="{{sortType === 'hot' ? 'color: #ff6b35;' : ''}}">热度</text>
+      <t-icon name="caret-down-small" size="32rpx" color="{{sortType === 'hot' ? '#ff6b35' : '#999'}}" />
+      <text class="sort-label" data-type="time" bindtap="onSortChange" style="{{sortType === 'time' ? 'color: #ff6b35;' : ''}}">发布时间</text>
+      <t-icon name="caret-down-small" size="32rpx" color="{{sortType === 'time' ? '#ff6b35' : '#999'}}" />
     </view>
   </view>
 
   <!-- 模板列表 -->
   <view class="template-list">
     <!-- 热门标签 -->
-    <view class="hot-tag">
+    <view class="hot-tag" wx:if="{{templates.length > 0}}">
       <image class="hot-tag-icon" src="/static/pages/template/hot-tag.svg" mode="aspectFit" />
       <text class="hot-tag-text">热门</text>
     </view>
 
-    <!-- 模板卡片示例 -->
-    <view class="template-card">
+    <!-- 模板卡片列表 -->
+    <view class="template-card" wx:for="{{templates}}" wx:key="_id" data-id="{{item._id}}" bindtap="onTemplateTap">
       <view class="template-image-wrapper">
-        <image class="template-image" src="" mode="aspectFill" />
-        <view class="official-badge">官方</view>
+        <image class="template-image" src="{{item.cover}}" mode="aspectFill" />
+        <view class="official-badge" wx:if="{{item.isOfficial}}">官方</view>
       </view>
       <view class="template-info">
-        <text class="template-title">方山特产</text>
+        <text class="template-title">{{item.name}}</text>
         <view class="template-meta">
           <view class="author-info">
             <t-icon name="user" size="28rpx" color="#ff6b35" />
-            <text class="author-name">旅拍大师</text>
+            <text class="author-name">{{item.creatorName}}</text>
           </view>
           <view class="stats-info">
-            <t-icon name="download" size="28rpx" color="#666" />
-            <text class="stat-text">1580</text>
+            <t-icon name="layers" size="28rpx" color="#666" />
+            <text class="stat-text">{{item.photoSetCount}}</text>
             <t-icon name="heart" size="28rpx" color="#ff6b35" />
-            <text class="stat-text">856</text>
+            <text class="stat-text">{{item.likeCount || 0}}</text>
           </view>
         </view>
       </view>
     </view>
 
-    <!-- 提示消息 -->
-    <view class="template-tip">
+    <!-- 空状态提示 -->
+    <view class="template-tip" wx:if="{{templates.length === 0 && !loading}}">
+      <t-icon name="info-circle" size="28rpx" color="#999" />
+      <text class="tip-text">暂无模板，快来创建第一个吧</text>
+    </view>
+
+    <!-- 底部提示 -->
+    <view class="template-tip" wx:if="{{templates.length > 0 && !hasMore}}">
+      <t-icon name="info-circle" size="28rpx" color="#999" />
+      <text class="tip-text">已经到底了</text>
+    </view>
+
+    <!-- 加载更多提示 -->
+    <view class="template-tip" wx:if="{{templates.length > 0 && hasMore && loading}}">
+      <text class="tip-text">加载中...</text>
+    </view>
+
+    <!-- 快来选择提示 -->
+    <view class="template-tip" wx:if="{{templates.length > 0 && hasMore && !loading}}">
       <t-icon name="info-circle" size="28rpx" color="#999" />
       <text class="tip-text">快来选择你喜欢的模板吧</text>
     </view>

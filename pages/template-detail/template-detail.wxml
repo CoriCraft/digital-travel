@@ -1,0 +1,97 @@
+<!-- pages/template-detail/template-detail.wxml -->
+<view class="container">
+  <!-- 自定义导航栏 -->
+  <view class="custom-nav" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <t-icon name="chevron-left" size="48rpx" />
+        <text class="nav-title">{{template.name || '模板详情'}}</text>
+      </view>
+      <view class="nav-right">
+        <t-icon name="share" size="44rpx" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 页面内容 -->
+  <view class="page-content">
+    <!-- 模板信息卡片 -->
+    <view class="template-header" wx:if="{{template}}">
+      <image class="template-cover" src="{{template.cover}}" mode="aspectFill" />
+      <view class="template-info-overlay">
+        <view class="template-title-row">
+          <text class="template-name">{{template.name}}</text>
+          <view class="official-badge" wx:if="{{template.isOfficial}}">官方</view>
+        </view>
+        <text class="template-description">{{template.description}}</text>
+        <view class="template-stats">
+          <view class="stat-item">
+            <t-icon name="layers" size="32rpx" color="#fff" />
+            <text class="stat-text">{{template.photoSetCount}} 照片集</text>
+          </view>
+          <view class="stat-item" wx:if="{{template.creatorName}}">
+            <t-icon name="user" size="32rpx" color="#fff" />
+            <text class="stat-text">{{template.creatorName}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 上传按钮 - 固定悬浮 -->
+    <view class="upload-fab" bindtap="onUpload">
+      <t-icon name="add" size="48rpx" color="#fff" />
+    </view>
+
+    <!-- 排序栏 -->
+    <view class="sort-bar">
+      <text class="sort-title">照片集 ({{photoSets.length}})</text>
+      <view class="sort-options">
+        <view class="sort-item" data-type="hot" bindtap="onSortChange">
+          <text class="sort-label" style="{{sortType === 'hot' ? 'color: #82F45F;' : ''}}">热度</text>
+          <t-icon name="caret-down-small" size="32rpx" color="{{sortType === 'hot' ? '#82F45F' : '#999'}}" />
+        </view>
+        <view class="sort-item" data-type="time" bindtap="onSortChange">
+          <text class="sort-label" style="{{sortType === 'time' ? 'color: #82F45F;' : ''}}">发布时间</text>
+          <t-icon name="caret-down-small" size="32rpx" color="{{sortType === 'time' ? '#82F45F' : '#999'}}" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 照片集列表 -->
+    <view class="photoset-list">
+      <view class="photoset-card" wx:for="{{photoSets}}" wx:key="_id" data-id="{{item._id}}" bindtap="onPhotoSetTap">
+        <image class="photoset-cover" src="{{item.coverPhoto}}" mode="aspectFill" />
+        <view class="photoset-info">
+          <view class="photoset-title-row">
+            <text class="photoset-title">{{item.title}}</text>
+            <view class="official-tag" wx:if="{{item.isOfficial}}">官方</view>
+          </view>
+          <text class="photoset-description">{{item.description}}</text>
+          <view class="photoset-meta">
+            <view class="author-info">
+              <image class="author-avatar" src="{{item.userAvatar || defaultAvatar}}" mode="aspectFill" />
+              <text class="author-name">{{item.userName}}</text>
+            </view>
+            <view class="photoset-stats">
+              <view class="stat-item">
+                <t-icon name="browse" size="28rpx" color="#999" />
+                <text class="stat-num">{{item.viewCount || 0}}</text>
+              </view>
+              <view class="stat-item">
+                <t-icon name="heart" size="28rpx" color="#82F45F" />
+                <text class="stat-num">{{item.likeCount || 0}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{photoSets.length === 0 && !loading}}">
+        <t-icon name="image" size="120rpx" color="#ddd" />
+        <text class="empty-text">暂无照片集</text>
+        <text class="empty-tip" wx:if="{{template.allowUserUpload}}">快来上传第一个照片集吧</text>
+      </view>
+    </view>
+  </view>
+</view>

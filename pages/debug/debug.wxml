@@ -1,0 +1,20 @@
+<view class="container">
+  <view class="header">数据库调试工具</view>
+
+  <view class="section">
+    <view class="section-title">操作</view>
+    <button class="btn" bindtap="insertTestData">插入测试数据</button>
+    <button class="btn" bindtap="queryTemplates">查询模板(云函数)</button>
+    <button class="btn" bindtap="directQuery">直接查询数据库</button>
+  </view>
+
+  <view class="section">
+    <view class="section-title">查询结果</view>
+    <view class="result-box">{{queryResult || '暂无数据'}}</view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">插入结果</view>
+    <view class="result-box">{{insertResult || '暂无数据'}}</view>
+  </view>
+</view>

@@ -31,10 +31,15 @@
   },
   "pages": [
     "pages/template/template",
+    "pages/template-detail/template-detail",
+    "pages/create-template/create-template",
+    "pages/photoset-detail/photoset-detail",
+    "pages/upload-photoset/upload-photoset",
     "pages/experience/experience",
     "pages/purchase/purchase",
     "pages/album/album",
-    "pages/my/my"
+    "pages/my/my",
+    "pages/debug/debug"
   ],
   "window": {
     "navigationStyle": "custom",

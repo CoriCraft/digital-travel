@@ -1,0 +1,295 @@
+/* pages/template-detail/template-detail.wxss */
+.container {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* 自定义导航栏 */
+.custom-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: transparent;
+  padding-top: var(--status-bar-height);
+}
+
+.nav-content {
+  height: var(--nav-bar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32rpx;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  color: #fff;
+}
+
+.nav-title {
+  margin-left: 16rpx;
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+.nav-right {
+  color: #fff;
+}
+
+/* 页面内容 */
+.page-content {
+  padding-top: calc(var(--status-bar-height) + var(--nav-bar-height));
+}
+
+/* 模板信息卡片 */
+.template-header {
+  position: relative;
+  width: 100%;
+  height: 500rpx;
+  overflow: hidden;
+}
+
+.template-cover {
+  width: 100%;
+  height: 100%;
+}
+
+.template-info-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40rpx 32rpx;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0));
+  color: #fff;
+}
+
+.template-title-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.template-name {
+  font-size: 44rpx;
+  font-weight: 700;
+  margin-right: 16rpx;
+}
+
+.official-badge {
+  padding: 4rpx 16rpx;
+  background-color: #82F45F;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  color: #fff;
+}
+
+.template-description {
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 24rpx;
+  display: block;
+}
+
+.template-stats {
+  display: flex;
+  align-items: center;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  margin-right: 32rpx;
+}
+
+.stat-text {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.9);
+  margin-left: 8rpx;
+}
+
+/* 上传按钮 */
+.upload-btn {
+  margin: 32rpx;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-text {
+  font-size: 32rpx;
+  color: #fff;
+  margin-left: 16rpx;
+  font-weight: 600;
+}
+
+/* 浮动操作按钮 */
+.upload-fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 120rpx;
+  width: 112rpx;
+  height: 112rpx;
+  background: linear-gradient(135deg, #82F45F 0%, #6FD84A 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(130, 244, 95, 0.4);
+  z-index: 99;
+}
+
+/* 排序栏 */
+.sort-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 32rpx;
+  background-color: #fff;
+  margin: 0 32rpx 24rpx;
+  border-radius: 16rpx;
+}
+
+.sort-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.sort-options {
+  display: flex;
+  align-items: center;
+}
+
+.sort-item {
+  display: flex;
+  align-items: center;
+  margin-left: 32rpx;
+}
+
+.sort-label {
+  font-size: 28rpx;
+  color: #666;
+  margin-right: 4rpx;
+}
+
+/* 照片集列表 */
+.photoset-list {
+  padding: 0 32rpx 32rpx;
+}
+
+.photoset-card {
+  background-color: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.photoset-cover {
+  width: 100%;
+  height: 400rpx;
+}
+
+.photoset-info {
+  padding: 24rpx;
+}
+
+.photoset-title-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.photoset-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-right: 16rpx;
+  flex: 1;
+}
+
+.official-tag {
+  padding: 4rpx 12rpx;
+  background-color: #82F45F;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  color: #fff;
+}
+
+.photoset-description {
+  font-size: 26rpx;
+  color: #999;
+  margin-bottom: 20rpx;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.photoset-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+}
+
+.author-avatar {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+}
+
+.author-name {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.photoset-stats {
+  display: flex;
+  align-items: center;
+}
+
+.photoset-stats .stat-item {
+  display: flex;
+  align-items: center;
+  margin-left: 24rpx;
+}
+
+.stat-num {
+  font-size: 26rpx;
+  color: #999;
+  margin-left: 6rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #999;
+  margin-top: 24rpx;
+}
+
+.empty-tip {
+  font-size: 28rpx;
+  color: #ccc;
+  margin-top: 16rpx;
+}

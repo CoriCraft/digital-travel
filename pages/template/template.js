@@ -17,6 +17,13 @@ Page({
       { label: '风格分类', value: 2 },
       { label: '场景打卡', value: 3 },
     ],
+    templates: [], // 模板列表
+    sortType: 'hot', // 排序类型: hot-热度, time-时间
+    loading: false,
+    searchKeyword: '', // 搜索关键词
+    pageSize: 20, // 每页数量
+    currentPage: 0, // 当前页码
+    hasMore: true, // 是否还有更多数据
   },
 
   /**
@@ -30,6 +37,8 @@ Page({
     });
     // 获取当前位置
     this.getCurrentLocation();
+    // 加载模板列表
+    this.loadTemplates();
   },
 
   /**
@@ -67,7 +76,18 @@ Page({
   /**
    * 页面上拉触底事件的处理函数
    */
-  onReachBottom() {},
+  onReachBottom() {
+    console.log('触底加载更多');
+    if (!this.data.hasMore) {
+      wx.showToast({
+        title: '没有更多了',
+        icon: 'none',
+        duration: 1500
+      });
+      return;
+    }
+    this.loadTemplates(true);
+  },
 
   /**
    * 用户点击右上角分享
@@ -182,10 +202,196 @@ Page({
     const { value } = e.detail;
     this.setData({
       currentTemplateFilter: value,
-    })
+      currentPage: 0,
+      templates: [],
+      hasMore: true
+    });
+    // 切换分类时重新加载模板
+    this.loadTemplates();
   },
 
   onSearch () {
-    console.log('search button click!')
+    console.log('search button click!');
+    const { searchKeyword } = this.data;
+    if (!searchKeyword || searchKeyword.trim() === '') {
+      wx.showToast({
+        title: '请输入搜索关键词',
+        icon: 'none'
+      });
+      return;
+    }
+    // 重置分页并加载
+    this.setData({
+      currentPage: 0,
+      templates: [],
+      hasMore: true
+    });
+    this.loadTemplates();
+  },
+
+  /**
+   * 搜索输入变化
+   */
+  onSearchInput(e) {
+    this.setData({
+      searchKeyword: e.detail.value
+    });
+  },
+
+  /**
+   * 清空搜索
+   */
+  onClearSearch() {
+    this.setData({
+      searchKeyword: '',
+      currentPage: 0,
+      templates: [],
+      hasMore: true
+    });
+    this.loadTemplates();
+  },
+
+  /**
+   * 加载模板列表
+   */
+  loadTemplates(loadMore = false) {
+    if (this.data.loading) return;
+    if (loadMore && !this.data.hasMore) return;
+
+    this.setData({ loading: true });
+
+    // 显示加载提示
+    if (loadMore) {
+      wx.showLoading({ title: '加载更多...' });
+    } else {
+      wx.showLoading({ title: '加载中...' });
+    }
+
+    const db = wx.cloud.database();
+    const _ = db.command;
+    const { currentTemplateFilter, searchKeyword, pageSize, currentPage, sortType } = this.data;
+
+    // 构建查询条件
+    let query = {
+      status: _.in(['active', 'approved'])
+    };
+
+    // 根据分类筛选
+    if (currentTemplateFilter > 0) {
+      const categoryMap = {
+        1: '景区主题',
+        2: '风格分类',
+        3: '场景打卡'
+      };
+      query.category = categoryMap[currentTemplateFilter];
+    }
+
+    // 搜索功能：模板名称或标签匹配
+    if (searchKeyword && searchKeyword.trim() !== '') {
+      const keyword = searchKeyword.trim();
+      query = _.and([
+        query,
+        _.or([
+          { name: db.RegExp({ regexp: keyword, options: 'i' }) },
+          { tags: keyword }
+        ])
+      ]);
+    }
+
+    const skip = loadMore ? currentPage * pageSize : 0;
+
+    // 根据排序类型设置排序字段
+    let orderByField = 'sort';
+    let orderByDirection = 'asc';
+
+    if (sortType === 'hot') {
+      orderByField = 'photoSetCount';
+      orderByDirection = 'desc';
+    } else if (sortType === 'time') {
+      orderByField = 'createTime';
+      orderByDirection = 'desc';
+    }
+
+    db.collection('templates')
+      .where(query)
+      .orderBy(orderByField, orderByDirection)
+      .skip(skip)
+      .limit(pageSize)
+      .get()
+      .then(res => {
+        console.log('模板列表:', res.data);
+        const newTemplates = loadMore ? [...this.data.templates, ...res.data] : res.data;
+        const hasMore = res.data.length === pageSize;
+
+        this.setData({
+          templates: newTemplates,
+          loading: false,
+          hasMore: hasMore,
+          currentPage: loadMore ? currentPage + 1 : 1
+        });
+
+        wx.hideLoading();
+
+        // 如果是加载更多且没有更多数据，提示用户
+        if (loadMore && !hasMore) {
+          wx.showToast({
+            title: '已加载全部',
+            icon: 'none',
+            duration: 1500
+          });
+        }
+      })
+      .catch(err => {
+        console.error('加载模板失败:', err);
+        this.setData({ loading: false });
+        wx.hideLoading();
+        wx.showToast({
+          title: '加载失败',
+          icon: 'none'
+        });
+      });
+  },
+
+  /**
+   * 切换排序方式
+   */
+  onSortChange(e) {
+    const { type } = e.currentTarget.dataset;
+    if (type === this.data.sortType) return;
+
+    // 切换排序时重新加载数据
+    this.setData({
+      sortType: type,
+      currentPage: 0,
+      templates: [],
+      hasMore: true
+    });
+    this.loadTemplates();
+  },
+
+  /**
+   * 排序模板列表（已废弃，改为后端排序）
+   */
+  sortTemplates() {
+    // 此方法已废弃，排序逻辑已移至 loadTemplates 中的数据库查询
+  },
+
+  /**
+   * 点击模板卡片
+   */
+  onTemplateTap(e) {
+    const { id } = e.currentTarget.dataset;
+    wx.navigateTo({
+      url: `/pages/template-detail/template-detail?id=${id}`
+    });
+  },
+
+  /**
+   * 创作模板
+   */
+  onCreateTemplate() {
+    wx.navigateTo({
+      url: '/pages/create-template/create-template'
+    });
   }
 });

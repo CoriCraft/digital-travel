@@ -1,6 +1,4 @@
 <view class="container">
-  <view class="bg-layer"></view>
-
   <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
     <view class="nav-content">
       <view class="nav-left">

@@ -2,12 +2,42 @@
 node_modules/
 miniprogram_npm/
 
-# project.config.json
+# 微信小程序配置
 project.config.json
 project.private.config.json
 log/
+
+# 项目文档（已移至根目录）
 .claude
-CLAUDE.md
 rules
 PROJECT_GOALS.md
 cloudfunctions/
+
+# AI编辑器配置（保留.mcp.json, .github/, .vscode/）
+.clinerules/
+.codebuddy/
+.codex/
+.comate/
+.cursor/
+.gemini/
+.kiro/
+.qwen/
+.roo/
+.rules/
+.aider/
+.windsurf/
+.trae/
+.qoder/
+.antigravity/
+.augment/
+.copilot/
+
+# 构建产物
+build/
+coverage/
+dist/
+*.log
+nul
+
+# CloudBase配置（包含环境ID）
+cloudbaserc.json

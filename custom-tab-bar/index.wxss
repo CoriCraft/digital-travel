@@ -36,6 +36,6 @@
 /* ✅ 只作用在「文字 + 选中态」 */
 .tab-text.is-active {
   font-size: 24rpx;
-  color: #07c160;
+  color: #82F45F;
   font-weight: 500;
 }

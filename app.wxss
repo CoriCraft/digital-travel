@@ -7,7 +7,58 @@
   unicode-range: U+0000-FFFF;
 }
 
+/* ==================== 主题配色变量 ==================== */
+page {
+  --primary-green: #82F45F;
+  --primary-cyan: #8FF1EC;
+  --bg-gray: #F4F4F4;
+  --text-dark: #333333;
+  --text-gray: #666666;
+  --text-light: #999999;
+  --border-color: #EEEEEE;
+  --white: #FFFFFF;
+}
+
+/* ==================== 全局背景样式 ==================== */
+page {
+  background-color: var(--bg-gray);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 背景光晕效果 - 使用伪元素实现 */
+page::before {
+  content: '';
+  position: fixed;
+  top: -200rpx;
+  left: 0;
+  right: 0;
+  height: 800rpx;
+  background:
+    radial-gradient(circle at 70% -10%, rgba(143, 241, 236, 0.7) 0%, transparent 50%),
+    radial-gradient(circle at -15% 20%, rgba(143, 241, 236, 0.7) 0%, transparent 50%),
+    radial-gradient(circle at 110% 60%, rgba(143, 241, 236, 0.4) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 顶部绿色渐变 */
+page::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 800rpx;
+  background: linear-gradient(180deg, rgba(130, 244, 95, 0.3) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 确保页面内容在背景之上 */
 .container {
+  position: relative;
+  z-index: 1;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -15,4 +66,26 @@
   justify-content: space-between;
   padding: 200rpx 0;
   box-sizing: border-box;
-} 
+}
+
+/* ==================== 通用工具类 ==================== */
+.bg-primary {
+  background-color: var(--primary-green) !important;
+}
+
+.bg-cyan {
+  background-color: var(--primary-cyan) !important;
+}
+
+.text-primary {
+  color: var(--primary-green) !important;
+}
+
+.text-cyan {
+  color: var(--primary-cyan) !important;
+}
+
+.border-primary {
+  border-color: var(--primary-green) !important;
+}
+

@@ -1,0 +1,106 @@
+<!-- pages/upload-photoset/upload-photoset.wxml -->
+<view class="container">
+  <!-- 自定义导航栏 -->
+  <view class="custom-nav" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <t-icon name="close" size="48rpx" />
+      </view>
+      <text class="nav-title">上传照片集</text>
+      <view class="nav-right"></view>
+    </view>
+  </view>
+
+  <!-- 页面内容 -->
+  <view class="page-content">
+    <!-- 模板信息提示 -->
+    <view class="template-info" wx:if="{{template}}">
+      <view class="info-icon">
+        <t-icon name="info-circle" size="32rpx" color="#667eea" />
+      </view>
+      <text class="info-text">上传到: {{template.name}}</text>
+    </view>
+
+    <!-- 表单区域 -->
+    <view class="form-section">
+      <!-- 标题输入 -->
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">标题</text>
+          <text class="required">*</text>
+        </view>
+        <input
+          class="form-input"
+          placeholder="请输入照片集标题"
+          value="{{title}}"
+          bindinput="onTitleInput"
+          maxlength="50"
+        />
+        <view class="input-counter">{{title.length}}/50</view>
+      </view>
+
+      <!-- 描述输入 -->
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">描述</text>
+          <text class="required">*</text>
+        </view>
+        <textarea
+          class="form-textarea"
+          placeholder="请输入照片集描述"
+          value="{{description}}"
+          bindinput="onDescriptionInput"
+          maxlength="200"
+        />
+        <view class="input-counter">{{description.length}}/200</view>
+      </view>
+
+      <!-- 照片选择 -->
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">照片</text>
+          <text class="required">*</text>
+          <text class="label-tip">(最多9张)</text>
+        </view>
+        <view class="photo-grid">
+          <!-- 已选择的照片 -->
+          <view class="photo-item" wx:for="{{photos}}" wx:key="index">
+            <image class="photo-preview" src="{{item}}" mode="aspectFill" bindtap="onPreviewPhoto" data-index="{{index}}" />
+            <view class="photo-delete" bindtap="onDeletePhoto" data-index="{{index}}">
+              <t-icon name="close" size="32rpx" color="#fff" />
+            </view>
+          </view>
+
+          <!-- 添加照片按钮 -->
+          <view class="photo-add" wx:if="{{photos.length < 9}}" bindtap="onChoosePhotos">
+            <t-icon name="add" size="64rpx" color="#ccc" />
+            <text class="add-text">添加照片</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 提示信息 -->
+      <view class="upload-tips">
+        <view class="tip-item">
+          <t-icon name="check-circle" size="28rpx" color="#52c41a" />
+          <text class="tip-text">照片将进入审核,审核通过后展示</text>
+        </view>
+        <view class="tip-item">
+          <t-icon name="check-circle" size="28rpx" color="#52c41a" />
+          <text class="tip-text">请上传清晰、美观的照片</text>
+        </view>
+        <view class="tip-item">
+          <t-icon name="check-circle" size="28rpx" color="#52c41a" />
+          <text class="tip-text">请勿上传违规、侵权内容</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部提交按钮 -->
+  <view class="submit-bar">
+    <button class="submit-btn" bindtap="onSubmit" disabled="{{uploading}}">
+      {{uploading ? '上传中...' : '提交审核'}}
+    </button>
+  </view>
+</view>

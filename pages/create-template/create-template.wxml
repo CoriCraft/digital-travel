@@ -1,0 +1,133 @@
+<view class="container">
+  <!-- 自定义导航栏 -->
+  <view class="custom-nav" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <t-icon name="chevron-left" size="48rpx" />
+        <text class="nav-title">创作模板</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 页面内容 -->
+  <view class="page-content">
+    <view class="form-container">
+      <!-- 模板名称 -->
+      <view class="form-item">
+        <view class="form-label">
+          <text class="required">*</text>
+          <text>模板名称</text>
+        </view>
+        <t-input
+          placeholder="请输入模板名称"
+          value="{{name}}"
+          bind:change="onNameInput"
+          maxlength="30"
+        />
+      </view>
+
+      <!-- 模板描述 -->
+      <view class="form-item">
+        <view class="form-label">
+          <text class="required">*</text>
+          <text>模板描述</text>
+        </view>
+        <t-textarea
+          placeholder="请输入模板描述"
+          value="{{description}}"
+          bind:change="onDescInput"
+          maxlength="200"
+          indicator
+        />
+      </view>
+
+      <!-- 分类选择 -->
+      <view class="form-item">
+        <view class="form-label">
+          <text class="required">*</text>
+          <text>模板分类</text>
+        </view>
+        <t-radio-group value="{{category}}" bindchange="onCategoryChange">
+          <t-radio
+            wx:for="{{categoryList}}"
+            wx:key="value"
+            value="{{item.value}}"
+            label="{{item.label}}"
+            block
+          />
+        </t-radio-group>
+      </view>
+
+      <!-- 标签 -->
+      <view class="form-item">
+        <view class="form-label">
+          <text class="required">*</text>
+          <text>标签（最多5个）</text>
+        </view>
+        <view class="tag-input-wrapper">
+          <t-input
+            placeholder="输入标签后点击添加"
+            value="{{tagInput}}"
+            bind:change="onTagInput"
+            maxlength="10"
+          >
+            <view slot="suffix" class="add-tag-btn" bindtap="onAddTag">
+              添加
+            </view>
+          </t-input>
+        </view>
+        <view class="tag-list" wx:if="{{tags.length > 0}}">
+          <view
+            class="tag-item"
+            wx:for="{{tags}}"
+            wx:key="index"
+            data-index="{{index}}"
+            bindtap="onDeleteTag"
+          >
+            <text>{{item}}</text>
+            <t-icon name="close" size="28rpx" />
+          </view>
+        </view>
+      </view>
+
+      <!-- 封面图片 -->
+      <view class="form-item">
+        <view class="form-label">
+          <text class="required">*</text>
+          <text>封面图片</text>
+        </view>
+        <view class="cover-upload">
+          <view class="cover-preview" wx:if="{{coverImageUrl}}">
+            <image class="cover-image" src="{{coverImageUrl}}" mode="aspectFill" />
+            <view class="cover-delete" bindtap="onDeleteCover">
+              <t-icon name="close" size="40rpx" color="#fff" />
+            </view>
+          </view>
+          <view class="cover-upload-btn" wx:else bindtap="onChooseCover">
+            <t-icon name="add" size="80rpx" color="#999" />
+            <text class="upload-hint">点击上传封面</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 提交按钮 -->
+      <view class="submit-section">
+        <t-button
+          theme="primary"
+          size="large"
+          bindtap="onSubmit"
+          disabled="{{submitting}}"
+          loading="{{submitting}}"
+        >
+          {{submitting ? '创建中...' : '创建模板'}}
+        </t-button>
+      </view>
+
+      <!-- 提示信息 -->
+      <view class="form-tips">
+        <t-icon name="info-circle" size="28rpx" color="#ff6b35" />
+        <text class="tips-text">创建的模板需要审核通过后才会显示</text>
+      </view>
+    </view>
+  </view>
+</view>

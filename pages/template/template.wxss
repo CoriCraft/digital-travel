@@ -5,7 +5,7 @@
   left: 0;
   right: 0;
   height: calc(var(--status-bar-height) + var(--nav-bar-height));
-  background-color: #d4f4dd;
+  background-color: transparent;
   z-index: 999;
 }
 
@@ -72,7 +72,8 @@
 .page-content {
   /* padding-top: calc(var(--status-bar-height) + var(--nav-bar-height)); */
   min-height: 100vh;
-  background-color: #d4f4dd;
+  position: relative;
+  z-index: 1;
 }
 
 /* 横向搜索栏 */
@@ -80,7 +81,7 @@
   display: flex;
   align-items: center;
   padding: 16rpx 24rpx;
-  background: #d4f4dd;
+  background: transparent;
 }
 
 /* 图标容器（控制大小 + 居中） */
@@ -140,7 +141,7 @@
   justify-content: center;
 
   border-radius: 22rpx;
-  background-color: #22c55e;
+  background-color: #82F45F;
   color: #fff;
 
   font-size: 22rpx;
@@ -164,14 +165,14 @@
   align-items: center;
   box-sizing: border-box;
   padding: 0 24rpx;
-  background-color: #d4f4dd;
+  background-color: transparent;
 }
 
 /* 创作画框按钮 */
 .create-canvas-btn {
   margin: 24rpx;
   padding: 32rpx;
-  background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 100%);
+  background: linear-gradient(135deg, rgba(143, 241, 236, 0.3) 0%, rgba(130, 244, 95, 0.3) 100%);
   border-radius: 24rpx;
   display: flex;
   flex-direction: column;
@@ -203,7 +204,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 24rpx;
-  background-color: #d4f4dd;
+  background-color: transparent;
 }
 
 .category-left {
@@ -232,7 +233,7 @@
 /* 模板列表 */
 .template-list {
   padding: 0 24rpx 24rpx;
-  background-color: #d4f4dd;
+  background-color: transparent;
 }
 
 /* 热门标签 */
@@ -242,7 +243,7 @@
   align-items: center;
   gap: 8rpx;
   padding: 8rpx 24rpx 8rpx 16rpx;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, #82F45F 0%, #6FD84A 100%);
   border-radius: 0 16rpx 16rpx 0;
   margin-bottom: 16rpx;
   margin-left: -24rpx;
@@ -283,7 +284,7 @@
   top: 16rpx;
   right: 16rpx;
   padding: 8rpx 16rpx;
-  background-color: #22c55e;
+  background-color: #82F45F;
   color: #fff;
   font-size: 24rpx;
   font-weight: 600;
