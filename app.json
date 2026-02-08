@@ -39,11 +39,8 @@
     "pages/purchase/purchase",
     "pages/album/album",
     "pages/my/my",
-<<<<<<< HEAD
-    "pages/debug/debug"
-=======
+    "pages/debug/debug",
     "pages/good-info/good-info"
->>>>>>> 20172aa267dab8bfede42d05b53fb6f3143ba5fd
   ],
   "window": {
     "navigationStyle": "custom",
