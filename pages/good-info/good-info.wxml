@@ -1,0 +1,62 @@
+<!--pages/good-info/good-info.wxml-->
+<view class="page-container">
+  <!-- 背景 -->
+  <view class="top-bg-layer"></view>
+
+  <!-- 顶部导航栏 -->
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <t-icon name="arrow-left" size="48rpx" color="#333" />
+      </view>
+      <view class="nav-title">商品详情</view>
+      <view class="nav-right-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- 页面主体 -->
+  <scroll-view class="page-scroll" scroll-y enable-flex style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+
+    <!-- 商品主图 -->
+    <view class="product-hero">
+      <image class="hero-img" src="/static/pages/purchase/rec1.png" mode="aspectFill" />
+    </view>
+
+    <!-- 商品信息 -->
+    <view class="product-info">
+      <view class="product-title">
+        【方山小米】农家自种自采，原生态，色泽金黄口感香糯
+      </view>
+
+      <view class="product-tags">
+        <text class="tag red">官方立减12%</text>
+        <text class="tag green">山区公益营养</text>
+      </view>
+    </view>
+
+    <!-- 商品详情 -->
+    <view class="product-detail">
+      <!-- 详情标题 -->
+      <view class="detail-header">
+        <view class="detail-bar"></view>
+        <text class="detail-text">详情</text>
+      </view>
+      <!-- 详情图片 -->
+      <image class="detail-img" src="/static/pages/purchase/rec2.png" mode="widthFix" />
+      <image class="detail-img" src="/static/pages/purchase/rec3.png" mode="widthFix" />
+    </view>
+
+  </scroll-view>
+
+  <!-- 底部购买栏 -->
+  <view class="bottom-bar">
+    <view class="fav-btn">
+      <t-icon name="heart" size="40rpx" />
+    </view>
+
+    <view class="buy-btn">
+      跳转购买
+    </view>
+  </view>
+
+</view>

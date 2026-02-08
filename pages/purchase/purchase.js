@@ -149,6 +149,15 @@ Page({
     })
   },
 
+  onGoodsTap(e) {
+    const item = e.currentTarget.dataset.item
+    console.log('点击商品：', item)
+
+    wx.navigateTo({
+      url: `/pages/good-info/good-info?id=${item.id}`
+    })
+  },
+
   mockGoodsList() {
     const base = {
       name: '云南高山咖啡豆',

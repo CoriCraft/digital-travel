@@ -13,7 +13,8 @@ rules
 PROJECT_GOALS.md
 cloudfunctions/
 
-# AI编辑器配置（保留.mcp.json, .github/, .vscode/）
+# AI编辑器配置（保留 .github/, .vscode/）
+.mcp.json
 .clinerules/
 .codebuddy/
 .codex/

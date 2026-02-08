@@ -55,7 +55,7 @@
     <view class="waterfall-container">
       <view class="column">
         <block wx:for="{{leftList}}" wx:key="id">
-          <view class="goods-card">
+          <view class="goods-card" bindtap="onGoodsTap" data-item="{{item}}">
             <view class="card-img-box">
               <image src="{{item.img}}" mode="widthFix" class="goods-img" />
               <view class="ai-badge" wx:if="{{index === 0}}">AI定制</view>
@@ -82,7 +82,7 @@
 
       <view class="column">
         <block wx:for="{{rightList}}" wx:key="id">
-          <view class="goods-card">
+          <view class="goods-card" bindtap="onGoodsTap" data-item="{{item}}">
             <view class="card-img-box">
               <image src="{{item.img}}" mode="widthFix" class="goods-img" />
             </view>
