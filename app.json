@@ -34,7 +34,8 @@
     "pages/experience/experience",
     "pages/purchase/purchase",
     "pages/album/album",
-    "pages/my/my"
+    "pages/my/my",
+    "pages/good-info/good-info"
   ],
   "window": {
     "navigationStyle": "custom",

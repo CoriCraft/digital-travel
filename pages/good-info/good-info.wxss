@@ -1,0 +1,174 @@
+/* pages/good-info/good-info.wxss */
+.page-container {
+  min-height: 100vh;
+  background-color: #F7F8FA;
+  position: relative;
+}
+
+.top-bg-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 500rpx;
+  background: linear-gradient(180deg, #DFF7E2 0%, #F0F9F4 60%, #F7F8FA 100%);
+  z-index: 0;
+}
+
+/* --- 导航栏 --- */
+.custom-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background: transparent; 
+}
+
+.nav-content {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24rpx;
+}
+
+.nav-left {
+  width: 60rpx;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.nav-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.nav-right-placeholder {
+  width: 60rpx;
+}
+
+/* 页面滚动区 */
+.page-scroll {
+  padding-bottom: 140rpx; /* 给底部按钮留空间 */
+}
+
+/* 商品主图 */
+.product-hero {
+  margin: 0 24rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.hero-img {
+  width: 100%;
+  height: 480rpx;
+  background-color: #eee;
+}
+
+/* 商品信息 */
+.product-info {
+  margin: 24rpx;
+}
+
+.product-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #222;
+  line-height: 1.5;
+}
+
+.product-tags {
+  margin-top: 16rpx;
+  display: flex;
+  gap: 16rpx;
+}
+
+.tag {
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+}
+
+.tag.red {
+  background: #ffecec;
+  color: #ff4d4f;
+}
+
+.tag.green {
+  background: #e8f7ec;
+  color: #2bae66;
+}
+
+/* 详情标题 */
+.detail-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.detail-bar {
+  width: 6rpx;
+  height: 28rpx;
+  background-color: #7bc96f; /* 绿色竖线 */
+  border-radius: 3rpx;
+  margin-right: 12rpx;
+}
+
+.detail-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 详情图片区 */
+.product-detail {
+  margin: 24rpx;
+}
+
+.detail-img {
+  width: 100%;
+  margin-bottom: 20rpx;
+  border-radius: 12rpx;
+}
+
+/* 底部购买栏 */
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 120rpx;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 24rpx;
+  box-shadow: 0 -8rpx 24rpx rgba(0, 0, 0, 0.08);
+  z-index: 200;
+}
+
+.fav-btn {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 44rpx;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buy-btn {
+  flex: 1;
+  height: 88rpx;
+  margin-left: 24rpx;
+  background: linear-gradient(135deg, #8fd14f, #6bbf3e);
+  border-radius: 44rpx;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
