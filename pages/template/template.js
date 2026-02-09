@@ -56,6 +56,8 @@ Page({
         value: "template",
       });
     }
+    // 不需要重新加载整个列表，只需要更新可能变化的数据
+    // 收藏量、点赞量、观看量等会在详情页更新，返回时自动同步
   },
 
   /**
@@ -95,19 +97,44 @@ Page({
   onShareAppMessage() {},
 
   onLocationTap() {
-    // 点击位置时重新获取定位
-    this.getCurrentLocation();
+    // 点击位置时手动选择位置
+    this.chooseLocation();
   },
 
   /**
-   * 获取当前位置 - 用户手动选择
+   * 获取当前位置 - 从缓存读取或提示用户选择
    */
   getCurrentLocation() {
+    // 检查缓存
+    const cacheKey = 'user_location_cache';
+    const cachedData = wx.getStorageSync(cacheKey);
+    const now = Date.now();
+    const cacheExpire = 7 * 24 * 60 * 60 * 1000; // 缓存7天
+
+    // 如果有缓存且未过期，使用缓存数据
+    if (cachedData && cachedData.timestamp && (now - cachedData.timestamp < cacheExpire)) {
+      console.log('使用缓存的定位数据');
+      this.setData({
+        location: cachedData.displayText,
+        currentLocation: cachedData.location
+      });
+      return;
+    }
+
+    // 缓存过期或不存在，显示默认文本，等待用户点击选择
+    console.log('无缓存定位数据，等待用户选择');
+    this.setData({
+      location: '选择位置'
+    });
+  },
+
+  /**
+   * 手动选择位置
+   */
+  chooseLocation() {
     wx.chooseLocation({
       success: (res) => {
         console.log('用户选择的位置:', res);
-        console.log('地址字符串:', res.address);
-
         const address = res.address || '';
         const name = res.name || '';
 
@@ -117,11 +144,9 @@ Page({
         let displayText = name || address;
 
         if (address) {
-          // 优先匹配更精确的模式
           let match = null;
 
-          // 1. 匹配: 地区+市 (如"喀什地区喀什市")
-          // 使用非贪婪匹配,并且排除"省|自治区"等字符
+          // 1. 匹配: 地区+市
           match = address.match(/([^省自治区]{2,}?)地区([^地区市县区]{2,}?)市/);
           if (match) {
             city = match[1];
@@ -169,26 +194,31 @@ Page({
           }
         }
 
-        console.log('提取结果 - city:', city, 'county:', county, 'displayText:', displayText);
+        const locationData = {
+          name: res.name,
+          address: res.address,
+          city: city,
+          county: county,
+          latitude: res.latitude,
+          longitude: res.longitude
+        };
+
+        // 更新缓存
+        const cacheKey = 'user_location_cache';
+        wx.setStorageSync(cacheKey, {
+          displayText: displayText,
+          location: locationData,
+          timestamp: Date.now()
+        });
 
         this.setData({
           location: displayText,
-          currentLocation: {
-            name: res.name,
-            address: res.address,
-            city: city,
-            county: county,
-            latitude: res.latitude,
-            longitude: res.longitude
-          }
+          currentLocation: locationData
         });
       },
       fail: (err) => {
         console.error('选择位置失败:', err);
-
-        if (err.errMsg && err.errMsg.indexOf('cancel') !== -1) {
-          console.log('用户取消选择位置');
-        } else {
+        if (err.errMsg && err.errMsg.indexOf('cancel') === -1) {
           wx.showToast({
             title: '获取位置失败',
             icon: 'none'
@@ -384,6 +414,22 @@ Page({
     wx.navigateTo({
       url: `/pages/template-detail/template-detail?id=${id}`
     });
+  },
+
+  /**
+   * 更新列表中的单个模板数据（从详情页返回时调用）
+   */
+  updateTemplateItem(templateId, updates) {
+    const templates = this.data.templates;
+    const index = templates.findIndex(item => item._id === templateId);
+    if (index !== -1) {
+      // 只更新变化的字段
+      Object.assign(templates[index], updates);
+      this.setData({
+        [`templates[${index}]`]: templates[index]
+      });
+      console.log('已更新模板数据:', templateId, updates);
+    }
   },
 
   /**

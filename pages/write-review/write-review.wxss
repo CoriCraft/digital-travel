@@ -1,0 +1,127 @@
+/* pages/write-review/write-review.wxss */
+
+.page-container {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+/* 自定义导航栏 */
+.custom-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: #fff;
+  padding-top: var(--status-bar-height);
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+
+.nav-content {
+  height: var(--nav-bar-height);
+  display: flex;
+  align-items: center;
+  padding: 0 32rpx;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  color: #1a1a1a;
+}
+
+.nav-title {
+  margin-left: 16rpx;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+/* 页面内容 */
+.page-content {
+  padding-top: calc(var(--status-bar-height) + var(--nav-bar-height) + 32rpx);
+  padding-bottom: 32rpx;
+}
+
+/* 地点信息 */
+.location-info {
+  background: #fff;
+  padding: 32rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.location-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #333;
+}
+
+/* 评分区域 */
+.rating-section {
+  background: #fff;
+  padding: 32rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.section-label {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 16rpx;
+}
+
+.star {
+  font-size: 64rpx;
+  color: #ddd;
+  transition: color 0.2s;
+}
+
+.star.active {
+  color: #FFD700;
+}
+
+/* 评价内容 */
+.content-section {
+  background: #fff;
+  padding: 32rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.content-input {
+  width: 100%;
+  min-height: 300rpx;
+  padding: 20rpx;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+  box-sizing: border-box;
+  margin-top: 20rpx;
+}
+
+.char-count {
+  display: block;
+  text-align: right;
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 12rpx;
+}
+
+/* 提交按钮 */
+.submit-btn {
+  margin: 32rpx 24rpx;
+  padding: 28rpx;
+  background: linear-gradient(90deg, rgba(143, 241, 236, 0.8) 0%, rgba(130, 244, 95, 0.8) 100%);
+  border-radius: 16rpx;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2e4422;
+  box-shadow: 0 4rpx 12rpx rgba(130, 244, 95, 0.3);
+}

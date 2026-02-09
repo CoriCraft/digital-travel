@@ -96,6 +96,8 @@
   padding: 0 24rpx;
   gap: 20rpx;
   margin-bottom: 30rpx;
+  min-height: 500rpx; /* 确保有足够高度 */
+  overflow: hidden; /* 防止子元素溢出 */
 }
 
 .grid-col {
@@ -103,6 +105,13 @@
   display: flex;
   flex-direction: column;
   gap: 20rpx;
+  min-width: 0; /* 关键：允许flex子元素收缩 */
+  max-width: 50%; /* 限制最大宽度 */
+}
+
+.right-col {
+  /* 调试：添加背景色看看是否存在 */
+  /* background: rgba(255, 0, 0, 0.1); */
 }
 
 .bento-card {
@@ -155,6 +164,7 @@
   flex: 1;
   display: flex;
   gap: 12rpx;
+  min-height: 0; /* 防止flex子元素溢出 */
 }
 
 .img-placeholder {
@@ -162,6 +172,14 @@
   border-radius: 12rpx;
   width: 50%;
   height: 100%;
+  overflow: hidden;
+  flex-shrink: 0; /* 防止收缩 */
+}
+
+.img-placeholder image {
+  width: 100%;
+  height: 100%;
+  display: block; /* 防止图片底部空隙 */
 }
 
 /* 左侧：景点游玩 (180rpx) -> 左列总高 500rpx */
@@ -192,6 +210,7 @@
   display: flex;
   gap: 12rpx;
   height: 80rpx;
+  min-height: 0;
 }
 
 .img-mini {
@@ -199,6 +218,14 @@
   background: rgba(255,255,255,0.6);
   border-radius: 8rpx;
   height: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.img-mini image {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* 右侧：酒店民宿 (320rpx) */
@@ -218,7 +245,8 @@
   margin-top: 16rpx;
   display: flex;
   gap: 12rpx;
-  height: 100%; 
+  height: 100%;
+  min-height: 0;
 }
 
 .img-tall {
@@ -226,6 +254,14 @@
   background: rgba(255,255,255,0.6);
   border-radius: 12rpx;
   height: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.img-tall image {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* 右侧：特色农家菜 (160rpx) -> 右列总高 500rpx */
@@ -248,12 +284,21 @@
   flex: 1;
   display: flex;
   gap: 12rpx;
+  min-height: 0;
 }
 
 .img-food {
   flex: 1;
   background: #f0f0f0;
   border-radius: 12rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.img-food image {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* --- Tab 栏 --- */
@@ -308,11 +353,26 @@
   height: 320rpx;
   background: #eee;
   border-radius: 24rpx 24rpx 0 0;
+  overflow: hidden;
+}
+
+.feed-img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 加载状态 */
+.loading-more,
+.no-more,
+.empty-tip {
+  text-align: center;
+  padding: 40rpx 0;
+  font-size: 28rpx;
+  color: #999;
 }
 
 .feed-info {
   padding: 24rpx;
-  position: relative; /* 关键：相对定位基准 */
 }
 
 .info-top {
@@ -376,27 +436,27 @@
   box-shadow: 0 4rpx 12rpx rgba(46, 68, 34, 0.08);
 }
 
-/* 关键：悬浮帮助按钮 (复现设计图) */
+/* 关键：悬浮帮助按钮 (全局固定定位) */
 .float-help-bubble {
-  position: absolute; /* 绝对定位 */
-  right: 24rpx;       /* 距离右侧边距 */
-  bottom: 130rpx;     /* 距离底部的高度 (位于导航按钮上方) */
-  
-  width: 96rpx;       /* 尺寸稍微加大一点以匹配设计图的通透感 */
+  position: fixed; /* 固定定位 */
+  right: 24rpx;    /* 距离右侧边距 */
+  bottom: 120rpx;  /* 距离底部的高度 (避开tabbar) */
+
+  width: 96rpx;
   height: 96rpx;
   background: #ffffff;
-  
+
   /* 超椭圆/大圆角设计 */
-  border-radius: 36rpx; 
-  
+  border-radius: 36rpx;
+
   /* 弥散阴影：颜色淡，扩散半径大 */
   box-shadow: 0 8rpx 24rpx rgba(142, 217, 77, 0.25);
-  
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 999; /* 确保在最上层 */
 }
 
 /* 新增代码：控制 SVG 图标的大小 */

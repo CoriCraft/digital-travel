@@ -20,24 +20,20 @@
   height: var(--nav-bar-height);
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 0 32rpx;
 }
 
 .nav-left {
   display: flex;
   align-items: center;
-  color: #fff;
+  color: #1a1a1a;
 }
 
 .nav-title {
   margin-left: 16rpx;
   font-size: 36rpx;
   font-weight: 600;
-}
-
-.nav-right {
-  color: #fff;
+  color: #1a1a1a;
 }
 
 /* 页面内容 */
@@ -130,7 +126,39 @@
   font-weight: 600;
 }
 
-/* 浮动操作按钮 */
+/* 收藏按钮 - 悬浮 */
+.favorite-fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 400rpx;
+  width: 112rpx;
+  height: 112rpx;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
+  z-index: 99;
+}
+
+/* 点赞按钮 - 悬浮 */
+.like-fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 260rpx;
+  width: 112rpx;
+  height: 112rpx;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
+  z-index: 99;
+}
+
+/* 上传按钮 */
 .upload-fab {
   position: fixed;
   right: 40rpx;

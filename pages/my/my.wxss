@@ -91,17 +91,46 @@ page {
   margin-bottom: 20rpx;
 }
 
+.avatar-btn {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  line-height: 1;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.avatar-btn::after {
+  border: none;
+}
+
 .avatar {
   width: 100rpx;
   height: 100rpx;
   border-radius: 50%;
   background: #f0f0f0;
-  margin-right: 24rpx;
-  flex-shrink: 0; /* 防止头像被压缩 */
+  display: block;
 }
 
 .user-meta { display: flex; flex-direction: column; }
-.nickname { font-size: 34rpx; font-weight: bold; color: #333; margin-bottom: 4rpx; }
+
+.nickname-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 4rpx;
+}
+
+.nickname { font-size: 34rpx; font-weight: bold; color: #333; }
+
+.icon-edit {
+  width: 28rpx;
+  height: 28rpx;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999999'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
 .user-id { font-size: 24rpx; color: #999; }
 
 .card-divider {

@@ -10,8 +10,10 @@ Page({
     photoSet: null,
     currentIndex: 0,
     isLiked: false,
+    isFavorite: false,
     statusBarHeight: 0,
     navBarHeight: 0,
+    menuButtonRight: 0, // 胶囊按钮右侧距离
     formattedTime: '',
     defaultAvatar: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="50" fill="%23E8F5E9"/%3E%3Cpath d="M50 45c8.284 0 15-6.716 15-15s-6.716-15-15-15-15 6.716-15 15 6.716 15 15 15zm0 5c-13.807 0-25 11.193-25 25v10h50V75c0-13.807-11.193-25-25-25z" fill="%233ECE79"/%3E%3C/svg%3E'
   },
@@ -24,11 +26,13 @@ Page({
     this.setData({
       photoSetId: id,
       statusBarHeight: app.globalData.statusBarHeight,
-      navBarHeight: app.globalData.navBarHeight
+      navBarHeight: app.globalData.navBarHeight,
+      menuButtonRight: app.globalData.menuButtonRight
     });
 
     this.loadPhotoSetDetail();
     this.checkLikeStatus();
+    this.checkFavoriteStatus();
     this.updateViewCount();
   },
 
@@ -36,15 +40,39 @@ Page({
    * 加载照片集详情
    */
   loadPhotoSetDetail() {
+    const { photoSetId } = this.data;
+    const cacheKey = `photoset_cache_${photoSetId}`;
+    const cachedData = wx.getStorageSync(cacheKey);
+    const now = Date.now();
+    const cacheExpire = 5 * 60 * 1000; // 缓存5分钟
+
+    // 如果有缓存且未过期，使用缓存数据
+    if (cachedData && cachedData.timestamp && (now - cachedData.timestamp < cacheExpire)) {
+      console.log('使用缓存的照片集数据');
+      this.setData({
+        photoSet: cachedData.data,
+        formattedTime: this.formatTime(cachedData.data.createTime)
+      });
+      return;
+    }
+
+    // 缓存过期或不存在，从数据库加载
+    console.log('从数据库加载照片集数据');
     const db = wx.cloud.database();
     db.collection('photoSets')
-      .doc(this.data.photoSetId)
+      .doc(photoSetId)
       .get()
       .then(res => {
         console.log('照片集详情:', res.data);
         this.setData({
           photoSet: res.data,
           formattedTime: this.formatTime(res.data.createTime)
+        });
+
+        // 保存到缓存
+        wx.setStorageSync(cacheKey, {
+          data: res.data,
+          timestamp: now
         });
       })
       .catch(err => {
@@ -110,26 +138,135 @@ Page({
    * 更新浏览次数
    */
   updateViewCount() {
-    wx.cloud.callFunction({
-      name: 'updateViewCount',
-      data: {
-        photoSetId: this.data.photoSetId
-      }
-    })
-      .then(res => {
-        if (res.result.success) {
+    const { photoSetId } = this.data;
+    const storageKey = `photoset_view_${photoSetId}`;
+    const lastViewTime = wx.getStorageSync(storageKey) || 0;
+    const now = Date.now();
+    const oneHour = 60 * 60 * 1000; // 1小时
+
+    // 如果距离上次观看超过1小时，才增加观看量
+    if (now - lastViewTime > oneHour) {
+      const db = wx.cloud.database();
+      const _ = db.command;
+
+      db.collection('photoSets')
+        .doc(photoSetId)
+        .update({
+          data: {
+            viewCount: _.inc(1)
+          }
+        })
+        .then(() => {
           console.log('浏览次数+1');
-        }
+          // 记录本次观看时间
+          wx.setStorageSync(storageKey, now);
+        })
+        .catch(err => {
+          console.error('更新浏览次数失败:', err);
+        });
+    } else {
+      console.log('1小时内已浏览过，不重复计数');
+    }
+  },
+
+  /**
+   * 检查收藏状态
+   */
+  checkFavoriteStatus() {
+    const favoritePhotoSets = wx.getStorageSync('favoritePhotoSets') || []
+    const isFavorite = favoritePhotoSets.includes(this.data.photoSetId)
+    this.setData({ isFavorite })
+  },
+
+  /**
+   * 切换收藏状态
+   */
+  onToggleFavorite() {
+    const { isFavorite, photoSetId, photoSet } = this.data
+    let favoritePhotoSets = wx.getStorageSync('favoritePhotoSets') || []
+
+    const db = wx.cloud.database()
+    const _ = db.command
+
+    if (isFavorite) {
+      // 取消收藏
+      favoritePhotoSets = favoritePhotoSets.filter(id => id !== photoSetId)
+      // 数据库收藏量 -1，但不能小于 0
+      const currentCount = photoSet.favoriteCount || 0
+      if (currentCount > 0) {
+        db.collection('photoSets')
+          .doc(photoSetId)
+          .update({
+            data: { favoriteCount: _.inc(-1) }
+          })
+          .then(() => {
+            console.log('收藏量-1')
+            // 重新加载照片集详情以更新收藏量显示
+            this.loadPhotoSetDetail()
+          })
+          .catch(err => {
+            console.error('更新收藏量失败:', err)
+          })
+      } else {
+        // 如果已经是 0，直接设置为 0
+        db.collection('photoSets')
+          .doc(photoSetId)
+          .update({
+            data: { favoriteCount: 0 }
+          })
+          .then(() => {
+            console.log('收藏量设置为0')
+            this.loadPhotoSetDetail()
+          })
+      }
+      wx.showToast({
+        title: '已取消收藏',
+        icon: 'success'
       })
-      .catch(err => {
-        console.error('调用云函数失败:', err);
-      });
+    } else {
+      // 添加收藏
+      favoritePhotoSets.push(photoSetId)
+      // 数据库收藏量 +1
+      db.collection('photoSets')
+        .doc(photoSetId)
+        .update({
+          data: { favoriteCount: _.inc(1) }
+        })
+        .then(() => {
+          console.log('收藏量+1')
+          // 重新加载照片集详情以更新收藏量显示
+          this.loadPhotoSetDetail()
+        })
+        .catch(err => {
+          console.error('更新收藏量失败:', err)
+        })
+      wx.showToast({
+        title: '收藏成功',
+        icon: 'success'
+      })
+    }
+
+    wx.setStorageSync('favoritePhotoSets', favoritePhotoSets)
+    this.setData({ isFavorite: !isFavorite })
   },
 
   /**
    * 返回上一页
    */
   onBack() {
+    // 返回时传递更新后的数据
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+      const prevPage = pages[pages.length - 2];
+      if (prevPage.route === 'pages/template-detail/template-detail') {
+        // 更新模板详情页中对应的照片集数据
+        prevPage.updatePhotoSetItem(this.data.photoSetId, {
+          favoriteCount: this.data.photoSet.favoriteCount,
+          likeCount: this.data.photoSet.likeCount,
+          viewCount: this.data.photoSet.viewCount
+        });
+      }
+    }
     wx.navigateBack();
   },
 
@@ -147,38 +284,35 @@ Page({
    */
   onToggleLike() {
     const { isLiked, photoSetId } = this.data;
+    const db = wx.cloud.database();
+    const _ = db.command;
 
-    wx.cloud.callFunction({
-      name: 'updateViewCount',
-      data: {
-        photoSetId: photoSetId,
-        action: 'like',
-        increment: isLiked ? -1 : 1
-      }
-    })
-      .then(res => {
-        if (res.result.success) {
-          let likedPhotoSets = wx.getStorageSync('likedPhotoSets') || [];
-          if (isLiked) {
-            likedPhotoSets = likedPhotoSets.filter(id => id !== photoSetId);
-          } else {
-            likedPhotoSets.push(photoSetId);
-          }
-          wx.setStorageSync('likedPhotoSets', likedPhotoSets);
-
-          this.setData({
-            isLiked: !isLiked,
-            'photoSet.likeCount': (this.data.photoSet.likeCount || 0) + (isLiked ? -1 : 1)
-          });
-
-          wx.showToast({
-            title: isLiked ? '已取消点赞' : '点赞成功',
-            icon: 'success',
-            duration: 1500
-          });
-        } else {
-          throw new Error(res.result.message);
+    db.collection('photoSets')
+      .doc(photoSetId)
+      .update({
+        data: {
+          likeCount: _.inc(isLiked ? -1 : 1)
         }
+      })
+      .then(() => {
+        let likedPhotoSets = wx.getStorageSync('likedPhotoSets') || [];
+        if (isLiked) {
+          likedPhotoSets = likedPhotoSets.filter(id => id !== photoSetId);
+        } else {
+          likedPhotoSets.push(photoSetId);
+        }
+        wx.setStorageSync('likedPhotoSets', likedPhotoSets);
+
+        this.setData({
+          isLiked: !isLiked,
+          'photoSet.likeCount': (this.data.photoSet.likeCount || 0) + (isLiked ? -1 : 1)
+        });
+
+        wx.showToast({
+          title: isLiked ? '已取消点赞' : '点赞成功',
+          icon: 'success',
+          duration: 1500
+        });
       })
       .catch(err => {
         console.error('点赞操作失败:', err);

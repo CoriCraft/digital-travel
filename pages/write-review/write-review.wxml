@@ -1,0 +1,40 @@
+<!-- pages/write-review/write-review.wxml -->
+<view class="page-container">
+  <!-- 自定义导航栏 -->
+  <view class="custom-nav" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <t-icon name="chevron-left" size="48rpx" color="#1a1a1a" />
+        <text class="nav-title">写评价</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 页面内容 -->
+  <view class="page-content" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
+    <!-- 地点名称 -->
+    <view class="location-info">
+      <text class="location-name">{{locationName}}</text>
+    </view>
+
+    <!-- 评分 -->
+    <view class="rating-section">
+      <text class="section-label">评分</text>
+      <view class="rating-stars">
+        <text class="star {{index < rating ? 'active' : ''}}" wx:for="{{[1,2,3,4,5]}}" wx:key="index" bindtap="onRatingChange" data-rating="{{index + 1}}">★</text>
+      </view>
+    </view>
+
+    <!-- 评价内容 -->
+    <view class="content-section">
+      <text class="section-label">评价内容</text>
+      <textarea class="content-input" placeholder="分享你的体验吧~" maxlength="500" value="{{content}}" bindinput="onContentInput" />
+      <text class="char-count">{{content.length}}/500</text>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-btn" bindtap="onSubmit">
+      <text>提交评价</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,117 @@
+<view class="container">
+  <!-- 导航栏 -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <view class="icon-back"></view>
+      </view>
+      <text class="nav-title">我的收藏</text>
+      <view class="nav-right-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- 主内容 -->
+  <view class="main-content" style="padding-top: {{statusBarHeight + navBarHeight + 20}}px;">
+
+    <!-- 标签切换 -->
+    <view class="tabs">
+      <view
+        class="tab-item {{currentTab === 0 ? 'active' : ''}}"
+        data-index="{{0}}"
+        bindtap="onTabChange"
+      >
+        <text class="tab-text">模板</text>
+        <view class="tab-badge" wx:if="{{templates.length > 0}}">{{templates.length}}</view>
+      </view>
+      <view
+        class="tab-item {{currentTab === 1 ? 'active' : ''}}"
+        data-index="{{1}}"
+        bindtap="onTabChange"
+      >
+        <text class="tab-text">照片集</text>
+        <view class="tab-badge" wx:if="{{photoSets.length > 0}}">{{photoSets.length}}</view>
+      </view>
+    </view>
+
+    <!-- 收藏的模板 -->
+    <view class="content-section" wx:if="{{currentTab === 0}}">
+      <view wx:if="{{templates.length === 0}}" class="empty">
+        <image class="empty-icon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23CCCCCC'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E"></image>
+        <text class="empty-text">还没有收藏模板</text>
+        <text class="empty-tip">快去收藏你喜欢的模板吧</text>
+      </view>
+
+      <view wx:else class="template-grid">
+        <view
+          wx:for="{{templates}}"
+          wx:key="_id"
+          class="template-card"
+          data-id="{{item._id}}"
+          bindtap="onTemplateTap"
+        >
+          <image class="template-cover" src="{{item.cover}}" mode="aspectFill"></image>
+          <view class="template-info">
+            <text class="template-name">{{item.name}}</text>
+            <view class="template-meta">
+              <view class="meta-item">
+                <text class="meta-icon">📸</text>
+                <text class="meta-text">{{item.photoSetCount || 0}}</text>
+              </view>
+              <view class="meta-item">
+                <text class="meta-icon">❤️</text>
+                <text class="meta-text">{{item.likeCount || 0}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="favorite-btn" catchtap="onUnfavoriteTemplate" data-id="{{item._id}}" data-index="{{index}}">
+            <text class="favorite-icon">❤️</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 收藏的照片集 -->
+    <view class="content-section" wx:if="{{currentTab === 1}}">
+      <view wx:if="{{photoSets.length === 0}}" class="empty">
+        <image class="empty-icon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23CCCCCC'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E"></image>
+        <text class="empty-text">还没有收藏照片集</text>
+        <text class="empty-tip">快去收藏你喜欢的照片集吧</text>
+      </view>
+
+      <view wx:else class="photoset-grid">
+        <view
+          wx:for="{{photoSets}}"
+          wx:key="_id"
+          class="photoset-card"
+          data-id="{{item._id}}"
+          bindtap="onPhotoSetTap"
+        >
+          <image class="photoset-cover" src="{{item.coverPhoto}}" mode="aspectFill"></image>
+          <view class="photoset-overlay">
+            <view class="photo-count">
+              <text class="count-icon">📷</text>
+              <text class="count-text">{{item.photos.length}}</text>
+            </view>
+          </view>
+          <view class="photoset-info">
+            <text class="photoset-title">{{item.title}}</text>
+            <view class="photoset-meta">
+              <view class="meta-item">
+                <text class="meta-icon">👁</text>
+                <text class="meta-text">{{item.viewCount || 0}}</text>
+              </view>
+              <view class="meta-item">
+                <text class="meta-icon">❤️</text>
+                <text class="meta-text">{{item.likeCount || 0}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="favorite-btn" catchtap="onUnfavoritePhotoSet" data-id="{{item._id}}" data-index="{{index}}">
+            <text class="favorite-icon">❤️</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+  </view>
+</view>

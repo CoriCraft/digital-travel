@@ -1,0 +1,136 @@
+<!-- pages/location-detail/location-detail.wxml -->
+<view class="page-container">
+  <!-- 自定义导航栏 -->
+  <view class="custom-nav" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <t-icon name="chevron-left" size="48rpx" color="#1a1a1a" />
+        <text class="nav-title">{{location.name || '地点详情'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-container">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else class="detail-content" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
+    <!-- 封面图 -->
+    <view class="cover-section">
+      <image class="cover-img" src="{{location.coverImage}}" mode="aspectFill" />
+      <view class="cover-overlay">
+        <view class="location-badge" wx:if="{{location.isHot}}">
+          <text>🔥 热门</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 基本信息 -->
+    <view class="info-section">
+      <view class="title-row">
+        <text class="location-name">{{location.name}}</text>
+        <view class="rating-box" wx:if="{{location.rating}}">
+          <text class="rating-star">⭐</text>
+          <text class="rating-num">{{location.rating}}</text>
+        </view>
+      </view>
+
+      <view class="tags-row">
+        <view class="tag" wx:for="{{location.tags}}" wx:key="index">
+          <text>{{item}}</text>
+        </view>
+      </view>
+
+      <view class="stats-row">
+        <view class="stat-item">
+          <text class="stat-icon">👁</text>
+          <text class="stat-text">{{location.viewCount || 0}}次浏览</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-icon">📍</text>
+          <text class="stat-text">{{location.checkInCount || 0}}人打卡</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-icon">💬</text>
+          <text class="stat-text">{{location.ratingCount || 0}}条评论</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 详细描述 -->
+    <view class="desc-section">
+      <view class="section-title">
+        <text>地点介绍</text>
+      </view>
+      <view class="desc-content">
+        <text>{{location.description}}</text>
+      </view>
+    </view>
+
+    <!-- 地址信息 -->
+    <view class="address-section">
+      <view class="section-title">
+        <text>地址信息</text>
+      </view>
+      <view class="address-row">
+        <image class="icon-location" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM4LjEzIDIgNSA1LjEzIDUgOUM1IDE0LjI1IDEyIDIyIDEyIDIyQzEyIDIyIDE5IDE0LjI1IDE5IDlDMTkgNS4xMyAxNS44NyAyIDEyIDJaTTEyIDExLjVDMTAuNjIgMTEuNSA5LjUgMTAuMzggOS41IDlDOS41IDcuNjIgMTAuNjIgNi41IDEyIDYuNUMxMy4zOCA2LjUgMTQuNSA3LjYyIDE0LjUgOUMxNC41IDEwLjM4IDEzLjM4IDExLjUgMTIgMTEuNVoiIGZpbGw9IiNGRjU3MjIiLz48L3N2Zz4=" />
+        <text class="address-text">{{location.address}}</text>
+      </view>
+      <view class="info-row" wx:if="{{location.openTime}}">
+        <text class="info-label">营业时间：</text>
+        <text class="info-value">{{location.openTime}}</text>
+      </view>
+      <view class="info-row" wx:if="{{location.phone}}">
+        <text class="info-label">联系电话：</text>
+        <text class="info-value">{{location.phone}}</text>
+      </view>
+    </view>
+
+    <!-- 评论区域 -->
+    <view class="review-section">
+      <view class="section-title">
+        <text>用户评价 ({{reviews.length}})</text>
+      </view>
+
+      <!-- 评论列表 -->
+      <view class="review-list" wx:if="{{reviews.length > 0}}">
+        <view class="review-item" wx:for="{{reviews}}" wx:key="_id">
+          <view class="review-header">
+            <image class="user-avatar" src="{{item.userAvatar || '/static/default-avatar.png'}}" mode="aspectFill" />
+            <view class="user-info">
+              <text class="user-name">{{item.userName}}</text>
+              <view class="rating-stars">
+                <text class="star {{index < item.rating ? 'active' : ''}}" wx:for="{{[1,2,3,4,5]}}" wx:key="index" wx:for-item="star" wx:for-index="index">★</text>
+              </view>
+            </view>
+            <text class="review-time">{{item.createTime}}</text>
+          </view>
+          <text class="review-content">{{item.content}}</text>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-review" wx:else>
+        <text class="empty-text">暂无评价，快来抢沙发吧~</text>
+      </view>
+
+      <!-- 写评论按钮 -->
+      <view class="write-review-btn" bindtap="onWriteReview">
+        <text>写评价</text>
+      </view>
+    </view>
+
+    <!-- 底部占位 -->
+    <view class="bottom-placeholder"></view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar" wx:if="{{!loading}}">
+    <view class="action-btn btn-navigate" bindtap="onNavigate">
+      <text>导航</text>
+    </view>
+    <view class="action-btn btn-checkin" bindtap="onCheckIn">
+      <text>打卡</text>
+    </view>
+  </view>
+</view>

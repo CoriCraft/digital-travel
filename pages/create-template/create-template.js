@@ -286,6 +286,9 @@ Page({
       const db = wx.cloud.database();
       const { name, description, category, tags } = this.data;
 
+      // 获取用户信息
+      const userInfo = app.globalData.userInfo || {};
+
       db.collection('templates').add({
         data: {
           name: name.trim(),
@@ -299,8 +302,8 @@ Page({
           likeCount: 0,
           photoSetCount: 0,
           sort: 999,
-          creatorId: 'user',
-          creatorName: '用户',
+          creatorId: userInfo.openid || '',
+          creatorName: userInfo.nickName || '微信用户',
           createTime: Date.now(),
           updateTime: Date.now()
         },

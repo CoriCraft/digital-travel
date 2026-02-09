@@ -1,15 +1,12 @@
 <!-- pages/photoset-detail/photoset-detail.wxml -->
 <view class="page">
   <!-- 自定义导航栏 -->
-  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
-    <view class="nav-bar" style="height: {{navBarHeight}}px;">
+  <view class="custom-nav" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
+    <view class="nav-bar">
       <view class="nav-btn" bindtap="onBack">
         <t-icon name="chevron-left" size="48rpx" color="#1a1a1a" />
       </view>
       <view class="nav-title">照片详情</view>
-      <button class="nav-btn share-btn" open-type="share">
-        <t-icon name="share" size="44rpx" color="#1a1a1a" />
-      </button>
     </view>
   </view>
 
@@ -70,6 +67,12 @@
         </view>
         <view class="stat-divider"></view>
         <view class="stat-item">
+          <t-icon name="star-filled" size="36rpx" color="#FFD700" />
+          <text class="stat-value">{{photoSet.favoriteCount || 0}}</text>
+          <text class="stat-label">收藏</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
           <t-icon name="image" size="36rpx" color="#82F45F" />
           <text class="stat-value">{{photoSet.photos.length}}</text>
           <text class="stat-label">照片</text>
@@ -101,6 +104,13 @@
 
   <!-- 底部操作栏 -->
   <view class="action-bar" wx:if="{{photoSet}}">
+    <view class="action-item" bindtap="onToggleFavorite">
+      <view class="action-icon {{isFavorite ? 'active' : ''}}">
+        <t-icon name="star{{isFavorite ? '-filled' : ''}}" size="52rpx" color="{{isFavorite ? '#FFD700' : '#666'}}" />
+      </view>
+      <text class="action-label {{isFavorite ? 'active' : ''}}">{{isFavorite ? '已收藏' : '收藏'}}</text>
+    </view>
+
     <view class="action-item" bindtap="onToggleLike">
       <view class="action-icon {{isLiked ? 'active' : ''}}">
         <t-icon name="heart{{isLiked ? '-filled' : ''}}" size="52rpx" color="{{isLiked ? '#82F45F' : '#666'}}" />

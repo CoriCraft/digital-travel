@@ -7,9 +7,21 @@ App({
       traceUser: true
     })
 
-    this.globalData.statusBarHeight = wx.getWindowInfo().statusBarHeight;
-    this.globalData.navBarHeight = (wx.getMenuButtonBoundingClientRect().top - wx.getWindowInfo().statusBarHeight) * 2 + wx.getMenuButtonBoundingClientRect().height;
-    console.log(wx.getMenuButtonBoundingClientRect().top, wx.getMenuButtonBoundingClientRect().height)
+    // 获取系统信息
+    const systemInfo = wx.getWindowInfo();
+    const menuButtonInfo = wx.getMenuButtonBoundingClientRect();
+
+    this.globalData.statusBarHeight = systemInfo.statusBarHeight;
+    this.globalData.navBarHeight = (menuButtonInfo.top - systemInfo.statusBarHeight) * 2 + menuButtonInfo.height;
+
+    // 计算胶囊按钮右侧到屏幕右边缘的距离，用于导航栏右侧按钮避让
+    this.globalData.menuButtonRight = systemInfo.windowWidth - menuButtonInfo.left;
+
+    console.log('导航栏配置:', {
+      statusBarHeight: this.globalData.statusBarHeight,
+      navBarHeight: this.globalData.navBarHeight,
+      menuButtonRight: this.globalData.menuButtonRight
+    })
 
     // 展示本地存储能力
     const logs = wx.getStorageSync('logs') || []
@@ -24,24 +36,68 @@ App({
    * 获取用户信息
    */
   getUserInfo() {
+    // 先获取 openid
     wx.cloud.callFunction({
       name: 'getUserInfo',
       success: res => {
-        console.log('用户信息获取成功:', res.result)
+        console.log('用户 openid 获取成功:', res.result)
         this.globalData.userInfo = {
           openid: res.result.openid,
-          unionid: res.result.unionid
+          unionid: res.result.unionid,
+          nickName: '微信用户', // 默认昵称
+          avatarUrl: '' // 默认头像
+        }
+
+        // 尝试从本地存储获取用户信息
+        const storedUserInfo = wx.getStorageSync('userProfile')
+        if (storedUserInfo) {
+          this.globalData.userInfo.nickName = storedUserInfo.nickName || '微信用户'
+          this.globalData.userInfo.avatarUrl = storedUserInfo.avatarUrl || ''
+          console.log('从本地存储恢复用户信息:', this.globalData.userInfo)
+        } else {
+          // 首次使用，引导用户完善信息
+          console.log('首次使用，引导用户完善信息')
+          setTimeout(() => {
+            wx.redirectTo({
+              url: '/pages/user-info/user-info'
+            })
+          }, 1000)
         }
       },
       fail: err => {
         console.error('用户信息获取失败:', err)
+        // 设置默认用户信息
+        this.globalData.userInfo = {
+          openid: '',
+          nickName: '微信用户',
+          avatarUrl: ''
+        }
       }
     })
+  },
+
+  /**
+   * 更新用户资料（昵称和头像）
+   */
+  updateUserProfile(nickName, avatarUrl) {
+    if (this.globalData.userInfo) {
+      this.globalData.userInfo.nickName = nickName || '微信用户'
+      this.globalData.userInfo.avatarUrl = avatarUrl || ''
+
+      // 保存到本地存储
+      wx.setStorageSync('userProfile', {
+        nickName: this.globalData.userInfo.nickName,
+        avatarUrl: this.globalData.userInfo.avatarUrl
+      })
+
+      console.log('用户资料已更新:', this.globalData.userInfo)
+    }
   },
 
   globalData: {
     userInfo: null,
     statusBarHeight: 0,
     navBarHeight: 0,
+    menuButtonRight: 0, // 胶囊按钮右侧到屏幕右边缘的距离
   }
 })

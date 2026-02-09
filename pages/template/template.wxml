@@ -90,8 +90,12 @@
           <view class="stats-info">
             <t-icon name="layers" size="28rpx" color="#666" />
             <text class="stat-text">{{item.photoSetCount}}</text>
-            <t-icon name="heart" size="28rpx" color="#ff6b35" />
+            <t-icon name="browse" size="28rpx" color="#666" />
+            <text class="stat-text">{{item.viewCount || 0}}</text>
+            <t-icon name="heart-filled" size="28rpx" color="#FF4444" />
             <text class="stat-text">{{item.likeCount || 0}}</text>
+            <t-icon name="star-filled" size="28rpx" color="#FFD700" />
+            <text class="stat-text">{{item.favoriteCount || 0}}</text>
           </view>
         </view>
       </view>
