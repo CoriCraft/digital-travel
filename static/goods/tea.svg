@@ -1,0 +1,49 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景渐变 -->
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD93D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F4A261;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="box" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#654321;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="400" height="400" fill="url(#bg3)" rx="20"/>
+
+  <!-- 礼盒主体 -->
+  <rect x="120" y="180" width="160" height="140" fill="url(#box)" rx="10"/>
+
+  <!-- 礼盒盖子 -->
+  <rect x="110" y="150" width="180" height="40" fill="#A0522D" rx="10"/>
+  <rect x="115" y="155" width="170" height="30" fill="#CD853F" rx="8"/>
+
+  <!-- 丝带 - 竖向 -->
+  <rect x="185" y="150" width="30" height="170" fill="#DC143C"/>
+  <rect x="188" y="150" width="24" height="170" fill="#FF1744"/>
+
+  <!-- 丝带 - 横向 -->
+  <rect x="120" y="235" width="160" height="30" fill="#DC143C"/>
+  <rect x="120" y="238" width="160" height="24" fill="#FF1744"/>
+
+  <!-- 蝴蝶结 -->
+  <ellipse cx="170" cy="140" rx="25" ry="20" fill="#DC143C"/>
+  <ellipse cx="230" cy="140" rx="25" ry="20" fill="#DC143C"/>
+  <circle cx="200" cy="140" r="15" fill="#FF1744"/>
+  <path d="M 200 125 L 195 110 L 200 110 L 205 110 Z" fill="#DC143C"/>
+
+  <!-- 茶叶图案 -->
+  <ellipse cx="160" cy="220" rx="6" ry="10" fill="#2E7D32" opacity="0.6" transform="rotate(-20 160 220)"/>
+  <ellipse cx="175" cy="215" rx="6" ry="10" fill="#388E3C" opacity="0.6" transform="rotate(10 175 215)"/>
+  <ellipse cx="190" cy="220" rx="6" ry="10" fill="#43A047" opacity="0.6" transform="rotate(-15 190 220)"/>
+
+  <!-- 文字标签 -->
+  <rect x="140" y="270" width="120" height="35" fill="#FFF8E1" rx="5"/>
+  <text x="200" y="293" font-family="Arial" font-size="16" fill="#5D4037" text-anchor="middle" font-weight="bold">特色茶叶</text>
+
+  <!-- 装饰星星 -->
+  <path d="M 250 200 L 255 210 L 265 210 L 257 217 L 260 227 L 250 220 L 240 227 L 243 217 L 235 210 L 245 210 Z" fill="#FFD700" opacity="0.8"/>
+</svg>

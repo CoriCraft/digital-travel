@@ -1,0 +1,40 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景渐变 -->
+  <defs>
+    <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFE66D;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="coffee1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#654321;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="400" height="400" fill="url(#bg1)" rx="20"/>
+
+  <!-- 咖啡豆袋子 -->
+  <path d="M 150 120 Q 150 100 170 100 L 230 100 Q 250 100 250 120 L 250 280 Q 250 300 230 300 L 170 300 Q 150 300 150 280 Z"
+        fill="url(#coffee1)" stroke="#5D4037" stroke-width="3"/>
+
+  <!-- 袋子顶部折叠 -->
+  <rect x="150" y="100" width="100" height="30" fill="#6D4C41" rx="5"/>
+  <line x1="160" y1="115" x2="240" y2="115" stroke="#8D6E63" stroke-width="2"/>
+
+  <!-- 标签 -->
+  <rect x="170" y="160" width="60" height="80" fill="#FFF8E1" rx="5"/>
+  <text x="200" y="190" font-family="Arial" font-size="14" fill="#5D4037" text-anchor="middle" font-weight="bold">云南</text>
+  <text x="200" y="210" font-family="Arial" font-size="12" fill="#8D6E63" text-anchor="middle">高山</text>
+  <text x="200" y="230" font-family="Arial" font-size="12" fill="#8D6E63" text-anchor="middle">咖啡豆</text>
+
+  <!-- 咖啡豆装饰 -->
+  <ellipse cx="190" cy="260" rx="8" ry="12" fill="#3E2723"/>
+  <ellipse cx="210" cy="265" rx="8" ry="12" fill="#3E2723"/>
+  <ellipse cx="200" cy="275" rx="8" ry="12" fill="#3E2723"/>
+
+  <!-- 热气 -->
+  <path d="M 180 90 Q 175 70 180 50" stroke="#FFE0B2" stroke-width="3" fill="none" opacity="0.6"/>
+  <path d="M 200 85 Q 195 65 200 45" stroke="#FFE0B2" stroke-width="3" fill="none" opacity="0.6"/>
+  <path d="M 220 90 Q 215 70 220 50" stroke="#FFE0B2" stroke-width="3" fill="none" opacity="0.6"/>
+</svg>

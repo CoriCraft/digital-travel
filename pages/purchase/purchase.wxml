@@ -30,7 +30,7 @@
     <view class="search-section">
       <view class="search-input-box">
         <t-icon name="search" size="36rpx" color="#999" class="search-icon-inside" />
-        <input class="real-input" placeholder="猜你喜欢..." placeholder-class="placeholder-style" confirm-type="search" bindconfirm="onSearch" />
+        <input class="real-input" placeholder="猜你喜欢..." placeholder-class="placeholder-style" confirm-type="search" bindconfirm="onSearch" value="{{searchKeyword}}" />
       </view>
       <view class="search-btn-block" bindtap="onSearch">搜索</view>
     </view>
@@ -38,14 +38,20 @@
     <view class="tabs-section">
       <view class="tabs-row">
         <view class="tabs-list">
-          <view class="tab-item active">
+          <view class="tab-item {{currentCategory === '推荐' ? 'active' : ''}}" bindtap="onCategoryChange" data-category="推荐">
             <text class="tab-text">推荐</text>
-            <view class="tab-line"></view>
+            <view class="tab-line" wx:if="{{currentCategory === '推荐'}}"></view>
           </view>
-          <view class="tab-item">土特产</view>
-          <view class="tab-item">文创产品</view>
+          <view class="tab-item {{currentCategory === '土特产' ? 'active' : ''}}" bindtap="onCategoryChange" data-category="土特产">
+            <text class="tab-text">土特产</text>
+            <view class="tab-line" wx:if="{{currentCategory === '土特产'}}"></view>
+          </view>
+          <view class="tab-item {{currentCategory === '文创产品' ? 'active' : ''}}" bindtap="onCategoryChange" data-category="文创产品">
+            <text class="tab-text">文创产品</text>
+            <view class="tab-line" wx:if="{{currentCategory === '文创产品'}}"></view>
+          </view>
         </view>
-        
+
         <view class="tab-arrow">
           <t-icon name="chevron-down" size="40rpx" color="#666" />
         </view>
@@ -54,7 +60,7 @@
 
     <view class="waterfall-container">
       <view class="column">
-        <block wx:for="{{leftList}}" wx:key="id">
+        <block wx:for="{{leftList}}" wx:key="_id">
           <view class="goods-card" bindtap="onGoodsTap" data-item="{{item}}">
             <view class="card-img-box">
               <image src="{{item.img}}" mode="widthFix" class="goods-img" />
@@ -62,7 +68,7 @@
             </view>
             <view class="goods-info">
               <view class="goods-name">{{item.name}}</view>
-              
+
               <view class="goods-tags" wx:if="{{item.tags.length > 0}}">
                 <block wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">
                   <view wx:if="{{item.tagType === 'hot'}}" class="tag-hot">{{tag}}</view>
@@ -81,14 +87,14 @@
       </view>
 
       <view class="column">
-        <block wx:for="{{rightList}}" wx:key="id">
+        <block wx:for="{{rightList}}" wx:key="_id">
           <view class="goods-card" bindtap="onGoodsTap" data-item="{{item}}">
             <view class="card-img-box">
               <image src="{{item.img}}" mode="widthFix" class="goods-img" />
             </view>
             <view class="goods-info">
               <view class="goods-name">{{item.name}}</view>
-              
+
               <view class="goods-tags" wx:if="{{item.tags.length > 0}}">
                 <block wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">
                   <view wx:if="{{item.tagType === 'hot'}}" class="tag-hot">{{tag}}</view>

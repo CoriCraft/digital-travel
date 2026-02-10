@@ -1,0 +1,56 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景渐变 -->
+  <defs>
+    <linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#B8E6F0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E8D5F2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="ceramic" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E3F2FD;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#BBDEFB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#90CAF9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="400" height="400" fill="url(#bg4)" rx="20"/>
+
+  <!-- 陶瓷花瓶主体 -->
+  <path d="M 180 120 Q 180 100 200 100 Q 220 100 220 120 L 230 200 Q 240 250 230 280 L 230 300 Q 230 320 210 320 L 190 320 Q 170 320 170 300 L 170 280 Q 160 250 170 200 Z"
+        fill="url(#ceramic)" stroke="#1976D2" stroke-width="3"/>
+
+  <!-- 花瓶口 -->
+  <ellipse cx="200" cy="100" rx="20" ry="8" fill="#64B5F6"/>
+  <ellipse cx="200" cy="100" rx="15" ry="5" fill="#E3F2FD"/>
+
+  <!-- 花瓶底座 -->
+  <ellipse cx="200" cy="320" rx="30" ry="10" fill="#1976D2"/>
+  <ellipse cx="200" cy="318" rx="28" ry="8" fill="#64B5F6"/>
+
+  <!-- 民族图案 - 云纹 -->
+  <path d="M 185 160 Q 190 155 195 160 Q 200 165 205 160 Q 210 155 215 160"
+        fill="none" stroke="#FF6B9D" stroke-width="2"/>
+  <path d="M 185 180 Q 190 175 195 180 Q 200 185 205 180 Q 210 175 215 180"
+        fill="none" stroke="#FF6B9D" stroke-width="2"/>
+
+  <!-- 民族图案 - 几何纹 -->
+  <circle cx="190" cy="220" r="5" fill="#FFD93D"/>
+  <circle cx="210" cy="220" r="5" fill="#FFD93D"/>
+  <circle cx="200" cy="235" r="5" fill="#FFD93D"/>
+  <path d="M 190 220 L 200 235 L 210 220" fill="none" stroke="#FF6B9D" stroke-width="2"/>
+
+  <!-- 民族图案 - 波浪纹 -->
+  <path d="M 175 260 Q 185 255 195 260 Q 205 265 215 260 Q 225 255 235 260"
+        fill="none" stroke="#4CAF50" stroke-width="2"/>
+  <path d="M 175 275 Q 185 270 195 275 Q 205 280 215 275 Q 225 270 235 275"
+        fill="none" stroke="#4CAF50" stroke-width="2"/>
+
+  <!-- 装饰花朵 -->
+  <circle cx="150" cy="200" r="12" fill="#FF6B9D" opacity="0.6"/>
+  <circle cx="250" cy="200" r="12" fill="#FF6B9D" opacity="0.6"/>
+  <circle cx="150" cy="200" r="6" fill="#FFD93D"/>
+  <circle cx="250" cy="200" r="6" fill="#FFD93D"/>
+
+  <!-- 高光效果 -->
+  <ellipse cx="185" cy="150" rx="8" ry="20" fill="white" opacity="0.3"/>
+</svg>

@@ -10,52 +10,87 @@
         <t-icon name="arrow-left" size="48rpx" color="#333" />
       </view>
       <view class="nav-title">商品详情</view>
-      <view class="nav-right-placeholder"></view>
+      <view class="nav-right">
+        <t-icon name="share" size="44rpx" color="#333" />
+      </view>
     </view>
   </view>
 
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading-container" style="padding-top: {{statusBarHeight + navBarHeight + 200}}px;">
+    <t-loading theme="circular" size="60rpx" text="加载中..." />
+  </view>
+
   <!-- 页面主体 -->
-  <scroll-view class="page-scroll" scroll-y enable-flex style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+  <scroll-view wx:else class="page-scroll" scroll-y enable-flex style="padding-top: {{statusBarHeight + navBarHeight}}px;">
 
     <!-- 商品主图 -->
     <view class="product-hero">
-      <image class="hero-img" src="/static/pages/purchase/rec1.png" mode="aspectFill" />
+      <image class="hero-img" src="{{goods.img}}" mode="aspectFill" />
     </view>
 
     <!-- 商品信息 -->
     <view class="product-info">
-      <view class="product-title">
-        【方山小米】农家自种自采，原生态，色泽金黄口感香糯
+      <view class="product-price-row">
+        <view class="price-box">
+          <text class="price-symbol">¥</text>
+          <text class="price-value">{{goods.price}}</text>
+          <text class="price-original">¥{{goods.originalPrice}}</text>
+        </view>
+        <view class="sold-count">已售 {{goods.sold}}</view>
       </view>
 
-      <view class="product-tags">
-        <text class="tag red">官方立减12%</text>
-        <text class="tag green">山区公益营养</text>
+      <view class="product-title">{{goods.name}}</view>
+
+      <view class="product-tags" wx:if="{{goods.tags.length > 0}}">
+        <block wx:for="{{goods.tags}}" wx:key="*this">
+          <text wx:if="{{goods.tagType === 'hot'}}" class="tag tag-hot">{{item}}</text>
+          <text wx:elif="{{goods.tagType === 'discount-text'}}" class="tag tag-discount">{{item}}</text>
+          <text wx:elif="{{goods.tagType === 'green'}}" class="tag tag-green">{{item}}</text>
+          <text wx:else class="tag tag-plain">{{item}}</text>
+        </block>
       </view>
+    </view>
+
+    <!-- 商品描述 -->
+    <view class="product-desc">
+      <view class="desc-header">
+        <view class="desc-bar"></view>
+        <text class="desc-text">商品描述</text>
+      </view>
+      <view class="desc-content">{{goods.description}}</view>
     </view>
 
     <!-- 商品详情 -->
     <view class="product-detail">
-      <!-- 详情标题 -->
       <view class="detail-header">
         <view class="detail-bar"></view>
-        <text class="detail-text">详情</text>
+        <text class="detail-text">商品详情</text>
       </view>
-      <!-- 详情图片 -->
-      <image class="detail-img" src="/static/pages/purchase/rec2.png" mode="widthFix" />
-      <image class="detail-img" src="/static/pages/purchase/rec3.png" mode="widthFix" />
+
+      <!-- 如果有详情图片则显示 -->
+      <block wx:if="{{goods.detailImages && goods.detailImages.length > 0}}">
+        <image wx:for="{{goods.detailImages}}" wx:key="*this" class="detail-img" src="{{item}}" mode="widthFix" />
+      </block>
+
+      <!-- 否则显示商品主图 -->
+      <block wx:else>
+        <image class="detail-img" src="{{goods.img}}" mode="widthFix" />
+      </block>
     </view>
 
+    <view style="height: 120rpx;"></view>
   </scroll-view>
 
   <!-- 底部购买栏 -->
-  <view class="bottom-bar">
-    <view class="fav-btn">
-      <t-icon name="heart" size="40rpx" />
+  <view class="bottom-bar" wx:if="{{!loading}}">
+    <view class="fav-btn" bindtap="toggleFavorite">
+      <t-icon name="{{isFavorite ? 'heart-filled' : 'heart'}}" size="40rpx" color="{{isFavorite ? '#ff6b35' : '#666'}}" />
+      <text class="fav-text">{{isFavorite ? '已收藏' : '收藏'}}</text>
     </view>
 
-    <view class="buy-btn">
-      跳转购买
+    <view class="buy-btn" bindtap="onBuyNow">
+      立即购买
     </view>
   </view>
 

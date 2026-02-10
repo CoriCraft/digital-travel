@@ -64,10 +64,42 @@
   - 登录用户可创建
   - 用户只能修改/删除自己的相册
 
+**goods 集合** - 商品信息（导流模式）
+- 字段：
+  - `_id`: 商品ID
+  - `name`: 商品名称
+  - `description`: 商品描述
+  - `category`: 分类（粮油调味/土特产/文创产品）
+  - `coverImage`: 封面图片（本地SVG路径或云存储路径）
+  - `images`: 图片数组（云存储路径）
+  - `detailImages`: 详情图片数组
+  - `price`: 现价
+  - `originalPrice`: 原价
+  - `stock`: 库存
+  - `sold`: 已售数量
+  - `tags`: 标签数组
+  - `tagType`: 标签类型（hot/discount-text/green/plain）
+  - `isRecommend`: 是否推荐
+  - `status`: 状态（active/inactive）
+  - `imgWidth`: 图片宽度（用于瀑布流布局）
+  - `imgHeight`: 图片高度（用于瀑布流布局）
+  - `shortLink`: 商品短链接（用于复制跳转，如：#小程序://一方粮川/xxxxx）
+  - `targetAppId`: 目标小程序AppID（可选，用于直接跳转）
+  - `targetPath`: 目标小程序页面路径（可选）
+  - `createTime`: 创建时间
+  - `updateTime`: 更新时间
+- 安全规则：READONLY（所有人只读）
+- 导流说明：
+  - 本小程序为一方粮川等商家导流，不实现完整电商功能
+  - 用户点击"立即购买"后，复制商品短链接到剪贴板
+  - 用户在微信聊天窗口粘贴后，自动跳转到目标小程序完成购买
+  - 详见：`商品导流功能说明.md`
+
 #### 云存储
 
 - `templates/` - 模板封面图片
 - `photosets/` - 相册照片
+- `goods-images/` - 商品图片
 
 #### 控制台链接
 
@@ -75,7 +107,9 @@
 - 文档型数据库: https://tcb.cloud.tencent.com/dev?envId=cultural-tourism-7fb138kf77a2cb2#/db/doc
 - templates 集合: https://tcb.cloud.tencent.com/dev?envId=cultural-tourism-7fb138kf77a2cb2#/db/doc/collection/templates
 - photoSets 集合: https://tcb.cloud.tencent.com/dev?envId=cultural-tourism-7fb138kf77a2cb2#/db/doc/collection/photoSets
+- goods 集合: https://tcb.cloud.tencent.com/dev?envId=cultural-tourism-7fb138kf77a2cb2#/db/doc/collection/goods
 - 云存储: https://tcb.cloud.tencent.com/dev?envId=cultural-tourism-7fb138kf77a2cb2#/storage
+- 云函数: https://tcb.cloud.tencent.com/dev?envId=cultural-tourism-7fb138kf77a2cb2#/scf
 
 ## 功能模块
 
@@ -112,9 +146,58 @@
    - 数据保存到数据库
    - 创建的模板状态为 `pending`（待审核）
 
+### 产品购买模块
+
+**主要功能：**
+1. ✅ 商品列表展示（瀑布流布局）
+2. ✅ 分类筛选（推荐/土特产/文创产品）
+3. ✅ 搜索功能（商品名称搜索）
+4. ✅ 分页加载（每页20条，上拉加载更多）
+5. ✅ 推荐商品轮播
+6. ✅ 商品详情跳转
+
+**页面文件：**
+- `pages/purchase/purchase.*` - 商品列表页
+- `pages/good-info/good-info.*` - 商品详情页（待完善）
+
+**数据访问方式：**
+- 小程序直连数据库（无需云函数）
+- 使用 `wx.cloud.database()` 直接查询 goods 集合
+- 性能更好，代码更简洁
+
+**核心功能实现：**
+
+1. **瀑布流布局** (`pages/purchase/purchase.js`)
+   - 根据图片比例预估卡片高度
+   - 动态分配到左右两列
+   - 保持两列高度平衡
+
+2. **分类切换** (`pages/purchase/purchase.js`)
+   - 推荐：显示 `isRecommend=true` 的商品
+   - 土特产/文创产品：按 `category` 字段筛选
+   - 切换分类时重置列表
+
+3. **搜索功能** (`pages/purchase/purchase.js`)
+   - 支持商品名称模糊搜索
+   - 使用正则表达式实现
+   - 搜索时重置列表
+
+4. **图片处理** (`pages/purchase/purchase.js`)
+   - 使用 `wx.cloud.getTempFileURL()` 转换云存储路径
+   - 批量获取临时URL（2小时有效期）
+   - 在小程序端处理，无需云函数
+
 ## 开发说明
 
 ### 数据库优化记录
+
+**2026-02-11 产品购买模块完善：**
+1. ✅ 创建 goods 集合（商品信息）
+2. ✅ 上传示例商品图片到云存储（goods-images/）
+3. ✅ 插入10条测试商品数据
+4. ✅ 实现商品列表页面（分类、搜索、分页）
+5. ✅ 实现瀑布流布局
+6. ✅ 优化为小程序直连数据库（无需云函数，性能更好）
 
 **2026-02-08 优化内容：**
 1. ✅ 为所有文档添加了 `createTime` 和 `updateTime` 字段
@@ -127,12 +210,20 @@
 
 ### 后续可扩展功能
 
-1. **关联集合**（当需要时）：
+1. **产品购买模块待完善**：
+   - 商品详情页完善
+   - 购物车功能
+   - 订单管理
+   - 支付功能集成
+
+2. **关联集合**（当需要时）：
+   - `cart` - 购物车
+   - `orders` - 订单
    - `comments` - 评论功能
    - `likes` - 点赞记录
    - `users` - 用户信息
 
-2. **高级功能**：
+3. **高级功能**：
    - 模板审核管理
    - 用户个人中心
    - 模板收藏功能

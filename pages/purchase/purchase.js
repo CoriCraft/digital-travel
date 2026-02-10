@@ -32,18 +32,28 @@ Page({
     rightList: [],
     leftHeight: 0,
     rightHeight: 0,
+
+    // 当前分类
+    currentCategory: '推荐',
+    // 搜索关键词
+    searchKeyword: '',
+    // 分页
+    page: 1,
+    pageSize: 20,
+    hasMore: true,
+    loading: false,
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad(options) {
+    console.log('产品购买页面加载');
     this.setData({
       statusBarHeight: app.globalData.statusBarHeight,
       navBarHeight: app.globalData.navBarHeight,
-      goodsList: this.mockGoodsList(),
     });
-    this.buildWaterfall(this.data.goodsList);
+    this.loadGoods();
   },
 
   /**
@@ -77,7 +87,11 @@ Page({
   /**
    * 页面上拉触底事件的处理函数
    */
-  onReachBottom() {},
+  onReachBottom() {
+    if (this.data.hasMore && !this.data.loading) {
+      this.loadMore();
+    }
+  },
 
   /**
    * 用户点击右上角分享
@@ -99,30 +113,45 @@ Page({
   },
 
   //搜索按钮
-  onSearch () {
-    console.log('search button click!')
+  onSearch(e) {
+    const keyword = e.detail.value || '';
+    this.setData({
+      searchKeyword: keyword,
+      page: 1,
+      leftList: [],
+      rightList: [],
+      leftHeight: 0,
+      rightHeight: 0,
+    });
+    this.loadGoods();
   },
 
   //产品分类
-  onTabsChange(e) {
+  onCategoryChange(e) {
+    const category = e.currentTarget.dataset.category;
     this.setData({
-      goodsList: this.mockGoodsList(),
-    })
-    console.log('change:', e.detail.value)
-  },
-
-  onTabsClick(e) {
-    console.log('click:', e.detail.value)
+      currentCategory: category,
+      page: 1,
+      leftList: [],
+      rightList: [],
+      leftHeight: 0,
+      rightHeight: 0,
+    });
+    this.loadGoods();
   },
 
   //产品列表
   buildWaterfall(goodsList) {
+    console.log('buildWaterfall 接收到的商品数量：', goodsList.length);
+
     let {
       leftList,
       rightList,
       leftHeight,
       rightHeight,
     } = this.data
+
+    console.log('当前左右列表长度：', leftList.length, rightList.length);
 
     goodsList.forEach((item) => {
       // 根据图片比例预估高度（核心）
@@ -141,12 +170,16 @@ Page({
       }
     })
 
+    console.log('构建后左右列表长度：', leftList.length, rightList.length);
+
     this.setData({
       leftList,
       rightList,
       leftHeight,
       rightHeight,
     })
+
+    console.log('setData 完成');
   },
 
   onGoodsTap(e) {
@@ -154,24 +187,147 @@ Page({
     console.log('点击商品：', item)
 
     wx.navigateTo({
-      url: `/pages/good-info/good-info?id=${item.id}`
+      url: `/pages/good-info/good-info?id=${item._id}`
     })
   },
 
-  mockGoodsList() {
-    const base = {
-      name: '云南高山咖啡豆',
-      tags: ['爆款', '热卖'],
-      sold: 500,
-      imgWidth: 750,
-      imgHeight: 1000,
+  // 加载商品列表
+  async loadGoods() {
+    console.log('开始加载商品列表');
+    if (this.data.loading) return;
+
+    this.setData({ loading: true });
+
+    try {
+      const db = wx.cloud.database();
+      const _ = db.command;
+      const { currentCategory, searchKeyword, page, pageSize } = this.data;
+
+      console.log('查询参数：', { currentCategory, searchKeyword, page, pageSize });
+
+      // 构建查询条件
+      let query = {
+        status: 'active'
+      };
+
+      // 分类筛选
+      if (currentCategory === '推荐') {
+        query.isRecommend = true;
+      } else {
+        query.category = currentCategory;
+      }
+
+      // 搜索关键词
+      if (searchKeyword && searchKeyword.trim() !== '') {
+        const keyword = searchKeyword.trim();
+        query = _.and([
+          query,
+          { name: db.RegExp({ regexp: keyword, options: 'i' }) }
+        ]);
+      }
+
+      console.log('查询条件：', query);
+
+      // 查询商品列表
+      const { data } = await db.collection('goods')
+        .where(query)
+        .orderBy('sold', 'desc')
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .get();
+
+      console.log('查询到商品数量：', data.length);
+
+      // 查询总数
+      const { total } = await db.collection('goods')
+        .where(query)
+        .count();
+
+      console.log('商品总数：', total);
+
+      // SVG图片直接使用coverImage，无需转换
+      data.forEach(item => {
+        item.img = item.coverImage;
+      });
+
+      console.log('开始构建瀑布流');
+      this.buildWaterfall(data);
+      this.setData({
+        hasMore: page * pageSize < total,
+        loading: false
+      });
+      console.log('商品列表加载完成');
+    } catch (err) {
+      console.error('加载商品失败：', err);
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
+      });
+      this.setData({ loading: false });
     }
-  
-    return Array.from({ length: 10 }).map((_, index) => ({
-      id: index + 1,
-      ...base,
-      img: `/static/pages/purchase/rec${(index % 4) + 1}.png`,
-    }))
-  }
+  },
+
+  // 加载更多
+  async loadMore() {
+    const nextPage = this.data.page + 1;
+    this.setData({
+      page: nextPage,
+      loading: true
+    });
+
+    try {
+      const db = wx.cloud.database();
+      const _ = db.command;
+      const { currentCategory, searchKeyword, pageSize } = this.data;
+
+      // 构建查询条件
+      let query = {
+        status: 'active'
+      };
+
+      // 分类筛选
+      if (currentCategory === '推荐') {
+        query.isRecommend = true;
+      } else {
+        query.category = currentCategory;
+      }
+
+      // 搜索关键词
+      if (searchKeyword && searchKeyword.trim() !== '') {
+        const keyword = searchKeyword.trim();
+        query = _.and([
+          query,
+          { name: db.RegExp({ regexp: keyword, options: 'i' }) }
+        ]);
+      }
+
+      // 查询商品列表
+      const { data } = await db.collection('goods')
+        .where(query)
+        .orderBy('sold', 'desc')
+        .skip((nextPage - 1) * pageSize)
+        .limit(pageSize)
+        .get();
+
+      // 查询总数
+      const { total } = await db.collection('goods')
+        .where(query)
+        .count();
+
+      // SVG图片直接使用coverImage，无需转换
+      data.forEach(item => {
+        item.img = item.coverImage;
+      });
+
+      this.buildWaterfall(data);
+      this.setData({
+        hasMore: nextPage * pageSize < total,
+        loading: false
+      });
+    } catch (err) {
+      console.error('加载更多失败：', err);
+      this.setData({ loading: false });
+    }
+  },
 
 });
