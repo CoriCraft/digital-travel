@@ -1,0 +1,84 @@
+<view class="container">
+  <!-- 自定义导航栏 -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <t-icon name="chevron-left" size="48rpx" color="#333" />
+      </view>
+      <view class="nav-title">消息中心</view>
+      <view class="nav-right" bindtap="markAllRead">
+        <text class="mark-read-text">全部已读</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="main-content" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+
+    <!-- 筛选标签 -->
+    <view class="filter-tabs">
+      <view class="tab-item {{filterType === 'all' ? 'active' : ''}}"
+            data-type="all"
+            bindtap="onFilterChange">
+        全部
+        <view class="tab-badge" wx:if="{{filterType === 'all' && unreadCount > 0}}">{{unreadCount}}</view>
+      </view>
+      <view class="tab-item {{filterType === 'warning' ? 'active' : ''}}"
+            data-type="warning"
+            bindtap="onFilterChange">
+        警告
+      </view>
+      <view class="tab-item {{filterType === 'report_handled' ? 'active' : ''}}"
+            data-type="report_handled"
+            bindtap="onFilterChange">
+        举报
+      </view>
+      <view class="tab-item {{filterType === 'feedback_replied' ? 'active' : ''}}"
+            data-type="feedback_replied"
+            bindtap="onFilterChange">
+        反馈
+      </view>
+      <view class="tab-item {{filterType === 'system' ? 'active' : ''}}"
+            data-type="system"
+            bindtap="onFilterChange">
+        系统
+      </view>
+    </view>
+
+    <!-- 消息列表 -->
+    <view class="message-list">
+      <view class="message-item {{item.status === 'unread' ? 'unread' : ''}}"
+            wx:for="{{messages}}"
+            wx:key="_id"
+            data-message="{{item}}"
+            bindtap="onMessageTap">
+        <view class="message-header">
+          <view class="message-type-badge type-{{item.type}}">
+            {{item.typeText}}
+          </view>
+          <view class="message-time">{{item.formattedTime}}</view>
+        </view>
+        <view class="message-title">{{item.title}}</view>
+        <view class="message-content">{{item.content}}</view>
+        <view class="unread-dot" wx:if="{{item.status === 'unread'}}"></view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{messages.length === 0 && !loading}}">
+        <t-icon name="notification" size="120rpx" color="#ccc" />
+        <text class="empty-text">暂无消息</text>
+      </view>
+
+      <!-- 加载状态 -->
+      <view class="loading-more" wx:if="{{loading}}">
+        <t-loading size="40rpx" />
+        <text class="loading-text">加载中...</text>
+      </view>
+
+      <!-- 没有更多 -->
+      <view class="no-more" wx:if="{{!hasMore && messages.length > 0}}">
+        <text>没有更多消息了</text>
+      </view>
+    </view>
+
+  </view>
+</view>

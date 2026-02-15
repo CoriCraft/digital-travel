@@ -1,5 +1,6 @@
 // pages/template/template.js
 const app = getApp()
+const { getThumbnailUrl } = require('../../utils/util.js')
 
 Page({
   /**
@@ -333,25 +334,52 @@ Page({
     // 根据排序类型设置排序字段
     let orderByField = 'sort';
     let orderByDirection = 'asc';
+    let needClientSort = false; // 是否需要前端排序
 
     if (sortType === 'hot') {
-      orderByField = 'photoSetCount';
+      // 热度排序需要在前端计算，先按照创建时间获取数据
+      orderByField = 'createTime';
       orderByDirection = 'desc';
+      needClientSort = true;
     } else if (sortType === 'time') {
       orderByField = 'createTime';
       orderByDirection = 'desc';
     }
 
+    // 如果是热度排序，需要获取更多数据用于前端排序
+    const fetchLimit = needClientSort ? pageSize * 3 : pageSize;
+    const fetchSkip = needClientSort ? 0 : skip;
+
     db.collection('templates')
       .where(query)
       .orderBy(orderByField, orderByDirection)
-      .skip(skip)
-      .limit(pageSize)
+      .skip(fetchSkip)
+      .limit(fetchLimit)
       .get()
       .then(res => {
         console.log('模板列表:', res.data);
-        const newTemplates = loadMore ? [...this.data.templates, ...res.data] : res.data;
-        const hasMore = res.data.length === pageSize;
+
+        // 计算热门标签和热度分数
+        let templatesWithHot = this.calculateHotTemplates(res.data);
+
+        // 为每个模板添加缩略图URL
+        templatesWithHot = templatesWithHot.map(template => ({
+          ...template,
+          coverThumbnail: getThumbnailUrl(template.cover, 400)
+        }));
+
+        // 如果是热度排序，按热度分数排序
+        if (needClientSort) {
+          templatesWithHot = templatesWithHot.sort((a, b) => b.hotScore - a.hotScore);
+
+          // 分页处理
+          const startIndex = skip;
+          const endIndex = startIndex + pageSize;
+          templatesWithHot = templatesWithHot.slice(startIndex, endIndex);
+        }
+
+        const newTemplates = loadMore ? [...this.data.templates, ...templatesWithHot] : templatesWithHot;
+        const hasMore = needClientSort ? (skip + pageSize < res.data.length) : (res.data.length === pageSize);
 
         this.setData({
           templates: newTemplates,
@@ -380,6 +408,55 @@ Page({
           icon: 'none'
         });
       });
+  },
+
+  /**
+   * 计算热门模板
+   * 热度算法：热度分数 = 浏览量 * 0.1 + 点赞数 * 2 + 收藏数 * 3 + 照片集数量 * 5
+   * 只有热度分数排名前30%的模板才显示"热门"标签
+   */
+  calculateHotTemplates(templates) {
+    if (!templates || templates.length === 0) return templates;
+
+    console.log('开始计算热门模板，总数:', templates.length);
+
+    // 计算每个模板的热度分数
+    const templatesWithScore = templates.map(template => {
+      const viewCount = template.viewCount || 0;
+      const likeCount = template.likeCount || 0;
+      const favoriteCount = template.favoriteCount || 0;
+      const photoSetCount = template.photoSetCount || 0;
+
+      // 热度分数计算
+      const hotScore = viewCount * 0.1 + likeCount * 2 + favoriteCount * 3 + photoSetCount * 5;
+
+      console.log(`模板 ${template.name}: 浏览${viewCount}, 点赞${likeCount}, 收藏${favoriteCount}, 照片集${photoSetCount}, 热度=${hotScore}`);
+
+      return {
+        ...template,
+        hotScore
+      };
+    });
+
+    // 按热度分数排序
+    const sortedTemplates = [...templatesWithScore].sort((a, b) => b.hotScore - a.hotScore);
+
+    // 计算热门阈值（前30%）
+    const hotThreshold = Math.ceil(sortedTemplates.length * 0.3);
+    const minHotScore = sortedTemplates[hotThreshold - 1]?.hotScore || 0;
+
+    console.log(`热门阈值: 前${hotThreshold}个, 最低分数=${minHotScore}`);
+
+    // 标记热门模板
+    const result = templatesWithScore.map(template => ({
+      ...template,
+      isHot: template.hotScore >= minHotScore && template.hotScore > 0
+    }));
+
+    const hotCount = result.filter(t => t.isHot).length;
+    console.log(`标记了 ${hotCount} 个热门模板`);
+
+    return result;
   },
 
   /**
@@ -439,5 +516,79 @@ Page({
     wx.navigateTo({
       url: '/pages/create-template/create-template'
     });
+  },
+
+  /**
+   * 长按举报模板
+   */
+  onTemplateReport(e) {
+    const { id, name } = e.currentTarget.dataset;
+
+    wx.showActionSheet({
+      itemList: ['举报该模板'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this.showReportDialog(id, 'template', name);
+        }
+      }
+    });
+  },
+
+  /**
+   * 显示举报对话框
+   */
+  showReportDialog(targetId, targetType, targetName) {
+    const reportReasons = [
+      '色情低俗',
+      '违法违规',
+      '虚假信息',
+      '侵权内容',
+      '垃圾广告',
+      '其他原因'
+    ];
+
+    wx.showActionSheet({
+      itemList: reportReasons,
+      success: async (res) => {
+        const reason = reportReasons[res.tapIndex];
+        await this.submitReport(targetId, targetType, targetName, reason);
+      }
+    });
+  },
+
+  /**
+   * 提交举报
+   */
+  async submitReport(targetId, targetType, targetName, reason) {
+    try {
+      wx.showLoading({ title: '提交中...' });
+
+      const db = wx.cloud.database();
+      await db.collection('reports').add({
+        data: {
+          targetId,
+          targetType,
+          targetName,
+          reason,
+          reporterOpenId: app.globalData.userInfo?.openid || '',
+          reporterName: app.globalData.userInfo?.nickName || '匿名用户',
+          status: 'pending',
+          createTime: new Date(),
+        }
+      });
+
+      wx.hideLoading();
+      wx.showToast({
+        title: '举报成功',
+        icon: 'success'
+      });
+    } catch (err) {
+      console.error('举报失败:', err);
+      wx.hideLoading();
+      wx.showToast({
+        title: '举报失败',
+        icon: 'none'
+      });
+    }
   }
 });

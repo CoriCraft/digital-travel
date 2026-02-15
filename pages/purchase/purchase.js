@@ -16,13 +16,8 @@ Page({
     duration: 500,
     interval: 5000,
 
-    // 推荐图片列表
-    recommendList: [
-      '/static/pages/purchase/rec1.png',
-      '/static/pages/purchase/rec2.png',
-      '/static/pages/purchase/rec3.png',
-      '/static/pages/purchase/rec4.png'
-    ],
+    // 推荐图片列表（初始为空，从数据库加载）
+    recommendList: [],
 
     // 产品列表
     goodsList: [],
@@ -32,6 +27,9 @@ Page({
     rightList: [],
     leftHeight: 0,
     rightHeight: 0,
+
+    // 轮播商品完整数据
+    bannerGoodsList: [],
 
     // 当前分类
     currentCategory: '推荐',
@@ -53,6 +51,7 @@ Page({
       statusBarHeight: app.globalData.statusBarHeight,
       navBarHeight: app.globalData.navBarHeight,
     });
+    this.loadBannerGoods();  // 加载轮播商品
     this.loadGoods();
   },
 
@@ -107,14 +106,153 @@ Page({
 
   //推荐产品轮播
   onSwiperChange(e) {
-    const { current, source } = e.detail
-    this.setData({ current })
-    console.log('swiper:', current, source)
+    const { current, source } = e.detail;
+    this.setData({ current });
+    console.log('swiper change:', current, source);
+  },
+
+  /**
+   * 轮播点击事件
+   */
+  onBannerClick(e) {
+    // TDesign Swiper 的点击事件，current 在 this.data 中
+    const current = this.data.current;
+    const bannerGoods = this.data.bannerGoodsList;
+
+    console.log('轮播点击:', current, bannerGoods);
+
+    if (bannerGoods && bannerGoods.length > 0 && bannerGoods[current]) {
+      // 显示加载提示
+      wx.showLoading({
+        title: '加载中...',
+        mask: true
+      });
+
+      // 延迟跳转，给用户反馈
+      setTimeout(() => {
+        wx.hideLoading();
+        wx.navigateTo({
+          url: `/pages/good-info/good-info?id=${bannerGoods[current]._id}`,
+          fail: (err) => {
+            console.error('跳转失败:', err);
+            wx.showToast({
+              title: '跳转失败',
+              icon: 'none'
+            });
+          }
+        });
+      }, 300);
+    } else {
+      console.warn('轮播商品数据不存在, current:', current, 'bannerGoods:', bannerGoods);
+      wx.showToast({
+        title: '商品信息加载中',
+        icon: 'none'
+      });
+    }
+  },
+
+  /**
+   * 加载轮播商品（手动推荐 + 行为热度混合）
+   */
+  async loadBannerGoods() {
+    try {
+      const db = wx.cloud.database();
+
+      // 1. 先获取手动推荐的商品
+      const { data: recommendedGoods } = await db.collection('goods')
+        .where({
+          status: 'active',
+          isRecommend: true
+        })
+        .orderBy('recommendOrder', 'asc')
+        .limit(5)
+        .get();
+
+      let bannerGoods = [...recommendedGoods];
+
+      // 2. 如果手动推荐不足5个，用热度算法补充
+      if (bannerGoods.length < 5) {
+        const { data: allGoods } = await db.collection('goods')
+          .where({ status: 'active' })
+          .get();
+
+        // 计算热度
+        const goodsWithHot = allGoods
+          .filter(item => !item.isRecommend)  // 排除已推荐的
+          .map(item => ({
+            ...item,
+            hotScore: this.calculateHotScore(item)
+          }))
+          .sort((a, b) => b.hotScore - a.hotScore);
+
+        // 补充到5个
+        const needCount = 5 - bannerGoods.length;
+        bannerGoods.push(...goodsWithHot.slice(0, needCount));
+
+        console.log('热门商品补充:', goodsWithHot.slice(0, needCount).map(g => ({
+          name: g.name,
+          hotScore: g.hotScore
+        })));
+      }
+
+      // 3. 处理图片字段
+      bannerGoods.forEach(item => {
+        if (!item.img && item.coverImage) {
+          item.img = item.coverImage;
+        }
+      });
+
+      // 4. 转换为轮播格式
+      const recommendList = bannerGoods.map(item => ({
+        value: item.img || item.coverImage,
+        ariaLabel: item.name
+      }));
+
+      this.setData({
+        recommendList,
+        bannerGoodsList: bannerGoods
+      });
+
+      console.log('轮播商品加载成功:', bannerGoods.length, '个', bannerGoods.map(g => g.name));
+    } catch (err) {
+      console.error('加载轮播商品失败:', err);
+      // 失败时保持默认图片
+    }
+  },
+
+  /**
+   * 计算商品热度分数
+   * 热度公式：浏览量*0.5 + 收藏数*5 + 复制链接*3 + 分享次数*4
+   */
+  calculateHotScore(goods) {
+    const now = Date.now();
+    const createTime = goods.createTime ? new Date(goods.createTime).getTime() : now;
+    const daysSinceCreate = (now - createTime) / (1000 * 60 * 60 * 24);
+
+    // 新品加权（30天内的商品热度 x1.5）
+    const timeFactor = daysSinceCreate < 30 ? 1.5 : 1.0;
+
+    // 热度公式
+    const hotScore = (
+      (goods.viewCount || 0) * 0.5 +
+      (goods.favoriteCount || 0) * 5 +
+      (goods.copyCount || 0) * 3 +
+      (goods.shareCount || 0) * 4
+    ) * timeFactor;
+
+    return hotScore;
+  },
+
+  // 搜索输入
+  onSearchInput(e) {
+    this.setData({
+      searchKeyword: e.detail.value
+    });
   },
 
   //搜索按钮
   onSearch(e) {
-    const keyword = e.detail.value || '';
+    const keyword = e.detail.value || this.data.searchKeyword || '';
     this.setData({
       searchKeyword: keyword,
       page: 1,
@@ -156,10 +294,13 @@ Page({
     goodsList.forEach((item) => {
       // 根据图片比例预估高度（核心）
       const cardWidth = 340 // rpx，与你 swiper 一致
-      const imgHeight =
-        (cardWidth * item.imgHeight) / item.imgWidth
 
-      const cardHeight = imgHeight + 160 // 图片 + 文本区域估算
+      // 如果缺少图片尺寸信息，使用默认比例 3:4
+      const imgWidth = item.imgWidth || 3
+      const imgHeight = item.imgHeight || 4
+
+      const calculatedImgHeight = (cardWidth * imgHeight) / imgWidth
+      const cardHeight = calculatedImgHeight + 160 // 图片 + 文本区域估算
 
       if (leftHeight <= rightHeight) {
         leftList.push(item)
@@ -212,7 +353,8 @@ Page({
 
       // 分类筛选
       if (currentCategory === '推荐') {
-        query.isRecommend = true;
+        // 推荐分类：显示所有商品，按热度排序（前端排序）
+        // 不添加额外条件
       } else {
         query.category = currentCategory;
       }
@@ -229,19 +371,51 @@ Page({
       console.log('查询条件：', query);
 
       // 查询商品列表
-      const { data } = await db.collection('goods')
-        .where(query)
-        .orderBy('sold', 'desc')
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
-        .get();
+      let queryResult;
+      if (currentCategory === '推荐') {
+        // 推荐分类：获取所有商品，前端按热度排序
+        queryResult = await db.collection('goods')
+          .where(query)
+          .get();
+
+        // 计算热度并排序
+        const goodsWithHot = queryResult.data.map(item => ({
+          ...item,
+          hotScore: this.calculateHotScore(item)
+        })).sort((a, b) => b.hotScore - a.hotScore);
+
+        // 分页
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+        queryResult.data = goodsWithHot.slice(start, end);
+      } else {
+        // 其他分类：按销量排序
+        queryResult = await db.collection('goods')
+          .where(query)
+          .orderBy('sold', 'desc')
+          .skip((page - 1) * pageSize)
+          .limit(pageSize)
+          .get();
+      }
+
+      const data = queryResult.data;
 
       console.log('查询到商品数量：', data.length);
 
       // 查询总数
-      const { total } = await db.collection('goods')
-        .where(query)
-        .count();
+      let total;
+      if (currentCategory === '推荐') {
+        // 推荐分类：总数是所有商品数
+        const countResult = await db.collection('goods')
+          .where(query)
+          .count();
+        total = countResult.total;
+      } else {
+        const countResult = await db.collection('goods')
+          .where(query)
+          .count();
+        total = countResult.total;
+      }
 
       console.log('商品总数：', total);
 

@@ -6,41 +6,35 @@
   top: 0;
   left: 0;
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24rpx;
-  box-sizing: border-box;
   background: transparent;
   z-index: 999;
 }
 
-.nav-title {
-  font-size: 34rpx;
-  font-weight: 600;
-  color: #000;
+.nav-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24rpx;
+  height: 100%;
+}
+
+.nav-left,
+.nav-right {
+  width: 80rpx;
+  display: flex;
+  align-items: center;
 }
 
 .nav-right {
-  display: flex;
-  align-items: center;
+  justify-content: flex-end;
 }
 
-.avatar-circle {
-  width: 60rpx;
-  height: 60rpx;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.6);
-  border: 1px solid rgba(0,0,0,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.avatar-img {
-  width: 100%;
-  height: 100%;
+.nav-title {
+  flex: 1;
+  text-align: center;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
 }
 
 .page-container {
@@ -49,45 +43,6 @@
   padding-bottom: 60rpx;
   position: relative;
   z-index: 1;
-}
-
-/* --- 搜索胶囊 --- */
-.search-section {
-  padding: 16rpx 24rpx;
-  margin-bottom: 10rpx;
-}
-
-.search-capsule {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #fff;
-  height: 84rpx;
-  border-radius: 42rpx;
-  padding: 0 10rpx 0 32rpx;
-  box-shadow: 0 4rpx 16rpx rgba(168, 209, 178, 0.25);
-}
-
-.search-left {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-}
-
-.location-text {
-  font-size: 28rpx;
-  color: #333;
-  font-weight: 500;
-}
-
-.search-btn {
-  background: #82F45F;
-  color: #fff;
-  font-size: 28rpx;
-  font-weight: 600;
-  padding: 12rpx 36rpx;
-  border-radius: 36rpx;
-  box-shadow: 0 4rpx 10rpx rgba(130, 244, 95, 0.3);
 }
 
 /* --- 网格布局 (高度精确控制) --- */
@@ -293,12 +248,14 @@
   border-radius: 12rpx;
   overflow: hidden;
   flex-shrink: 0;
+  height: 100%;
 }
 
 .img-food image {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: cover;
 }
 
 /* --- Tab 栏 --- */
@@ -354,6 +311,22 @@
   background: #eee;
   border-radius: 24rpx 24rpx 0 0;
   overflow: hidden;
+  position: relative;
+}
+
+/* 距离标签 */
+.distance-badge {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10rpx);
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  z-index: 10;
 }
 
 .feed-img {

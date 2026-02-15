@@ -1,9 +1,9 @@
 <view class="container">
-  <!-- 导航栏 -->
-  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+  <!-- 透明导航栏 -->
+  <view class="nav-bar transparent" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
     <view class="nav-content">
       <view class="nav-left" bindtap="onBack">
-        <view class="icon-back"></view>
+        <t-icon name="chevron-left" size="48rpx" color="#333" />
       </view>
       <text class="nav-title">我的收藏</text>
       <view class="nav-right-placeholder"></view>
@@ -11,7 +11,7 @@
   </view>
 
   <!-- 主内容 -->
-  <view class="main-content" style="padding-top: {{statusBarHeight + navBarHeight + 20}}px;">
+  <scroll-view scroll-y class="main-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;" refresher-enabled="{{true}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
 
     <!-- 标签切换 -->
     <view class="tabs">
@@ -31,12 +31,28 @@
         <text class="tab-text">照片集</text>
         <view class="tab-badge" wx:if="{{photoSets.length > 0}}">{{photoSets.length}}</view>
       </view>
+      <view
+        class="tab-item {{currentTab === 2 ? 'active' : ''}}"
+        data-index="{{2}}"
+        bindtap="onTabChange"
+      >
+        <text class="tab-text">商品</text>
+        <view class="tab-badge" wx:if="{{goods.length > 0}}">{{goods.length}}</view>
+      </view>
+      <view
+        class="tab-item {{currentTab === 3 ? 'active' : ''}}"
+        data-index="{{3}}"
+        bindtap="onTabChange"
+      >
+        <text class="tab-text">地点</text>
+        <view class="tab-badge" wx:if="{{locations.length > 0}}">{{locations.length}}</view>
+      </view>
     </view>
 
     <!-- 收藏的模板 -->
     <view class="content-section" wx:if="{{currentTab === 0}}">
       <view wx:if="{{templates.length === 0}}" class="empty">
-        <image class="empty-icon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23CCCCCC'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E"></image>
+        <t-icon name="star" size="160rpx" color="#CCCCCC" />
         <text class="empty-text">还没有收藏模板</text>
         <text class="empty-tip">快去收藏你喜欢的模板吧</text>
       </view>
@@ -54,17 +70,17 @@
             <text class="template-name">{{item.name}}</text>
             <view class="template-meta">
               <view class="meta-item">
-                <text class="meta-icon">📸</text>
+                <t-icon name="image" size="28rpx" color="#999" />
                 <text class="meta-text">{{item.photoSetCount || 0}}</text>
               </view>
               <view class="meta-item">
-                <text class="meta-icon">❤️</text>
+                <t-icon name="heart-filled" size="28rpx" color="#FF4444" />
                 <text class="meta-text">{{item.likeCount || 0}}</text>
               </view>
             </view>
           </view>
           <view class="favorite-btn" catchtap="onUnfavoriteTemplate" data-id="{{item._id}}" data-index="{{index}}">
-            <text class="favorite-icon">❤️</text>
+            <t-icon name="star-filled" size="40rpx" color="#FFD700" />
           </view>
         </view>
       </view>
@@ -73,7 +89,7 @@
     <!-- 收藏的照片集 -->
     <view class="content-section" wx:if="{{currentTab === 1}}">
       <view wx:if="{{photoSets.length === 0}}" class="empty">
-        <image class="empty-icon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23CCCCCC'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E"></image>
+        <t-icon name="image" size="160rpx" color="#CCCCCC" />
         <text class="empty-text">还没有收藏照片集</text>
         <text class="empty-tip">快去收藏你喜欢的照片集吧</text>
       </view>
@@ -89,7 +105,7 @@
           <image class="photoset-cover" src="{{item.coverPhoto}}" mode="aspectFill"></image>
           <view class="photoset-overlay">
             <view class="photo-count">
-              <text class="count-icon">📷</text>
+              <t-icon name="camera" size="28rpx" color="#FFFFFF" />
               <text class="count-text">{{item.photos.length}}</text>
             </view>
           </view>
@@ -97,21 +113,95 @@
             <text class="photoset-title">{{item.title}}</text>
             <view class="photoset-meta">
               <view class="meta-item">
-                <text class="meta-icon">👁</text>
+                <t-icon name="browse" size="28rpx" color="#999" />
                 <text class="meta-text">{{item.viewCount || 0}}</text>
               </view>
               <view class="meta-item">
-                <text class="meta-icon">❤️</text>
+                <t-icon name="heart-filled" size="28rpx" color="#FF4444" />
                 <text class="meta-text">{{item.likeCount || 0}}</text>
               </view>
             </view>
           </view>
           <view class="favorite-btn" catchtap="onUnfavoritePhotoSet" data-id="{{item._id}}" data-index="{{index}}">
-            <text class="favorite-icon">❤️</text>
+            <t-icon name="star-filled" size="40rpx" color="#FFD700" />
           </view>
         </view>
       </view>
     </view>
 
-  </view>
+    <!-- 收藏的商品 -->
+    <view class="content-section" wx:if="{{currentTab === 2}}">
+      <view wx:if="{{goods.length === 0}}" class="empty">
+        <t-icon name="cart" size="160rpx" color="#CCCCCC" />
+        <text class="empty-text">还没有收藏商品</text>
+        <text class="empty-tip">快去收藏你喜欢的商品吧</text>
+      </view>
+
+      <view wx:else class="goods-grid">
+        <view
+          wx:for="{{goods}}"
+          wx:key="_id"
+          class="goods-card"
+          data-id="{{item._id}}"
+          bindtap="onGoodsTap"
+        >
+          <image class="goods-cover" src="{{item.img || item.coverImage}}" mode="aspectFill"></image>
+          <view class="goods-info">
+            <text class="goods-name">{{item.name}}</text>
+            <view class="goods-price-row">
+              <view class="price-box">
+                <text class="price-symbol">¥</text>
+                <text class="price-value">{{item.price}}</text>
+              </view>
+              <text class="sold-text">已售{{item.sold || 0}}</text>
+            </view>
+          </view>
+          <view class="favorite-btn" catchtap="onUnfavoriteGoods" data-id="{{item._id}}" data-index="{{index}}">
+            <t-icon name="star-filled" size="40rpx" color="#FFD700" />
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 收藏的地点 -->
+    <view class="content-section" wx:if="{{currentTab === 3}}">
+      <view wx:if="{{locations.length === 0}}" class="empty">
+        <t-icon name="location" size="160rpx" color="#CCCCCC" />
+        <text class="empty-text">还没有收藏地点</text>
+        <text class="empty-tip">快去收藏你喜欢的地点吧</text>
+      </view>
+
+      <view wx:else class="location-grid">
+        <view
+          wx:for="{{locations}}"
+          wx:key="_id"
+          class="location-card"
+          data-id="{{item._id}}"
+          bindtap="onLocationTap"
+        >
+          <image class="location-cover" src="{{item.coverImage}}" mode="aspectFill"></image>
+          <view class="location-info">
+            <text class="location-name">{{item.name}}</text>
+            <view class="location-tags" wx:if="{{item.tags && item.tags.length > 0}}">
+              <text class="location-tag" wx:for="{{item.tags}}" wx:key="index" wx:for-item="tag">{{tag}}</text>
+            </view>
+            <view class="location-meta">
+              <view class="meta-item" wx:if="{{item.rating}}">
+                <t-icon name="star-filled" size="28rpx" color="#FFD700" />
+                <text class="meta-text">{{item.rating}}</text>
+              </view>
+              <view class="meta-item">
+                <t-icon name="location" size="28rpx" color="#999" />
+                <text class="meta-text">{{item.checkInCount || 0}}人打卡</text>
+              </view>
+            </view>
+          </view>
+          <view class="favorite-btn" catchtap="onUnfavoriteLocation" data-id="{{item._id}}" data-index="{{index}}">
+            <t-icon name="star-filled" size="40rpx" color="#FFD700" />
+          </view>
+        </view>
+      </view>
+    </view>
+
+  </scroll-view>
 </view>

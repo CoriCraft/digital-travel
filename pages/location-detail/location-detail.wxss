@@ -329,11 +329,27 @@
   width: 100%;
   background: #fff;
   padding: 16rpx 24rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   display: flex;
   gap: 16rpx;
   box-shadow: 0 -4rpx 16rpx rgba(0,0,0,0.05);
   z-index: 998;
+}
+
+.action-icon-btn {
+  width: 100rpx;
+  height: 88rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+}
+
+.icon-label {
+  font-size: 22rpx;
+  color: #666;
 }
 
 .action-btn {
@@ -357,4 +373,10 @@
   background: linear-gradient(90deg, rgba(143, 241, 236, 0.8) 0%, rgba(130, 244, 95, 0.8) 100%);
   color: #2e4422;
   box-shadow: 0 4rpx 12rpx rgba(130, 244, 95, 0.3);
+}
+
+.btn-checked {
+  background: #f5f5f5;
+  color: #999;
+  border: 2rpx solid #e0e0e0;
 }

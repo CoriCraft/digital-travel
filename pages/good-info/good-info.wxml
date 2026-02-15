@@ -79,13 +79,51 @@
       </block>
     </view>
 
+    <!-- 用户评价 -->
+    <view class="reviews-section">
+      <view class="reviews-header">
+        <view class="reviews-bar"></view>
+        <text class="reviews-text">用户评价</text>
+        <text class="reviews-count">({{reviewCount}})</text>
+      </view>
+
+      <!-- 写评价按钮 -->
+      <view class="write-review-btn" bindtap="onWriteReview">
+        <t-icon name="edit" size="32rpx" color="#ff6b35" />
+        <text>写评价</text>
+      </view>
+
+      <!-- 评价列表 -->
+      <view wx:if="{{reviews.length > 0}}" class="reviews-list">
+        <view class="review-item" wx:for="{{reviews}}" wx:key="_id" bindlongpress="onReviewReport" data-id="{{item._id}}" data-type="goods" data-content="{{item.content}}">
+          <view class="review-user">
+            <image class="user-avatar" src="{{item.userAvatar || '/static/icons/default-avatar.png'}}" />
+            <view class="user-info">
+              <text class="user-name">{{item.userName}}</text>
+              <view class="review-rating">
+                <text class="star {{index < item.rating ? 'active' : ''}}" wx:for="{{[1,2,3,4,5]}}" wx:for-index="index" wx:key="index">★</text>
+              </view>
+            </view>
+            <text class="review-time">{{item.createTime}}</text>
+          </view>
+          <view class="review-content">{{item.content}}</view>
+        </view>
+      </view>
+
+      <!-- 暂无评价 -->
+      <view wx:else class="no-reviews">
+        <t-icon name="chat" size="80rpx" color="#ccc" />
+        <text class="no-reviews-text">暂无评价，快来抢沙发吧~</text>
+      </view>
+    </view>
+
     <view style="height: 120rpx;"></view>
   </scroll-view>
 
   <!-- 底部购买栏 -->
   <view class="bottom-bar" wx:if="{{!loading}}">
     <view class="fav-btn" bindtap="toggleFavorite">
-      <t-icon name="{{isFavorite ? 'heart-filled' : 'heart'}}" size="40rpx" color="{{isFavorite ? '#ff6b35' : '#666'}}" />
+      <t-icon name="{{isFavorite ? 'star-filled' : 'star'}}" size="40rpx" color="{{isFavorite ? '#FFD700' : '#666'}}" />
       <text class="fav-text">{{isFavorite ? '已收藏' : '收藏'}}</text>
     </view>
 

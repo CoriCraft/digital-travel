@@ -94,9 +94,9 @@
 
       <!-- 评论列表 -->
       <view class="review-list" wx:if="{{reviews.length > 0}}">
-        <view class="review-item" wx:for="{{reviews}}" wx:key="_id">
+        <view class="review-item" wx:for="{{reviews}}" wx:key="_id" bindlongpress="onReviewReport" data-id="{{item._id}}" data-type="location" data-content="{{item.content}}">
           <view class="review-header">
-            <image class="user-avatar" src="{{item.userAvatar || '/static/default-avatar.png'}}" mode="aspectFill" />
+            <image class="user-avatar" src="{{item.userAvatar || '/static/images/default-avatar.png'}}" mode="aspectFill" />
             <view class="user-info">
               <text class="user-name">{{item.userName}}</text>
               <view class="rating-stars">
@@ -126,11 +126,15 @@
 
   <!-- 底部操作栏 -->
   <view class="bottom-bar" wx:if="{{!loading}}">
+    <view class="action-icon-btn" bindtap="onToggleFavorite">
+      <t-icon name="{{isFavorite ? 'star-filled' : 'star'}}" size="48rpx" color="{{isFavorite ? '#FFD700' : '#666'}}" />
+      <text class="icon-label">{{isFavorite ? '已收藏' : '收藏'}}</text>
+    </view>
     <view class="action-btn btn-navigate" bindtap="onNavigate">
       <text>导航</text>
     </view>
-    <view class="action-btn btn-checkin" bindtap="onCheckIn">
-      <text>打卡</text>
+    <view class="action-btn {{hasCheckedIn ? 'btn-checked' : 'btn-checkin'}}" bindtap="onCheckIn">
+      <text>{{hasCheckedIn ? '已打卡' : '打卡'}}</text>
     </view>
   </view>
 </view>

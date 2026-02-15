@@ -71,7 +71,7 @@
     <!-- 照片集列表 -->
     <view class="photoset-list">
       <view class="photoset-card" wx:for="{{photoSets}}" wx:key="_id" data-id="{{item._id}}" bindtap="onPhotoSetTap">
-        <image class="photoset-cover" src="{{item.coverPhoto}}" mode="aspectFill" />
+        <image class="photoset-cover" src="{{item.coverThumbnail || item.coverPhoto}}" mode="aspectFill" lazy-load="{{true}}" />
         <view class="photoset-info">
           <view class="photoset-title-row">
             <text class="photoset-title">{{item.title}}</text>

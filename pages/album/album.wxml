@@ -1,19 +1,12 @@
 <view class="album-page">
-  <view class="nav-bar" style="height: {{statusBarHeight + navBarHeight}}px; padding-top: {{statusBarHeight}}px;">
-    <view class="nav-content" style="height: {{navBarHeight}}px;">
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+    <view class="nav-content">
       <view class="nav-left">
-        <view class="nav-icon" bindtap="goBack">
-          <image src="/static/icons/home.svg" class="icon-img"></image>
-        </view>
+        <t-icon name="home" size="48rpx" color="#333" />
       </view>
       <view class="nav-title">电子相册</view>
       <view class="nav-right">
-        <view class="nav-icon" bindtap="showMore">
-          <image src="/static/icons/more.svg" class="icon-img"></image>
-        </view>
-        <view class="nav-icon" bindtap="showSearch">
-          <image src="/static/icons/search.svg" class="icon-img"></image>
-        </view>
+        <!-- 右侧图标已移除 -->
       </view>
     </view>
   </view>

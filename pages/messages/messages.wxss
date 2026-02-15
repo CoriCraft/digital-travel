@@ -1,0 +1,235 @@
+.container {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, rgba(143, 241, 236, 0.3) 0%, rgba(130, 244, 95, 0.3) 100%);
+}
+
+/* 导航栏 */
+.nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: transparent;
+  z-index: 1000;
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 32rpx;
+}
+
+.nav-left {
+  width: 80rpx;
+}
+
+.nav-title {
+  flex: 1;
+  text-align: center;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.nav-right {
+  width: 120rpx;
+  text-align: right;
+}
+
+.mark-read-text {
+  font-size: 28rpx;
+  color: #3ECE79;
+}
+
+/* 主内容区 */
+.main-content {
+  padding-bottom: 40rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 筛选标签 */
+.filter-tabs {
+  display: flex !important;
+  background-color: transparent;
+  padding: 20rpx 32rpx;
+  border-bottom: 1px solid #eee;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.tab-item {
+  position: relative;
+  width: 20% !important;
+  flex-shrink: 0 !important;
+  text-align: center;
+  font-size: 30rpx;
+  color: #666;
+  padding: 16rpx 0;
+  transition: all 0.3s;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.tab-item.active {
+  color: #3ECE79;
+  font-weight: 600;
+  font-size: 32rpx;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48rpx;
+  height: 4rpx;
+  background-color: #3ECE79;
+  border-radius: 2rpx;
+}
+
+.tab-badge {
+  position: absolute;
+  top: 8rpx;
+  right: 20rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  line-height: 32rpx;
+  padding: 0 8rpx;
+  background-color: #ff4d4f;
+  color: #fff;
+  font-size: 20rpx;
+  border-radius: 16rpx;
+  text-align: center;
+}
+
+/* 消息列表 */
+.message-list {
+  padding: 20rpx 32rpx;
+}
+
+.message-item {
+  position: relative;
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+}
+
+.message-item.unread {
+  background-color: #f0fdf4;
+  border-left: 4rpx solid #3ECE79;
+}
+
+.message-item:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.message-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.message-type-badge {
+  display: inline-block;
+  padding: 8rpx 16rpx;
+  font-size: 22rpx;
+  border-radius: 8rpx;
+  font-weight: 500;
+}
+
+.message-type-badge.type-warning {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.message-type-badge.type-report_handled {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.message-type-badge.type-feedback_replied {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.message-type-badge.type-system {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.message-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.message-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12rpx;
+  line-height: 1.4;
+}
+
+.message-content {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+.unread-dot {
+  position: absolute;
+  top: 32rpx;
+  right: 32rpx;
+  width: 16rpx;
+  height: 16rpx;
+  background-color: #ff4d4f;
+  border-radius: 50%;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.empty-text {
+  margin-top: 32rpx;
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 加载状态 */
+.loading-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx 0;
+}
+
+.loading-text {
+  margin-left: 16rpx;
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 没有更多 */
+.no-more {
+  text-align: center;
+  padding: 40rpx 0;
+  font-size: 28rpx;
+  color: #999;
+}

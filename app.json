@@ -1,4 +1,10 @@
 {
+  "plugins": {
+    "mini-shop-plugin": {
+      "version": "latest",
+      "provider": "wx34345ae5855f892d"
+    }
+  },
   "tabBar": {
     "custom": true,
     "list": [
@@ -38,6 +44,10 @@
     "pages/upload-photoset/upload-photoset",
     "pages/my-works/my-works",
     "pages/my-favorites/my-favorites",
+    "pages/messages/messages",
+    "pages/help-center/help-center",
+    "pages/feedback/feedback",
+    "pages/settings/settings",
     "pages/experience/experience",
     "pages/location-detail/location-detail",
     "pages/write-review/write-review",
@@ -45,7 +55,8 @@
     "pages/album/album",
     "pages/my/my",
     "pages/debug/debug",
-    "pages/good-info/good-info"
+    "pages/good-info/good-info",
+    "pages/test-security/test-security"
   ],
   "window": {
     "navigationStyle": "custom",
@@ -59,7 +70,18 @@
     }
   },
   "requiredPrivateInfos": [
-    "chooseLocation"
+    "chooseLocation",
+    "getLocation"
+  ],
+  "navigateToMiniProgramAppIdList": [
+    "wxe5f52902cf4de896",
+    "wx8ac5d9e8e1be3527",
+    "wxefd4cdd5bdf52cbe",
+    "wx91d27dbf599dff74",
+    "wx8a7b431baea0ad19",
+    "wx3c12bd8a9a0e4801",
+    "wxbd687630cd02ce1d",
+    "wx1bfccbb25a60fd88"
   ],
   "style": "v2",
   "componentFramework": "glass-easel",

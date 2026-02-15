@@ -13,7 +13,9 @@ Page({
     locationId: '',
     location: null,
     loading: true,
-    reviews: []
+    reviews: [],
+    hasCheckedIn: false, // 是否已打卡
+    isFavorite: false, // 是否已收藏
   },
 
   /**
@@ -29,6 +31,8 @@ Page({
     if (options.id) {
       this.loadLocationDetail(options.id);
       this.loadReviews(options.id);
+      this.checkCheckInStatus(options.id);
+      this.checkFavoriteStatus(options.id);
     }
   },
 
@@ -79,6 +83,103 @@ Page({
   },
 
   /**
+   * 检查收藏状态
+   */
+  checkFavoriteStatus(locationId) {
+    const favoriteLocations = wx.getStorageSync('favoriteLocations') || [];
+    const isFavorite = favoriteLocations.includes(locationId);
+    this.setData({ isFavorite });
+  },
+
+  /**
+   * 切换收藏状态
+   */
+  onToggleFavorite() {
+    const { isFavorite, locationId, location } = this.data;
+    let favoriteLocations = wx.getStorageSync('favoriteLocations') || [];
+
+    const db = wx.cloud.database();
+    const _ = db.command;
+
+    if (isFavorite) {
+      // 取消收藏
+      favoriteLocations = favoriteLocations.filter(id => id !== locationId);
+      // 数据库收藏量 -1
+      const currentCount = location.favoriteCount || 0;
+      if (currentCount > 0) {
+        db.collection('locations')
+          .doc(locationId)
+          .update({
+            data: { favoriteCount: _.inc(-1) }
+          })
+          .then(() => {
+            console.log('收藏量-1');
+            this.setData({
+              'location.favoriteCount': currentCount - 1
+            });
+          })
+          .catch(err => {
+            console.error('更新收藏量失败:', err);
+          });
+      }
+      wx.showToast({
+        title: '已取消收藏',
+        icon: 'success'
+      });
+    } else {
+      // 添加收藏
+      favoriteLocations.push(locationId);
+      // 数据库收藏量 +1
+      db.collection('locations')
+        .doc(locationId)
+        .update({
+          data: { favoriteCount: _.inc(1) }
+        })
+        .then(() => {
+          console.log('收藏量+1');
+          this.setData({
+            'location.favoriteCount': (location.favoriteCount || 0) + 1
+          });
+        })
+        .catch(err => {
+          console.error('更新收藏量失败:', err);
+        });
+      wx.showToast({
+        title: '收藏成功',
+        icon: 'success'
+      });
+    }
+
+    wx.setStorageSync('favoriteLocations', favoriteLocations);
+    this.setData({ isFavorite: !isFavorite });
+  },
+
+  /**
+   * 检查打卡状态
+   */
+  async checkCheckInStatus(locationId) {
+    try {
+      const userInfo = app.globalData.userInfo;
+      if (!userInfo || !userInfo.openid) {
+        return;
+      }
+
+      const { data } = await db.collection('check_ins')
+        .where({
+          locationId: locationId,
+          userId: userInfo.openid
+        })
+        .get();
+
+      this.setData({
+        hasCheckedIn: data.length > 0
+      });
+    } catch (error) {
+      console.error('检查打卡状态失败:', error);
+    }
+  },
+
+  /**
    * 返回上一页
    */
   onBack() {
@@ -124,6 +225,7 @@ Page({
           title: '您已经打卡过了',
           icon: 'none'
         });
+        this.setData({ hasCheckedIn: true });
         return;
       }
 
@@ -151,7 +253,8 @@ Page({
 
       // 更新本地数据
       this.setData({
-        'location.checkInCount': (this.data.location.checkInCount || 0) + 1
+        'location.checkInCount': (this.data.location.checkInCount || 0) + 1,
+        hasCheckedIn: true
       });
 
       wx.hideLoading();
@@ -170,12 +273,36 @@ Page({
   },
 
   /**
-   * 分享
+   * 分享给好友
+   */
+  onShareAppMessage() {
+    const { location } = this.data;
+    return {
+      title: location.name || '线下体验地点',
+      path: `/pages/location-detail/location-detail?id=${location._id}`,
+      imageUrl: location.coverImage
+    };
+  },
+
+  /**
+   * 分享到朋友圈
+   */
+  onShareTimeline() {
+    const { location } = this.data;
+    return {
+      title: location.name || '线下体验地点',
+      query: `id=${location._id}`,
+      imageUrl: location.coverImage
+    };
+  },
+
+  /**
+   * 分享按钮点击（可选，用于自定义分享按钮）
    */
   onShare() {
-    wx.showToast({
-      title: '分享功能开发中',
-      icon: 'none'
+    wx.showShareMenu({
+      withShareTicket: true,
+      menus: ['shareAppMessage', 'shareTimeline']
     });
   },
 
@@ -263,5 +390,79 @@ Page({
     wx.navigateTo({
       url: `/pages/write-review/write-review?locationId=${this.data.locationId}&locationName=${this.data.location.name}`
     });
+  },
+
+  /**
+   * 长按举报评论
+   */
+  onReviewReport(e) {
+    const { id, type, content } = e.currentTarget.dataset;
+
+    wx.showActionSheet({
+      itemList: ['举报该评论'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this.showReportDialog(id, 'review_' + type, content.substring(0, 20));
+        }
+      }
+    });
+  },
+
+  /**
+   * 显示举报对话框
+   */
+  showReportDialog(targetId, targetType, targetName) {
+    const reportReasons = [
+      '色情低俗',
+      '违法违规',
+      '虚假信息',
+      '侵权内容',
+      '垃圾广告',
+      '其他原因'
+    ];
+
+    wx.showActionSheet({
+      itemList: reportReasons,
+      success: async (res) => {
+        const reason = reportReasons[res.tapIndex];
+        await this.submitReport(targetId, targetType, targetName, reason);
+      }
+    });
+  },
+
+  /**
+   * 提交举报
+   */
+  async submitReport(targetId, targetType, targetName, reason) {
+    try {
+      wx.showLoading({ title: '提交中...' });
+
+      const db = wx.cloud.database();
+      await db.collection('reports').add({
+        data: {
+          targetId,
+          targetType,
+          targetName,
+          reason,
+          reporterOpenId: app.globalData.userInfo?.openid || '',
+          reporterName: app.globalData.userInfo?.nickName || '匿名用户',
+          status: 'pending',
+          createTime: new Date(),
+        }
+      });
+
+      wx.hideLoading();
+      wx.showToast({
+        title: '举报成功',
+        icon: 'success'
+      });
+    } catch (err) {
+      console.error('举报失败:', err);
+      wx.hideLoading();
+      wx.showToast({
+        title: '举报失败',
+        icon: 'none'
+      });
+    }
   }
 })

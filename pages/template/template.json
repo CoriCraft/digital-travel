@@ -1,10 +1,11 @@
 {
-  "navigationStyle" : "custom",
-  "usingComponents" : {
-    "t-icon" : "tdesign-miniprogram/icon/icon",
-    "t-input" : "tdesign-miniprogram/input/input",
-    "t-divider" : "tdesign-miniprogram/divider/divider",
-    "t-tabs" : "tdesign-miniprogram/tabs/tabs",
-    "t-tab-panel" : "tdesign-miniprogram/tab-panel/tab-panel"
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-input": "tdesign-miniprogram/input/input",
+    "t-divider": "tdesign-miniprogram/divider/divider",
+    "t-tabs": "tdesign-miniprogram/tabs/tabs",
+    "t-tab-panel": "tdesign-miniprogram/tab-panel/tab-panel",
+    "search-bar": "/components/search-bar/search-bar"
   }
 }

@@ -17,6 +17,10 @@ Page({
 
     // 收藏状态
     isFavorite: false,
+
+    // 评价相关
+    reviews: [],
+    reviewCount: 0,
   },
 
   /**
@@ -32,6 +36,7 @@ Page({
 
     this.loadGoodsDetail();
     this.checkFavoriteStatus();
+    this.loadReviews();
   },
 
   /**
@@ -108,39 +113,105 @@ Page({
   },
 
   /**
-   * 立即购买 - 复制商品链接（因微信限制，实物商品小程序无法直接跳转）
+   * 立即购买
    */
   onBuyNow() {
     const { goods } = this.data;
 
-    // 使用短链接（复制到剪贴板）
+    // 使用短链接
     if (goods.shortLink) {
-      wx.setClipboardData({
-        data: goods.shortLink,
-        success: () => {
-          wx.showModal({
-            title: '链接已复制',
-            content: '已复制购买链接，请在微信聊天窗口粘贴打开即可购买',
-            confirmText: '我知道了',
-            showCancel: false
-          });
-        },
-        fail: () => {
-          wx.showToast({
-            title: '复制失败，请重试',
-            icon: 'none'
-          });
-        }
-      });
+      this.copyLink(goods.shortLink);
+      // 统计复制次数（一天内只算一次）
+      this.incrementCopyCount();
       return;
     }
 
-    // 如果没有配置短链接，提示用户
+    // 没有配置购买方式
     wx.showModal({
-      title: '提示',
-      content: '该商品暂未配置购买链接，请联系客服',
-      confirmText: '我知道了',
+      title: '暂无购买链接',
+      content: '该商品暂未配置购买链接\n\n如需购买，请联系客服咨询',
+      confirmText: '知道了',
       showCancel: false
+    });
+  },
+
+  /**
+   * 增加复制次数统计（一天内只算一次）
+   */
+  incrementCopyCount() {
+    const { goodsId } = this.data;
+    const storageKey = `goods_copy_${goodsId}`;
+    const lastCopyTime = wx.getStorageSync(storageKey) || 0;
+    const now = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000; // 24小时
+
+    // 如果距离上次复制超过24小时，才增加复制量
+    if (now - lastCopyTime > oneDay) {
+      const db = wx.cloud.database();
+      const _ = db.command;
+
+      db.collection('goods')
+        .doc(goodsId)
+        .update({
+          data: {
+            copyCount: _.inc(1)
+          }
+        })
+        .then(() => {
+          console.log('复制次数+1');
+          // 记录本次复制时间
+          wx.setStorageSync(storageKey, now);
+        })
+        .catch(err => {
+          console.error('更新复制次数失败:', err);
+        });
+    } else {
+      console.log('24小时内已复制过，不重复计数');
+    }
+  },
+
+  /**
+   * 增加分享次数统计
+   */
+  incrementShareCount() {
+    const db = wx.cloud.database();
+    const _ = db.command;
+
+    db.collection('goods')
+      .doc(this.data.goodsId)
+      .update({
+        data: {
+          shareCount: _.inc(1)
+        }
+      })
+      .then(() => {
+        console.log('分享次数+1');
+      })
+      .catch(err => {
+        console.error('更新分享次数失败:', err);
+      });
+  },
+
+  /**
+   * 复制链接
+   */
+  copyLink(url) {
+    wx.setClipboardData({
+      data: url,
+      success: () => {
+        wx.showModal({
+          title: '购买链接已复制',
+          content: '购买链接已复制到剪贴板\n\n请在微信聊天窗口中粘贴打开链接，即可完成购买',
+          confirmText: '知道了',
+          showCancel: false
+        });
+      },
+      fail: () => {
+        wx.showToast({
+          title: '复制失败，请重试',
+          icon: 'none'
+        });
+      }
     });
   },
 
@@ -149,11 +220,110 @@ Page({
    */
   onShareAppMessage() {
     const { goods } = this.data;
+
+    // 统计分享次数
+    this.incrementShareCount();
+
     return {
       title: goods.name,
       path: `/pages/good-info/good-info?id=${goods._id}`,
       imageUrl: goods.coverImage
     };
+  },
+
+  /**
+   * 分享到朋友圈
+   */
+  onShareTimeline() {
+    const { goods } = this.data;
+
+    // 统计分享次数
+    this.incrementShareCount();
+
+    return {
+      title: goods.name,
+      query: `id=${goods._id}`,
+      imageUrl: goods.coverImage
+    };
+  },
+
+  /**
+   * 加载商品评价
+   */
+  async loadReviews() {
+    try {
+      const db = wx.cloud.database();
+      const { data } = await db.collection('goods_reviews')
+        .where({
+          goodsId: this.data.goodsId,
+          status: 'approved'
+        })
+        .orderBy('createTime', 'desc')
+        .limit(10)
+        .get();
+
+      // 格式化时间
+      const reviews = data.map(item => ({
+        ...item,
+        createTime: this.formatTime(item.createTime)
+      }));
+
+      this.setData({
+        reviews,
+        reviewCount: data.length
+      });
+    } catch (err) {
+      console.error('加载评价失败：', err);
+    }
+  },
+
+  /**
+   * 格式化时间
+   */
+  formatTime(date) {
+    if (!date) return '';
+    const d = new Date(date);
+    const now = new Date();
+    const diff = now - d;
+
+    // 一分钟内
+    if (diff < 60000) {
+      return '刚刚';
+    }
+    // 一小时内
+    if (diff < 3600000) {
+      return Math.floor(diff / 60000) + '分钟前';
+    }
+    // 一天内
+    if (diff < 86400000) {
+      return Math.floor(diff / 3600000) + '小时前';
+    }
+    // 一周内
+    if (diff < 604800000) {
+      return Math.floor(diff / 86400000) + '天前';
+    }
+    // 超过一周，显示日期
+    return `${d.getMonth() + 1}-${d.getDate()}`;
+  },
+
+  /**
+   * 写评价
+   */
+  onWriteReview() {
+    const { goodsId, goods } = this.data;
+    wx.navigateTo({
+      url: `/pages/write-review/write-review?type=goods&goodsId=${goodsId}&goodsName=${goods.name}`
+    });
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow() {
+    // 从评价页面返回时，重新加载评价列表
+    if (this.data.goodsId) {
+      this.loadReviews();
+    }
   },
 
   // 左上角返回按钮
@@ -166,6 +336,81 @@ Page({
       wx.switchTab({
         url: '/pages/purchase/purchase'
       })
+    }
+  },
+
+  /**
+   * 长按举报评论
+   */
+  onReviewReport(e) {
+    const { id, type, content } = e.currentTarget.dataset;
+
+    wx.showActionSheet({
+      itemList: ['举报该评论'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this.showReportDialog(id, 'review_' + type, content.substring(0, 20));
+        }
+      }
+    });
+  },
+
+  /**
+   * 显示举报对话框
+   */
+  showReportDialog(targetId, targetType, targetName) {
+    const reportReasons = [
+      '色情低俗',
+      '违法违规',
+      '虚假信息',
+      '侵权内容',
+      '垃圾广告',
+      '其他原因'
+    ];
+
+    wx.showActionSheet({
+      itemList: reportReasons,
+      success: async (res) => {
+        const reason = reportReasons[res.tapIndex];
+        await this.submitReport(targetId, targetType, targetName, reason);
+      }
+    });
+  },
+
+  /**
+   * 提交举报
+   */
+  async submitReport(targetId, targetType, targetName, reason) {
+    try {
+      wx.showLoading({ title: '提交中...' });
+
+      const app = getApp();
+      const db = wx.cloud.database();
+      await db.collection('reports').add({
+        data: {
+          targetId,
+          targetType,
+          targetName,
+          reason,
+          reporterOpenId: app.globalData.userInfo?.openid || '',
+          reporterName: app.globalData.userInfo?.nickName || '匿名用户',
+          status: 'pending',
+          createTime: new Date(),
+        }
+      });
+
+      wx.hideLoading();
+      wx.showToast({
+        title: '举报成功',
+        icon: 'success'
+      });
+    } catch (err) {
+      console.error('举报失败:', err);
+      wx.hideLoading();
+      wx.showToast({
+        title: '举报失败',
+        icon: 'none'
+      });
     }
   }
 })

@@ -1,5 +1,6 @@
 // pages/my/my.js
 const app = getApp()
+const { checkImageSecurity, checkOperationLimit, recordOperationTime, getRemainingTime } = require('../../utils/util.js')
 
 Page({
 
@@ -13,7 +14,8 @@ Page({
     userName: '微信用户',
     userPhone: '',
     templateCount: 0,
-    experienceCount: 0
+    experienceCount: 0,
+    unreadCount: 0
   },
 
   /**
@@ -43,6 +45,11 @@ Page({
 
     // 加载统计数据
     this.loadStatistics()
+
+    // 延迟加载未读消息数量，避免阻塞页面渲染
+    setTimeout(() => {
+      this.loadUnreadCount()
+    }, 500)
   },
 
   /**
@@ -51,6 +58,7 @@ Page({
   loadStatistics() {
     const userInfo = app.globalData.userInfo
     if (!userInfo || !userInfo.openid) {
+      console.log('用户信息未加载，跳过统计')
       return
     }
 
@@ -89,43 +97,73 @@ Page({
   /**
    * 选择头像
    */
-  onChooseAvatar(e) {
+  async onChooseAvatar(e) {
     const { avatarUrl } = e.detail
     console.log('选择头像:', avatarUrl)
 
-    // 上传头像到云存储
-    wx.showLoading({ title: '上传中...' })
+    // 检查更换频率（24小时内只能更换一次）
+    const canChange = checkOperationLimit('lastAvatarChangeTime', 1440)
+    if (!canChange) {
+      const remaining = getRemainingTime('lastAvatarChangeTime', 1440)
+      wx.showModal({
+        title: '操作限制',
+        content: `为了防止频繁更换头像，24小时内只能更换一次。距离下次可更换还需 ${remaining}`,
+        showCancel: false
+      })
+      return
+    }
 
-    const cloudPath = `avatars/${app.globalData.userInfo.openid}_${Date.now()}.jpg`
-    wx.cloud.uploadFile({
-      cloudPath: cloudPath,
-      filePath: avatarUrl,
-      success: res => {
-        console.log('头像上传成功:', res.fileID)
+    wx.showLoading({ title: '审核中...' })
 
-        // 更新本地显示
-        this.setData({
-          userAvatar: avatarUrl
-        })
+    try {
+      // 图片内容安全审核
+      const checkResult = await checkImageSecurity(avatarUrl)
 
-        // 更新全局用户信息
-        app.updateUserProfile(this.data.userName, res.fileID)
-
+      if (!checkResult.success) {
         wx.hideLoading()
-        wx.showToast({
-          title: '头像更新成功',
-          icon: 'success'
+        wx.showModal({
+          title: '审核失败',
+          content: checkResult.errMsg,
+          showCancel: false
         })
-      },
-      fail: err => {
-        console.error('头像上传失败:', err)
-        wx.hideLoading()
-        wx.showToast({
-          title: '头像上传失败',
-          icon: 'none'
-        })
+        return
       }
-    })
+
+      // 审核通过，上传头像到云存储
+      wx.showLoading({ title: '上传中...' })
+
+      const cloudPath = `avatars/${app.globalData.userInfo.openid}_${Date.now()}.jpg`
+      const uploadRes = await wx.cloud.uploadFile({
+        cloudPath: cloudPath,
+        filePath: avatarUrl
+      })
+
+      console.log('头像上传成功:', uploadRes.fileID)
+
+      // 更新本地显示
+      this.setData({
+        userAvatar: avatarUrl
+      })
+
+      // 更新全局用户信息
+      app.updateUserProfile(this.data.userName, uploadRes.fileID)
+
+      // 记录更换时间
+      recordOperationTime('lastAvatarChangeTime')
+
+      wx.hideLoading()
+      wx.showToast({
+        title: '头像更新成功',
+        icon: 'success'
+      })
+    } catch (err) {
+      console.error('头像上传失败:', err)
+      wx.hideLoading()
+      wx.showToast({
+        title: '头像上传失败',
+        icon: 'none'
+      })
+    }
   },
 
   /**
@@ -159,16 +197,6 @@ Page({
   },
 
   /**
-   * 导航到订单页面
-   */
-  navigateToOrders() {
-    wx.showToast({
-      title: '订单功能开发中',
-      icon: 'none'
-    })
-  },
-
-  /**
    * 导航到作品页面
    */
   navigateToProducts() {
@@ -187,12 +215,61 @@ Page({
   },
 
   /**
+   * 加载未读消息数量
+   */
+  async loadUnreadCount() {
+    try {
+      // 检查用户信息是否已加载
+      const userInfo = app.globalData.userInfo
+      if (!userInfo || !userInfo.openid) {
+        console.log('用户信息未加载，跳过加载未读消息数量')
+        return
+      }
+
+      // 设置超时保护
+      const timeoutPromise = new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ timeout: true })
+        }, 5000) // 5秒超时
+      })
+
+      const callFunctionPromise = wx.cloud.callFunction({
+        name: 'getUnreadCount'
+      })
+
+      const res = await Promise.race([callFunctionPromise, timeoutPromise])
+
+      if (res.timeout) {
+        console.log('获取未读消息数量超时，使用默认值')
+        return
+      }
+
+      if (res.result && res.result.success) {
+        this.setData({
+          unreadCount: res.result.count
+        })
+      }
+    } catch (err) {
+      console.error('加载未读消息数量失败:', err)
+      // 失败时不影响页面显示，静默处理
+    }
+  },
+
+  /**
+   * 导航到消息中心
+   */
+  navigateToMessages() {
+    wx.navigateTo({
+      url: '/pages/messages/messages'
+    })
+  },
+
+  /**
    * 导航到帮助中心
    */
   navigateToHelp() {
-    wx.showToast({
-      title: '帮助中心开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/pages/help-center/help-center'
     })
   },
 
@@ -200,9 +277,8 @@ Page({
    * 导航到服务改进
    */
   navigateToService() {
-    wx.showToast({
-      title: '服务改进开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/pages/feedback/feedback'
     })
   },
 
@@ -210,9 +286,8 @@ Page({
    * 导航到设置
    */
   navigateToSettings() {
-    wx.showToast({
-      title: '设置功能开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/pages/settings/settings'
     })
   },
 

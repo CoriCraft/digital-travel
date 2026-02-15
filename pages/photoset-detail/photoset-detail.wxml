@@ -11,7 +11,7 @@
   </view>
 
   <!-- 主内容区域 -->
-  <scroll-view class="content" scroll-y style="padding-top: calc({{statusBarHeight}}px + {{navBarHeight}}px);">
+  <scroll-view class="content" scroll-y style="padding-top: calc({{statusBarHeight}}px + {{navBarHeight}}px);" bindlongpress="onPhotoSetReport">
     <!-- 照片轮播区域 -->
     <view class="photo-section" wx:if="{{photoSet}}">
       <swiper
@@ -21,8 +21,15 @@
         current="{{currentIndex}}"
         bindchange="onSwiperChange"
       >
-        <swiper-item wx:for="{{photoSet.photos}}" wx:key="index">
-          <image class="photo-image" src="{{item}}" mode="aspectFill" />
+        <swiper-item wx:for="{{photoSet.photos}}" wx:key="index" wx:for-index="idx">
+          <image
+            class="photo-image"
+            src="{{photoSet.photoThumbnails[idx] || item}}"
+            mode="aspectFill"
+            bindtap="onPhotoTap"
+            data-index="{{idx}}"
+            lazy-load="{{true}}"
+          />
         </swiper-item>
       </swiper>
 
@@ -113,7 +120,7 @@
 
     <view class="action-item" bindtap="onToggleLike">
       <view class="action-icon {{isLiked ? 'active' : ''}}">
-        <t-icon name="heart{{isLiked ? '-filled' : ''}}" size="52rpx" color="{{isLiked ? '#82F45F' : '#666'}}" />
+        <t-icon name="heart{{isLiked ? '-filled' : ''}}" size="52rpx" color="{{isLiked ? '#FF4444' : '#666'}}" />
       </view>
       <text class="action-label {{isLiked ? 'active' : ''}}">{{isLiked ? '已赞' : '点赞'}}</text>
     </view>

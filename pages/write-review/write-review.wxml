@@ -12,9 +12,9 @@
 
   <!-- 页面内容 -->
   <view class="page-content" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
-    <!-- 地点名称 -->
+    <!-- 名称 -->
     <view class="location-info">
-      <text class="location-name">{{locationName}}</text>
+      <text class="location-name">{{type === 'goods' ? goodsName : locationName}}</text>
     </view>
 
     <!-- 评分 -->

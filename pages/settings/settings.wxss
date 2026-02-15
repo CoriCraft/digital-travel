@@ -1,0 +1,113 @@
+/* pages/settings/settings.wxss */
+
+page {
+  height: 100vh;
+  background: #F5F5F5;
+}
+
+.container {
+  height: 100%;
+  width: 100%;
+}
+
+/* 导航栏 */
+.nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: transparent;
+}
+
+.nav-content {
+  width: 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32rpx;
+  box-sizing: border-box;
+}
+
+.nav-left {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.nav-right-placeholder {
+  width: 48rpx;
+}
+
+/* 主内容 */
+.main-scroll {
+  height: 100%;
+  width: 100%;
+}
+
+/* 区块 */
+.section {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #999;
+  padding: 24rpx 24rpx 16rpx;
+}
+
+/* 设置卡片 */
+.setting-card {
+  background: #FFFFFF;
+  margin: 0 24rpx;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 0;
+}
+
+.setting-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  flex: 1;
+}
+
+.setting-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  flex: 1;
+}
+
+.setting-label {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.setting-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.setting-divider {
+  height: 1rpx;
+  background: #F0F0F0;
+  margin: 0 0 0 60rpx;
+}

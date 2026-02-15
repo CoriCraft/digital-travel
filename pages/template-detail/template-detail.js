@@ -1,5 +1,6 @@
 // pages/template-detail/template-detail.js
 const app = getApp()
+const { getThumbnailUrl } = require('../../utils/util.js')
 
 Page({
   /**
@@ -160,14 +161,21 @@ Page({
       .get()
       .then(res => {
         console.log('照片集列表:', res.data);
+
+        // 为每个照片集添加缩略图URL
+        const photoSetsWithThumbnail = res.data.map(photoSet => ({
+          ...photoSet,
+          coverThumbnail: getThumbnailUrl(photoSet.coverPhoto, 400)
+        }));
+
         this.setData({
-          photoSets: res.data,
+          photoSets: photoSetsWithThumbnail,
           loading: false
         });
 
         // 保存到缓存
         wx.setStorageSync(cacheKey, {
-          data: res.data,
+          data: photoSetsWithThumbnail,
           timestamp: now
         });
 
@@ -466,7 +474,19 @@ Page({
   onShareAppMessage() {
     return {
       title: this.data.template?.name || '照片集模板',
-      path: `/pages/template-detail/template-detail?id=${this.data.templateId}`
+      path: `/pages/template-detail/template-detail?id=${this.data.templateId}`,
+      imageUrl: this.data.template?.coverImage
+    };
+  },
+
+  /**
+   * 分享到朋友圈
+   */
+  onShareTimeline() {
+    return {
+      title: this.data.template?.name || '照片集模板',
+      query: `id=${this.data.templateId}`,
+      imageUrl: this.data.template?.coverImage
     };
   },
 

@@ -11,7 +11,8 @@ Page({
   data: {
     statusBarHeight: 0,
     navBarHeight: 0,
-    location: "方山风景区",
+    location: "当前位置",
+    searchKeyword: "", // 搜索关键词
     currentCategory: 1, // 默认选中"推荐"
     categoryList: [
       { label: '关注', value: 0 },
@@ -22,10 +23,10 @@ Page({
       { label: '玩乐', value: 5 },
     ],
     // Bento Box 数据
-    leisureLocation: null,    // 休闲玩乐
-    scenicLocation: null,     // 景点游玩
-    hotelLocation: null,      // 酒店民宿
-    foodLocation: null,       // 特色美食
+    leisureLocations: [],    // 休闲玩乐（2张）
+    scenicLocations: [],     // 景点游玩（3张）
+    hotelLocations: [],      // 酒店民宿（2张）
+    foodLocations: [],       // 特色美食（2张）
     // Feed 列表数据
     feedList: [],
     page: 0,
@@ -63,6 +64,14 @@ Page({
       const tabBar = this.getTabBar();
       tabBar.setData({
         value: 'experience',
+      });
+    }
+
+    // 读取全局位置
+    const cachedLocation = wx.getStorageSync('selectedLocation');
+    if (cachedLocation && Date.now() - cachedLocation.timestamp < 7 * 24 * 60 * 60 * 1000) {
+      this.setData({
+        location: cachedLocation.displayText || cachedLocation.name || '当前位置'
       });
     }
   },
@@ -107,13 +116,13 @@ Page({
    */
   async loadBentoBoxData() {
     try {
-      // 查询精选地点（isFeatured=true）
+      // 查询精选地点（isFeatured=true），按 featuredOrder 排序
       const { data } = await db.collection('locations')
         .where({
           isFeatured: true,
           status: 'active'
         })
-        .orderBy('order', 'asc')
+        .orderBy('featuredOrder', 'asc')
         .get();
 
       // 转换云存储路径为临时URL
@@ -141,17 +150,17 @@ Page({
         });
       }
 
-      // 按类型分类
-      const leisureLocation = data.find(item => item.type === 'leisure');
-      const scenicLocation = data.find(item => item.type === 'scenic');
-      const hotelLocation = data.find(item => item.type === 'hotel');
-      const foodLocation = data.find(item => item.type === 'food');
+      // 按类型分类，每个类型取前N个（按 featuredOrder 排序）
+      const leisureLocations = data.filter(item => item.type === 'leisure').slice(0, 2);
+      const scenicLocations = data.filter(item => item.type === 'scenic').slice(0, 3);
+      const hotelLocations = data.filter(item => item.type === 'hotel').slice(0, 2);
+      const foodLocations = data.filter(item => item.type === 'food').slice(0, 2);
 
       this.setData({
-        leisureLocation,
-        scenicLocation,
-        hotelLocation,
-        foodLocation
+        leisureLocations,
+        scenicLocations,
+        hotelLocations,
+        foodLocations
       });
     } catch (error) {
       console.error('加载 Bento Box 数据失败:', error);
@@ -174,11 +183,26 @@ Page({
     try {
       const page = reset ? 0 : this.data.page;
       const pageSize = this.data.pageSize;
+      const searchKeyword = this.data.searchKeyword;
 
       // 构建查询条件
-      let query = db.collection('locations').where({
+      let whereCondition = {
         status: 'active'
-      });
+      };
+
+      // 搜索功能：地点名称或描述匹配
+      if (searchKeyword && searchKeyword.trim() !== '') {
+        const keyword = searchKeyword.trim();
+        whereCondition = _.and([
+          whereCondition,
+          _.or([
+            { name: db.RegExp({ regexp: keyword, options: 'i' }) },
+            { description: db.RegExp({ regexp: keyword, options: 'i' }) }
+          ])
+        ]);
+      }
+
+      let query = db.collection('locations').where(whereCondition);
 
       // 根据当前分类筛选
       const currentCategory = this.data.currentCategory;
@@ -189,8 +213,33 @@ Page({
         // 推荐：按评分排序
         query = query.orderBy('rating', 'desc');
       } else if (currentCategory === 2) {
-        // 附近：按距离排序（暂时按打卡数排序，后续接入地理位置）
-        query = query.orderBy('checkInCount', 'desc');
+        // 附近：按地理位置距离排序
+        try {
+          const location = await this.getUserLocation();
+          if (location) {
+            const geoPoint = db.Geo.Point(location.longitude, location.latitude);
+            query = db.collection('locations')
+              .where(_.and([
+                whereCondition,
+                {
+                  location: db.command.geoNear({
+                    geometry: geoPoint,
+                    maxDistance: 100000,
+                    minDistance: 0
+                  })
+                }
+              ]));
+            // 保存用户位置用于计算距离
+            this.userLocation = location;
+          } else {
+            query = query.orderBy('checkInCount', 'desc');
+            this.userLocation = null;
+          }
+        } catch (err) {
+          console.error('获取位置失败:', err);
+          query = query.orderBy('checkInCount', 'desc');
+          this.userLocation = null;
+        }
       } else if (currentCategory === 3) {
         // 美食
         query = query.where({ type: 'food' }).orderBy('rating', 'desc');
@@ -225,6 +274,22 @@ Page({
         data.forEach(item => {
           if (item.coverImage && urlMap[item.coverImage]) {
             item.coverImage = urlMap[item.coverImage];
+          }
+        });
+      }
+
+      // 如果是附近模式且有用户位置，计算距离
+      if (currentCategory === 2 && this.userLocation) {
+        data.forEach(item => {
+          if (item.latitude && item.longitude) {
+            const distance = this.calculateDistance(
+              this.userLocation.latitude,
+              this.userLocation.longitude,
+              item.latitude,
+              item.longitude
+            );
+            item.distance = distance;
+            item.distanceText = this.formatDistance(distance);
           }
         });
       }
@@ -265,12 +330,95 @@ Page({
   },
 
   /**
-   * 点击位置切换
+   * 搜索输入
    */
-  onLocationTap() {
-    console.log('切换位置');
-    // TODO: 实现位置选择功能
+  onSearchInput(e) {
+    this.setData({
+      searchKeyword: e.detail.value
+    });
   },
+
+  /**
+   * 搜索
+   */
+  onSearch(e) {
+    const searchKeyword = e.detail.value || this.data.searchKeyword;
+    console.log('搜索关键词:', searchKeyword);
+
+    this.setData({
+      searchKeyword,
+      page: 0,
+      feedList: [],
+      hasMore: true
+    }, () => {
+      this.loadFeedList(true);
+    });
+  },
+
+  /**
+   * 获取用户当前位置
+   */
+  getUserLocation() {
+    return new Promise((resolve, reject) => {
+      wx.getLocation({
+        type: 'gcj02', // 返回可以用于wx.openLocation的经纬度
+        success: (res) => {
+          console.log('获取位置成功:', res);
+          resolve({
+            latitude: res.latitude,
+            longitude: res.longitude
+          });
+        },
+        fail: (err) => {
+          console.error('获取位置失败:', err);
+          // 如果用户拒绝授权，提示用户
+          if (err.errMsg.includes('auth deny')) {
+            wx.showModal({
+              title: '需要位置权限',
+              content: '查看附近地点需要获取您的位置信息，请在设置中开启位置权限',
+              confirmText: '去设置',
+              success: (res) => {
+                if (res.confirm) {
+                  wx.openSetting();
+                }
+              }
+            });
+          }
+          resolve(null);
+        }
+      });
+    });
+  },
+
+  /**
+   * 计算两点之间的距离（单位：米）
+   * 使用 Haversine 公式
+   */
+  calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371000; // 地球半径（米）
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  },
+
+  /**
+   * 格式化距离显示
+   */
+  formatDistance(distance) {
+    if (distance < 1000) {
+      return Math.round(distance) + 'm';
+    } else {
+      return (distance / 1000).toFixed(1) + 'km';
+    }
+  },
+
+  /**
+   * 点击位置切换 - 已移除，使用创意模板页面的位置选择
+   */
 
   /**
    * 查看景点详情

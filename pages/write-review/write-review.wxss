@@ -12,9 +12,8 @@
   left: 0;
   right: 0;
   z-index: 999;
-  background: #fff;
+  background: transparent;
   padding-top: var(--status-bar-height);
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
 }
 
 .nav-content {

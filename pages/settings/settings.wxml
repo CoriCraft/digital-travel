@@ -1,0 +1,134 @@
+<view class="container">
+  <!-- 导航栏 -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <t-icon name="chevron-left" size="48rpx" color="#333" />
+      </view>
+      <text class="nav-title">设置</text>
+      <view class="nav-right-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- 主内容 -->
+  <scroll-view scroll-y class="main-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+
+    <!-- 通知设置 -->
+    <view class="section">
+      <view class="section-title">通知设置</view>
+      <view class="setting-card">
+        <view class="setting-item">
+          <view class="setting-left">
+            <t-icon name="notification" size="40rpx" color="#3ECE79" />
+            <view class="setting-info">
+              <text class="setting-label">系统通知</text>
+              <text class="setting-desc">接收系统消息和活动通知</text>
+            </view>
+          </view>
+          <switch checked="{{notificationEnabled}}" bindchange="onNotificationChange" color="#3ECE79" />
+        </view>
+        <view class="setting-divider"></view>
+        <view class="setting-item">
+          <view class="setting-left">
+            <t-icon name="chat" size="40rpx" color="#3ECE79" />
+            <view class="setting-info">
+              <text class="setting-label">互动消息</text>
+              <text class="setting-desc">接收点赞、评论、收藏通知</text>
+            </view>
+          </view>
+          <switch checked="{{interactionEnabled}}" bindchange="onInteractionChange" color="#3ECE79" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 隐私设置 -->
+    <view class="section">
+      <view class="section-title">隐私设置</view>
+      <view class="setting-card">
+        <view class="setting-item" bindtap="onPrivacyTap">
+          <view class="setting-left">
+            <t-icon name="lock-on" size="40rpx" color="#3ECE79" />
+            <view class="setting-info">
+              <text class="setting-label">隐私政策</text>
+            </view>
+          </view>
+          <t-icon name="chevron-right" size="32rpx" color="#999" />
+        </view>
+        <view class="setting-divider"></view>
+        <view class="setting-item" bindtap="onUserAgreementTap">
+          <view class="setting-left">
+            <t-icon name="file-text" size="40rpx" color="#3ECE79" />
+            <view class="setting-info">
+              <text class="setting-label">用户协议</text>
+            </view>
+          </view>
+          <t-icon name="chevron-right" size="32rpx" color="#999" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 缓存管理 -->
+    <view class="section">
+      <view class="section-title">缓存管理</view>
+      <view class="setting-card">
+        <view class="setting-item" bindtap="onClearCache">
+          <view class="setting-left">
+            <t-icon name="delete" size="40rpx" color="#3ECE79" />
+            <view class="setting-info">
+              <text class="setting-label">清除缓存</text>
+              <text class="setting-desc">当前缓存：{{cacheSize}}</text>
+            </view>
+          </view>
+          <t-icon name="chevron-right" size="32rpx" color="#999" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 关于 -->
+    <view class="section">
+      <view class="section-title">关于</view>
+      <view class="setting-card">
+        <view class="setting-item" bindtap="onAboutTap">
+          <view class="setting-left">
+            <t-icon name="info-circle" size="40rpx" color="#3ECE79" />
+            <view class="setting-info">
+              <text class="setting-label">关于我们</text>
+              <text class="setting-desc">版本号：{{version}}</text>
+            </view>
+          </view>
+          <t-icon name="chevron-right" size="32rpx" color="#999" />
+        </view>
+        <view class="setting-divider"></view>
+        <view class="setting-item" bindtap="onCheckUpdate">
+          <view class="setting-left">
+            <t-icon name="refresh" size="40rpx" color="#3ECE79" />
+            <view class="setting-info">
+              <text class="setting-label">检查更新</text>
+            </view>
+          </view>
+          <t-icon name="chevron-right" size="32rpx" color="#999" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 账号管理 -->
+    <view class="section">
+      <view class="section-title">账号管理</view>
+      <view class="setting-card">
+        <view class="setting-item" bindtap="onLogout">
+          <view class="setting-left">
+            <t-icon name="logout" size="40rpx" color="#FF4444" />
+            <view class="setting-info">
+              <text class="setting-label" style="color: #FF4444;">退出登录</text>
+            </view>
+          </view>
+          <t-icon name="chevron-right" size="32rpx" color="#999" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部间距 -->
+    <view style="height: 40rpx;"></view>
+
+  </scroll-view>
+</view>

@@ -1,5 +1,6 @@
 // pages/photoset-detail/photoset-detail.js
 const app = getApp()
+const { getThumbnailUrl } = require('../../utils/util.js')
 
 Page({
   /**
@@ -64,14 +65,21 @@ Page({
       .get()
       .then(res => {
         console.log('照片集详情:', res.data);
+
+        // 为照片添加缩略图URL
+        const photoSet = {
+          ...res.data,
+          photoThumbnails: res.data.photos.map(photo => getThumbnailUrl(photo, 600))
+        };
+
         this.setData({
-          photoSet: res.data,
+          photoSet: photoSet,
           formattedTime: this.formatTime(res.data.createTime)
         });
 
         // 保存到缓存
         wx.setStorageSync(cacheKey, {
-          data: res.data,
+          data: photoSet,
           timestamp: now
         });
       })
@@ -280,6 +288,22 @@ Page({
   },
 
   /**
+   * 点击照片查看原图
+   */
+  onPhotoTap(e) {
+    const { index } = e.currentTarget.dataset;
+    const { photoSet } = this.data;
+
+    if (!photoSet || !photoSet.photos) return;
+
+    // 预览原图
+    wx.previewImage({
+      current: photoSet.photos[index],
+      urls: photoSet.photos
+    });
+  },
+
+  /**
    * 点赞/取消点赞
    */
   onToggleLike() {
@@ -437,5 +461,92 @@ Page({
       path: `/pages/photoset-detail/photoset-detail?id=${this.data.photoSetId}`,
       imageUrl: this.data.photoSet?.coverPhoto || ''
     };
+  },
+
+  /**
+   * 分享到朋友圈
+   */
+  onShareTimeline() {
+    return {
+      title: this.data.photoSet?.title || '精美照片集',
+      query: `id=${this.data.photoSetId}`,
+      imageUrl: this.data.photoSet?.coverPhoto || ''
+    };
+  },
+
+  /**
+   * 长按举报照片集
+   */
+  onPhotoSetReport() {
+    const { photoSet } = this.data;
+    if (!photoSet) return;
+
+    wx.showActionSheet({
+      itemList: ['举报该照片集'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this.showReportDialog(photoSet._id, 'photoset', photoSet.title);
+        }
+      }
+    });
+  },
+
+  /**
+   * 显示举报对话框
+   */
+  showReportDialog(targetId, targetType, targetName) {
+    const reportReasons = [
+      '色情低俗',
+      '违法违规',
+      '虚假信息',
+      '侵权内容',
+      '垃圾广告',
+      '其他原因'
+    ];
+
+    wx.showActionSheet({
+      itemList: reportReasons,
+      success: async (res) => {
+        const reason = reportReasons[res.tapIndex];
+        await this.submitReport(targetId, targetType, targetName, reason);
+      }
+    });
+  },
+
+  /**
+   * 提交举报
+   */
+  async submitReport(targetId, targetType, targetName, reason) {
+    try {
+      wx.showLoading({ title: '提交中...' });
+
+      const app = getApp();
+      const db = wx.cloud.database();
+      await db.collection('reports').add({
+        data: {
+          targetId,
+          targetType,
+          targetName,
+          reason,
+          reporterOpenId: app.globalData.userInfo?.openid || '',
+          reporterName: app.globalData.userInfo?.nickName || '匿名用户',
+          status: 'pending',
+          createTime: new Date(),
+        }
+      });
+
+      wx.hideLoading();
+      wx.showToast({
+        title: '举报成功',
+        icon: 'success'
+      });
+    } catch (err) {
+      console.error('举报失败:', err);
+      wx.hideLoading();
+      wx.showToast({
+        title: '举报失败',
+        icon: 'none'
+      });
+    }
   }
 })

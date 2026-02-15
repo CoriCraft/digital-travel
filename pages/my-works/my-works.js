@@ -9,6 +9,10 @@ Page({
     templates: [],
     photoSets: [],
     loading: false,
+    refreshing: false,
+    totalViews: 0,
+    totalLikes: 0,
+    totalFavorites: 0,
     defaultAvatar: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="50" fill="%23E8F5E9"/%3E%3Cpath d="M50 45c8.284 0 15-6.716 15-15s-6.716-15-15-15-15 6.716-15 15 6.716 15 15 15zm0 5c-13.807 0-25 11.193-25 25v10h50V75c0-13.807-11.193-25-25-25z" fill="%233ECE79"/%3E%3C/svg%3E'
   },
 
@@ -37,6 +41,14 @@ Page({
   },
 
   /**
+   * 下拉刷新
+   */
+  onRefresh() {
+    this.setData({ refreshing: true })
+    this.loadMyWorks()
+  },
+
+  /**
    * 加载我的作品
    */
   loadMyWorks() {
@@ -49,8 +61,10 @@ Page({
       return
     }
 
-    this.setData({ loading: true })
-    wx.showLoading({ title: '加载中...' })
+    if (!this.data.refreshing) {
+      this.setData({ loading: true })
+      wx.showLoading({ title: '加载中...' })
+    }
 
     const db = wx.cloud.database()
 
@@ -64,6 +78,7 @@ Page({
       .then(res => {
         console.log('我的模板:', res.data)
         this.setData({ templates: res.data })
+        this.calculateStatistics()
       })
       .catch(err => {
         console.error('加载模板失败:', err)
@@ -80,15 +95,51 @@ Page({
         console.log('我的照片集:', res.data)
         this.setData({
           photoSets: res.data,
-          loading: false
+          loading: false,
+          refreshing: false
         })
         wx.hideLoading()
+        this.calculateStatistics()
       })
       .catch(err => {
         console.error('加载照片集失败:', err)
-        this.setData({ loading: false })
+        this.setData({
+          loading: false,
+          refreshing: false
+        })
         wx.hideLoading()
       })
+  },
+
+  /**
+   * 计算统计数据
+   */
+  calculateStatistics() {
+    const { templates, photoSets } = this.data
+
+    let totalViews = 0
+    let totalLikes = 0
+    let totalFavorites = 0
+
+    // 统计模板数据
+    templates.forEach(item => {
+      totalViews += item.viewCount || 0
+      totalLikes += item.likeCount || 0
+      totalFavorites += item.favoriteCount || 0
+    })
+
+    // 统计照片集数据
+    photoSets.forEach(item => {
+      totalViews += item.viewCount || 0
+      totalLikes += item.likeCount || 0
+      totalFavorites += item.favoriteCount || 0
+    })
+
+    this.setData({
+      totalViews,
+      totalLikes,
+      totalFavorites
+    })
   },
 
   /**

@@ -1,0 +1,245 @@
+/* pages/help-center/help-center.wxss */
+
+page {
+  height: 100vh;
+  background: #F5F5F5;
+}
+
+.container {
+  height: 100%;
+  width: 100%;
+}
+
+/* 导航栏 */
+.nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: transparent;
+}
+
+.nav-content {
+  width: 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32rpx;
+  box-sizing: border-box;
+}
+
+.nav-left {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.nav-right-placeholder {
+  width: 48rpx;
+}
+
+/* 主内容 */
+.main-scroll {
+  height: 100%;
+  width: 100%;
+}
+
+/* 搜索区域 */
+.search-section {
+  padding: 24rpx;
+  background: #FFFFFF;
+  margin-bottom: 20rpx;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  background: #F5F5F5;
+  border-radius: 48rpx;
+  padding: 16rpx 32rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 区块 */
+.section {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  padding: 24rpx 24rpx 16rpx;
+}
+
+/* 问题列表 */
+.question-list {
+  background: #FFFFFF;
+  padding: 0 24rpx;
+}
+
+.question-item {
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.question-item:last-child {
+  border-bottom: none;
+}
+
+.question-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.question-title {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.question-preview {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 12rpx;
+  padding-left: 48rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.question-answer {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.8;
+  margin-top: 16rpx;
+  padding: 20rpx;
+  background: #F8F8F8;
+  border-radius: 12rpx;
+  white-space: pre-line;
+}
+
+/* 功能指南 */
+.guide-list {
+  background: #FFFFFF;
+  padding: 0 24rpx;
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.guide-item:last-child {
+  border-bottom: none;
+}
+
+.guide-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.guide-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.guide-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.guide-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 联系我们 */
+.contact-card {
+  background: #FFFFFF;
+  margin: 0 24rpx;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 0;
+}
+
+.contact-icon {
+  width: 72rpx;
+  height: 72rpx;
+  background: rgba(62, 206, 121, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contact-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.contact-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.contact-value {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.contact-divider {
+  height: 1rpx;
+  background: #F0F0F0;
+  margin: 0 92rpx 0 0;
+}
+
+/* 底部提示 */
+.footer-tip {
+  padding: 40rpx 24rpx 60rpx;
+  text-align: center;
+}
+
+.tip-text {
+  font-size: 24rpx;
+  color: #999;
+}

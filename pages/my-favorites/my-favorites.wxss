@@ -21,6 +21,11 @@ page {
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
+.nav-bar.transparent {
+  background: transparent;
+  box-shadow: none;
+}
+
 .nav-content {
   width: 100%;
   height: 44px;
@@ -57,18 +62,18 @@ page {
 }
 
 /* 主内容 */
-.main-content {
+.main-scroll {
   height: 100%;
-  overflow-y: auto;
-  padding-bottom: 40rpx;
+  width: 100%;
 }
 
 /* 标签切换 */
 .tabs {
   display: flex;
   background: #FFFFFF;
-  padding: 0 32rpx;
-  margin-bottom: 20rpx;
+  padding: 0 24rpx;
+  margin: 24rpx 24rpx 20rpx;
+  border-radius: 16rpx;
 }
 
 .tab-item {
@@ -120,7 +125,7 @@ page {
 
 /* 内容区域 */
 .content-section {
-  padding: 0 32rpx;
+  padding: 0 24rpx 40rpx;
 }
 
 /* 空状态 */
@@ -288,6 +293,126 @@ page {
 }
 
 .photoset-meta {
+  display: flex;
+  gap: 20rpx;
+}
+
+/* 商品网格 */
+.goods-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+}
+
+.goods-card {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+.goods-cover {
+  width: 100%;
+  height: 280rpx;
+}
+
+.goods-info {
+  padding: 20rpx;
+}
+
+.goods-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  margin-bottom: 12rpx;
+  min-height: 72rpx;
+}
+
+.goods-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.price-box {
+  display: flex;
+  align-items: baseline;
+}
+
+.price-symbol {
+  font-size: 22rpx;
+  color: #FF4444;
+  font-weight: 600;
+}
+
+.price-value {
+  font-size: 32rpx;
+  color: #FF4444;
+  font-weight: 700;
+}
+
+.sold-text {
+  font-size: 22rpx;
+  color: #999;
+}
+
+/* 地点网格 */
+.location-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+}
+
+.location-card {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+.location-cover {
+  width: 100%;
+  height: 280rpx;
+}
+
+.location-info {
+  padding: 20rpx;
+}
+
+.location-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 12rpx;
+  display: block;
+}
+
+.location-tags {
+  display: flex;
+  gap: 8rpx;
+  margin-bottom: 12rpx;
+  flex-wrap: wrap;
+}
+
+.location-tag {
+  font-size: 20rpx;
+  color: #666;
+  background: #F5F5F5;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.location-meta {
   display: flex;
   gap: 20rpx;
 }

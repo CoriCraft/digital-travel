@@ -1,0 +1,116 @@
+<view class="container">
+  <!-- 导航栏 -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <t-icon name="chevron-left" size="48rpx" color="#333" />
+      </view>
+      <text class="nav-title">意见反馈</text>
+      <view class="nav-right-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- 主内容 -->
+  <scroll-view scroll-y class="main-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+
+    <!-- 反馈类型 -->
+    <view class="section">
+      <view class="section-title">反馈类型</view>
+      <view class="type-list">
+        <view
+          wx:for="{{feedbackTypes}}"
+          wx:key="value"
+          class="type-item {{selectedType === item.value ? 'active' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="onTypeSelect"
+        >
+          <t-icon name="{{item.icon}}" size="36rpx" color="{{selectedType === item.value ? '#3ECE79' : '#999'}}" />
+          <text class="type-text">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 问题描述 -->
+    <view class="section">
+      <view class="section-title">问题描述 <text class="required">*</text></view>
+      <view class="textarea-wrapper">
+        <textarea
+          class="feedback-textarea"
+          placeholder="请详细描述您遇到的问题或建议，我们会认真对待每一条反馈"
+          maxlength="500"
+          value="{{content}}"
+          bindinput="onContentInput"
+        ></textarea>
+        <view class="char-count">{{content.length}}/500</view>
+      </view>
+    </view>
+
+    <!-- 上传图片 -->
+    <view class="section">
+      <view class="section-title">上传图片（选填）</view>
+      <view class="image-upload">
+        <view
+          wx:for="{{images}}"
+          wx:key="index"
+          class="image-item"
+        >
+          <image class="upload-image" src="{{item}}" mode="aspectFill"></image>
+          <view class="image-delete" data-index="{{index}}" catchtap="onDeleteImage">
+            <t-icon name="close" size="28rpx" color="#FFFFFF" />
+          </view>
+        </view>
+        <view class="image-add" wx:if="{{images.length < 3}}" bindtap="onChooseImage">
+          <t-icon name="add" size="48rpx" color="#999" />
+          <text class="add-text">添加图片</text>
+        </view>
+      </view>
+      <view class="image-tip">最多上传3张图片，每张不超过5MB</view>
+    </view>
+
+    <!-- 联系方式 -->
+    <view class="section">
+      <view class="section-title">联系方式（选填）</view>
+      <view class="input-wrapper">
+        <input
+          class="feedback-input"
+          placeholder="请输入您的手机号或微信号"
+          value="{{contact}}"
+          bindinput="onContactInput"
+        />
+      </view>
+      <view class="contact-tip">填写联系方式后，我们会及时回复您的反馈</view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-section">
+      <button class="submit-btn" bindtap="onSubmit" disabled="{{submitting}}">
+        {{submitting ? '提交中...' : '提交反馈'}}
+      </button>
+    </view>
+
+    <!-- 历史反馈 -->
+    <view class="section" wx:if="{{historyList.length > 0}}">
+      <view class="section-title">我的反馈</view>
+      <view class="history-list">
+        <view
+          wx:for="{{historyList}}"
+          wx:key="_id"
+          class="history-item"
+          data-id="{{item._id}}"
+          bindtap="onHistoryTap"
+        >
+          <view class="history-header">
+            <view class="history-type">
+              <t-icon name="{{getTypeIcon(item.type)}}" size="28rpx" color="#3ECE79" />
+              <text class="history-type-text">{{getTypeLabel(item.type)}}</text>
+            </view>
+            <view class="history-status status-{{item.status}}">{{getStatusText(item.status)}}</view>
+          </view>
+          <view class="history-content">{{item.content}}</view>
+          <view class="history-time">{{item.createTime}}</view>
+        </view>
+      </view>
+    </view>
+
+  </scroll-view>
+</view>

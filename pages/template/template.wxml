@@ -5,34 +5,20 @@
       <text class="location-text">{{location}} ></text>
     </view>
     <view class="nav-right">
-      <t-icon name="ellipsis" size="48rpx" class="nav-icon" />
-      <view class="nav-circle-icon">
-        <t-icon name="user-circle" size="48rpx" />
-      </view>
+      <!-- 右侧图标已移除 -->
     </view>
   </view>
 </view>
 
 <!-- 页面内容，需要顶下来 -->
 <view class="page-content">
-  <view class="search-bar">
-    <!-- 左侧图标容器 -->
-    <view class="search-icon">
-      <t-icon name="search" size="40rpx" />
-    </view>
-
-    <!-- 右侧输入框 -->
-    <view class="search-input">
-      <view class="search-input-wrapper">
-        <t-input class="search-input-inner" placeholder="模板搜索" borderless value="{{searchKeyword}}" bind:change="onSearchInput">
-          <view slot="suffix" class="search-btn" bindtap="onSearch">
-            搜索
-          </view>
-        </t-input>
-      </view>
-    </view>
-  </view>
-
+  <!-- 搜索框 -->
+  <search-bar
+    placeholder="模板搜索"
+    value="{{searchKeyword}}"
+    bind:input="onSearchInput"
+    bind:search="onSearch"
+  />
 
   <view class="divider">
     <t-divider class="custom-divider" />
@@ -68,17 +54,12 @@
 
   <!-- 模板列表 -->
   <view class="template-list">
-    <!-- 热门标签 -->
-    <view class="hot-tag" wx:if="{{templates.length > 0}}">
-      <image class="hot-tag-icon" src="/static/pages/template/hot-tag.svg" mode="aspectFit" />
-      <text class="hot-tag-text">热门</text>
-    </view>
-
     <!-- 模板卡片列表 -->
-    <view class="template-card" wx:for="{{templates}}" wx:key="_id" data-id="{{item._id}}" bindtap="onTemplateTap">
+    <view class="template-card" wx:for="{{templates}}" wx:key="_id" data-id="{{item._id}}" bindtap="onTemplateTap" bindlongpress="onTemplateReport" data-name="{{item.name}}">
       <view class="template-image-wrapper">
-        <image class="template-image" src="{{item.cover}}" mode="aspectFill" />
+        <image class="template-image" src="{{item.coverThumbnail || item.cover}}" mode="aspectFill" lazy-load="{{true}}" />
         <view class="official-badge" wx:if="{{item.isOfficial}}">官方</view>
+        <view class="hot-badge" wx:if="{{item.isHot}}">🔥 热门</view>
       </view>
       <view class="template-info">
         <text class="template-title">{{item.name}}</text>

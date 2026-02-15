@@ -1,5 +1,6 @@
 // pages/upload-photoset/upload-photoset.js
 const app = getApp()
+const { checkImageSecurity, compressImage } = require('../../utils/util.js')
 
 Page({
   /**
@@ -94,7 +95,7 @@ Page({
   /**
    * 选择照片
    */
-  onChoosePhotos() {
+  async onChoosePhotos() {
     const { photos } = this.data;
     const remainCount = 9 - photos.length; // 最多9张
 
@@ -108,13 +109,51 @@ Page({
 
     wx.chooseImage({
       count: remainCount,
-      sizeType: ['compressed'],
+      sizeType: ['original', 'compressed'],
       sourceType: ['album', 'camera'],
-      success: res => {
-        const newPhotos = [...photos, ...res.tempFilePaths];
-        this.setData({
-          photos: newPhotos
-        });
+      success: async (res) => {
+        const tempFilePaths = res.tempFilePaths;
+
+        wx.showLoading({ title: `审核图片中 0/${tempFilePaths.length}` });
+
+        try {
+          // 逐个审核图片，必须全部通过
+          for (let i = 0; i < tempFilePaths.length; i++) {
+            wx.showLoading({ title: `审核图片中 ${i + 1}/${tempFilePaths.length}` });
+
+            const checkResult = await checkImageSecurity(tempFilePaths[i]);
+
+            if (!checkResult.success) {
+              wx.hideLoading();
+              wx.showModal({
+                title: '图片审核失败',
+                content: `第${i + 1}张图片：${checkResult.errMsg}\n\n所有图片必须通过审核才能添加，请重新选择`,
+                showCancel: false
+              });
+              return; // 有一张不通过就全部拒绝
+            }
+          }
+
+          wx.hideLoading();
+
+          // 全部通过，添加到列表
+          const newPhotos = [...photos, ...tempFilePaths];
+          this.setData({
+            photos: newPhotos
+          });
+
+          wx.showToast({
+            title: `已添加${tempFilePaths.length}张照片`,
+            icon: 'success'
+          });
+        } catch (err) {
+          console.error('图片审核异常:', err);
+          wx.hideLoading();
+          wx.showToast({
+            title: '图片审核失败，请重试',
+            icon: 'none'
+          });
+        }
       },
       fail: err => {
         console.error('选择照片失败:', err);
@@ -180,13 +219,21 @@ Page({
     if (uploading) return;
 
     this.setData({ uploading: true });
-    wx.showLoading({ title: '上传中...' });
+    wx.showLoading({ title: '压缩图片中...' });
 
     try {
+      // 先压缩所有照片
+      const compressedPhotos = [];
+      for (let i = 0; i < photos.length; i++) {
+        wx.showLoading({ title: `压缩图片 ${i + 1}/${photos.length}` });
+        const compressed = await compressImage(photos[i], 85);
+        compressedPhotos.push(compressed);
+      }
+
       // 上传所有照片到云存储
       const uploadedPhotos = [];
-      for (let i = 0; i < photos.length; i++) {
-        const filePath = photos[i];
+      for (let i = 0; i < compressedPhotos.length; i++) {
+        const filePath = compressedPhotos[i];
         const cloudPath = `photosets/${templateId}/${Date.now()}_${i}.jpg`;
 
         const uploadResult = await wx.cloud.uploadFile({
@@ -198,7 +245,7 @@ Page({
 
         // 更新进度
         wx.showLoading({
-          title: `上传中 ${i + 1}/${photos.length}`
+          title: `上传中 ${i + 1}/${compressedPhotos.length}`
         });
       }
 
@@ -218,7 +265,10 @@ Page({
           userName: userInfo.nickName || '匿名用户',
           userAvatar: userInfo.avatarUrl || '',
           isOfficial: false,
-          status: 'pending', // 待审核
+          status: 'approved', // 已审核通过（前置审核）
+          contentCheckStatus: 'passed', // 内容审核状态：passed-通过, rejected-拒绝, pending-待审核
+          contentCheckTime: db.serverDate(), // 内容审核时间
+          contentCheckMethod: 'auto', // 审核方式：auto-自动审核, manual-人工审核
           viewCount: 0,
           likeCount: 0,
           createTime: db.serverDate(),
@@ -228,9 +278,14 @@ Page({
 
       console.log('照片集创建成功:', createResult);
 
+      // 清除模板详情页的照片集缓存，确保新照片集能立即显示
+      const cacheKey = `photosets_cache_${templateId}`;
+      wx.removeStorageSync(cacheKey);
+      console.log('已清除照片集缓存:', cacheKey);
+
       wx.hideLoading();
       wx.showToast({
-        title: '提交成功,等待审核',
+        title: '提交成功',
         icon: 'success',
         duration: 2000
       });

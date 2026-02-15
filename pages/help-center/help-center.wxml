@@ -1,0 +1,111 @@
+<view class="container">
+  <!-- 导航栏 -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <t-icon name="chevron-left" size="48rpx" color="#333" />
+      </view>
+      <text class="nav-title">帮助中心</text>
+      <view class="nav-right-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- 主内容 -->
+  <scroll-view scroll-y class="main-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+
+    <!-- 搜索框 -->
+    <view class="search-section">
+      <view class="search-box">
+        <t-icon name="search" size="32rpx" color="#999" />
+        <input class="search-input" placeholder="搜索帮助内容" bindinput="onSearchInput" value="{{searchKeyword}}" />
+      </view>
+    </view>
+
+    <!-- 常见问题 -->
+    <view class="section">
+      <view class="section-title">常见问题</view>
+      <view class="question-list">
+        <view
+          wx:for="{{filteredQuestions}}"
+          wx:key="id"
+          class="question-item"
+          data-id="{{item.id}}"
+          bindtap="onQuestionTap"
+        >
+          <view class="question-header">
+            <t-icon name="help-circle" size="36rpx" color="#3ECE79" />
+            <text class="question-title">{{item.title}}</text>
+            <t-icon name="chevron-right" size="32rpx" color="#999" />
+          </view>
+          <view class="question-preview" wx:if="{{!item.expanded}}">{{item.preview}}</view>
+          <view class="question-answer" wx:if="{{item.expanded}}">{{item.answer}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 功能指南 -->
+    <view class="section">
+      <view class="section-title">功能指南</view>
+      <view class="guide-list">
+        <view
+          wx:for="{{guides}}"
+          wx:key="id"
+          class="guide-item"
+          data-id="{{item.id}}"
+          bindtap="onGuideTap"
+        >
+          <view class="guide-icon" style="background: {{item.color}};">
+            <t-icon name="{{item.icon}}" size="40rpx" color="#FFFFFF" />
+          </view>
+          <view class="guide-info">
+            <text class="guide-title">{{item.title}}</text>
+            <text class="guide-desc">{{item.desc}}</text>
+          </view>
+          <t-icon name="chevron-right" size="32rpx" color="#999" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 联系我们 -->
+    <view class="section">
+      <view class="section-title">联系我们</view>
+      <view class="contact-card">
+        <view class="contact-item" bindtap="onCallPhone">
+          <view class="contact-icon">
+            <t-icon name="call" size="40rpx" color="#3ECE79" />
+          </view>
+          <view class="contact-info">
+            <text class="contact-label">客服电话</text>
+            <text class="contact-value">400-123-4567</text>
+          </view>
+        </view>
+        <view class="contact-divider"></view>
+        <view class="contact-item" bindtap="onCopyEmail">
+          <view class="contact-icon">
+            <t-icon name="mail" size="40rpx" color="#3ECE79" />
+          </view>
+          <view class="contact-info">
+            <text class="contact-label">客服邮箱</text>
+            <text class="contact-value">support@example.com</text>
+          </view>
+        </view>
+        <view class="contact-divider"></view>
+        <view class="contact-item" bindtap="onOpenWechat">
+          <view class="contact-icon">
+            <t-icon name="logo-wechat" size="40rpx" color="#3ECE79" />
+          </view>
+          <view class="contact-info">
+            <text class="contact-label">微信客服</text>
+            <text class="contact-value">digitaltravel2024</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部提示 -->
+    <view class="footer-tip">
+      <text class="tip-text">工作时间：周一至周日 9:00-21:00</text>
+    </view>
+
+  </scroll-view>
+</view>

@@ -21,6 +21,11 @@ page {
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
+.nav-bar.transparent {
+  background: transparent;
+  box-shadow: none;
+}
+
 .nav-content {
   width: 100%;
   height: 44px;
@@ -57,18 +62,55 @@ page {
 }
 
 /* 主内容 */
-.main-content {
+.main-scroll {
   height: 100%;
-  overflow-y: auto;
-  padding-bottom: 40rpx;
+  width: 100%;
+}
+
+/* 数据统计卡片 */
+.stats-card {
+  background: linear-gradient(135deg, #3ECE79 0%, #2AB361 100%);
+  margin: 24rpx;
+  padding: 40rpx 32rpx;
+  border-radius: 24rpx;
+  display: flex;
+  justify-content: space-around;
+  box-shadow: 0 8rpx 24rpx rgba(62, 206, 121, 0.3);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.stat-num {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.stat-divider {
+  width: 2rpx;
+  height: 60rpx;
+  background: rgba(255, 255, 255, 0.3);
+  align-self: center;
 }
 
 /* 标签切换 */
 .tabs {
   display: flex;
   background: #FFFFFF;
-  padding: 0 32rpx;
-  margin-bottom: 20rpx;
+  padding: 0 24rpx;
+  margin: 0 24rpx 20rpx;
+  border-radius: 16rpx;
 }
 
 .tab-item {
@@ -120,7 +162,7 @@ page {
 
 /* 内容区域 */
 .content-section {
-  padding: 0 32rpx;
+  padding: 0 24rpx 40rpx;
 }
 
 /* 空状态 */
@@ -203,6 +245,22 @@ page {
   font-size: 20rpx;
   color: #FFFFFF;
   flex-shrink: 0;
+}
+
+.status-pending {
+  background: #FF9800;
+}
+
+.status-active {
+  background: #4CAF50;
+}
+
+.status-approved {
+  background: #4CAF50;
+}
+
+.status-rejected {
+  background: #F44336;
 }
 
 .template-desc {

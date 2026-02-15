@@ -24,16 +24,18 @@
         image-props="{{ { mode: 'aspectFill' } }}"
         t-class="banner-swiper"
         t-class-image="banner-image"
+        bindchange="onSwiperChange"
+        bindclick="onBannerClick"
       />
     </view>
 
-    <view class="search-section">
-      <view class="search-input-box">
-        <t-icon name="search" size="36rpx" color="#999" class="search-icon-inside" />
-        <input class="real-input" placeholder="猜你喜欢..." placeholder-class="placeholder-style" confirm-type="search" bindconfirm="onSearch" value="{{searchKeyword}}" />
-      </view>
-      <view class="search-btn-block" bindtap="onSearch">搜索</view>
-    </view>
+    <!-- 搜索框 -->
+    <search-bar
+      placeholder="猜你喜欢..."
+      value="{{searchKeyword}}"
+      bind:input="onSearchInput"
+      bind:search="onSearch"
+    />
 
     <view class="tabs-section">
       <view class="tabs-row">
@@ -63,7 +65,7 @@
         <block wx:for="{{leftList}}" wx:key="_id">
           <view class="goods-card" bindtap="onGoodsTap" data-item="{{item}}">
             <view class="card-img-box">
-              <image src="{{item.img}}" mode="widthFix" class="goods-img" />
+              <image src="{{item.img}}" mode="widthFix" class="goods-img" lazy-load="{{true}}" />
               <view class="ai-badge" wx:if="{{index === 0}}">AI定制</view>
             </view>
             <view class="goods-info">
@@ -90,7 +92,7 @@
         <block wx:for="{{rightList}}" wx:key="_id">
           <view class="goods-card" bindtap="onGoodsTap" data-item="{{item}}">
             <view class="card-img-box">
-              <image src="{{item.img}}" mode="widthFix" class="goods-img" />
+              <image src="{{item.img}}" mode="widthFix" class="goods-img" lazy-load="{{true}}" />
             </view>
             <view class="goods-info">
               <view class="goods-name">{{item.name}}</view>

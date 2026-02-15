@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-loading": "tdesign-miniprogram/loading/loading"
+  },
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+}

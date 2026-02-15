@@ -1,6 +1,11 @@
 // app.js
+const miniShopPlugin = requirePlugin('mini-shop-plugin');
+
 App({
   onLaunch() {
+    // 初始化微信小店插件
+    miniShopPlugin.initApp(this, wx);
+
     // 初始化 CloudBase
     wx.cloud.init({
       env: 'cultural-tourism-7fb138kf77a2cb2',
@@ -56,12 +61,8 @@ App({
           console.log('从本地存储恢复用户信息:', this.globalData.userInfo)
         } else {
           // 首次使用，引导用户完善信息
-          console.log('首次使用，引导用户完善信息')
-          setTimeout(() => {
-            wx.redirectTo({
-              url: '/pages/user-info/user-info'
-            })
-          }, 1000)
+          console.log('首次使用，用户可稍后完善信息')
+          // 不自动跳转，避免干扰用户正常使用
         }
       },
       fail: err => {

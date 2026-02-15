@@ -2,10 +2,12 @@
   <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
     <view class="nav-content">
       <view class="nav-left">
-        <view class="icon-home"></view>
+        <t-icon name="home" size="48rpx" color="#333" />
       </view>
-      <text class="nav-title">我的</text>
-      <view class="nav-right-placeholder"></view>
+      <view class="nav-title">我的</view>
+      <view class="nav-right">
+        <!-- 右侧图标已移除 -->
+      </view>
     </view>
   </view>
 
@@ -41,17 +43,6 @@
     </view>
 
     <view class="menu-section">
-      <view class="menu-card" bindtap="navigateToOrders">
-        <view class="icon-box bg-pale-green">
-          <view class="icon-img icon-truck"></view>
-        </view>
-        <view class="menu-info">
-          <text class="menu-title">我的订单</text>
-          <text class="menu-desc">门票、商品订单</text>
-        </view>
-        <view class="icon-arrow"></view>
-      </view>
-
       <view class="menu-card" bindtap="navigateToProducts">
         <view class="icon-box bg-pale-green">
           <view class="icon-img icon-photo"></view>
@@ -69,7 +60,19 @@
         </view>
         <view class="menu-info">
           <text class="menu-title">我的收藏</text>
-          <text class="menu-desc">模板、作品、商品</text>
+          <text class="menu-desc">模板、照片集、商品、地点</text>
+        </view>
+        <view class="icon-arrow"></view>
+      </view>
+
+      <view class="menu-card" bindtap="navigateToMessages">
+        <view class="icon-box bg-pale-green">
+          <view class="icon-img icon-message"></view>
+          <view class="message-badge-icon" wx:if="{{unreadCount > 0}}">{{unreadCount > 99 ? '99+' : unreadCount}}</view>
+        </view>
+        <view class="menu-info">
+          <text class="menu-title">消息中心</text>
+          <text class="menu-desc">系统通知、互动消息</text>
         </view>
         <view class="icon-arrow"></view>
       </view>

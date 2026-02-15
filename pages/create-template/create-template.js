@@ -1,5 +1,6 @@
 // pages/create-template/create-template.js
 const app = getApp()
+const { checkImageSecurity } = require('../../utils/util.js')
 
 Page({
   data: {
@@ -126,18 +127,51 @@ Page({
   /**
    * 选择封面图片
    */
-  onChooseCover() {
+  async onChooseCover() {
     wx.chooseMedia({
       count: 1,
       mediaType: ['image'],
-      sizeType: ['compressed'],
+      sizeType: ['original', 'compressed'],
       sourceType: ['album', 'camera'],
-      success: (res) => {
+      success: async (res) => {
         const tempFile = res.tempFiles[0];
-        this.setData({
-          coverImage: tempFile.tempFilePath,
-          coverImageUrl: tempFile.tempFilePath
-        });
+        const tempFilePath = tempFile.tempFilePath;
+
+        wx.showLoading({ title: '审核图片中...' });
+
+        try {
+          // 图片内容安全审核
+          const checkResult = await checkImageSecurity(tempFilePath);
+
+          wx.hideLoading();
+
+          if (!checkResult.success) {
+            wx.showModal({
+              title: '图片审核失败',
+              content: checkResult.errMsg,
+              showCancel: false
+            });
+            return;
+          }
+
+          // 审核通过，设置封面
+          this.setData({
+            coverImage: tempFilePath,
+            coverImageUrl: tempFilePath
+          });
+
+          wx.showToast({
+            title: '封面设置成功',
+            icon: 'success'
+          });
+        } catch (err) {
+          console.error('图片审核异常:', err);
+          wx.hideLoading();
+          wx.showToast({
+            title: '图片审核失败',
+            icon: 'none'
+          });
+        }
       },
       fail: (err) => {
         console.error('选择图片失败:', err);
@@ -298,7 +332,10 @@ Page({
           cover: coverCloudPath,
           isOfficial: false,
           allowUserUpload: true,
-          status: 'pending', // 待审核
+          status: 'approved', // 已审核通过（前置审核）
+          coverCheckStatus: 'passed', // 封面审核状态：passed-通过, rejected-拒绝, pending-待审核
+          coverCheckTime: db.serverDate(), // 封面审核时间
+          coverCheckMethod: 'auto', // 审核方式：auto-自动审核, manual-人工审核
           likeCount: 0,
           photoSetCount: 0,
           sort: 999,

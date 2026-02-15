@@ -14,32 +14,30 @@
   left: 0;
   width: 100%;
   z-index: 100;
-  background: transparent; 
+  background: transparent;
 }
 
 .nav-content {
-  height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24rpx;
+  height: 100%;
 }
 
-.nav-left {
-  width: 60rpx;
-  height: 100%;
+.nav-left,
+.nav-right-placeholder {
+  width: 80rpx;
   display: flex;
   align-items: center;
 }
 
 .nav-title {
+  flex: 1;
+  text-align: center;
   font-size: 34rpx;
   font-weight: 600;
   color: #333;
-}
-
-.nav-right-placeholder {
-  width: 60rpx;
 }
 
 /* --- 主滚动区 --- */
@@ -59,8 +57,14 @@
   border-radius: 24rpx;
   overflow: hidden;
   /* 核心修改：高度加高到 420rpx，解决显示不全问题 */
-  height: 420rpx !important; 
+  height: 420rpx !important;
   box-shadow: 0 8rpx 20rpx rgba(166, 219, 178, 0.4);
+  transition: all 0.3s ease;
+}
+
+.banner-swiper:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(166, 219, 178, 0.6);
 }
 
 .banner-image {

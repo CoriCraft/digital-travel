@@ -1,31 +1,24 @@
 <view class="custom-nav" style="padding-top:{{statusBarHeight}}px; height:{{navBarHeight}}px;">
-  <view class="nav-left">
-    <t-icon name="home" size="48rpx" color="#000" />
-  </view>
-  <view class="nav-center">
-    <text class="nav-title">线下体验</text>
-  </view>
-  <view class="nav-right">
-    <t-icon name="ellipsis" size="48rpx" color="#000" style="margin-right: 20rpx;" />
-    <view class="avatar-circle">
-      <image class="avatar-img" src="https://tdesign.gtimg.com/mobile/demos/avatar1.png" mode="aspectFill" />
+  <view class="nav-content">
+    <view class="nav-left">
+      <t-icon name="home" size="48rpx" color="#333" />
+    </view>
+    <view class="nav-title">线下体验</view>
+    <view class="nav-right">
+      <!-- 右侧图标已移除 -->
     </view>
   </view>
 </view>
 
 <view class="page-container" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
-  
-  <view class="search-section">
-    <view class="search-capsule">
-      <view class="search-left">
-        <t-icon name="scan" size="40rpx" color="#666" />
-        <text class="location-text">方山风景区</text>
-      </view>
-      <view class="search-btn">
-        <text>搜索</text>
-      </view>
-    </view>
-  </view>
+
+  <!-- 搜索框 -->
+  <search-bar
+    placeholder="搜索地点、美食、景点..."
+    value="{{searchKeyword}}"
+    bind:input="onSearchInput"
+    bind:search="onSearch"
+  />
 
   <view class="grid-section">
     <view class="grid-col left-col">
@@ -36,9 +29,10 @@
           <text class="card-sub">精品推荐/吃喝玩乐</text>
         </view>
         <view class="leisure-imgs">
-          <image wx:if="{{leisureLocation}}" class="img-placeholder left" src="{{leisureLocation.coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{leisureLocation._id}}" />
+          <image wx:if="{{leisureLocations[0]}}" class="img-placeholder left" src="{{leisureLocations[0].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{leisureLocations[0]._id}}" />
           <view wx:else class="img-placeholder left"></view>
-          <view class="img-placeholder right"></view>
+          <image wx:if="{{leisureLocations[1]}}" class="img-placeholder right" src="{{leisureLocations[1].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{leisureLocations[1]._id}}" />
+          <view wx:else class="img-placeholder right"></view>
         </view>
       </view>
 
@@ -48,10 +42,12 @@
           <view class="action-pill">马上看看 ></view>
         </view>
         <view class="scenic-imgs">
-          <image wx:if="{{scenicLocation}}" class="img-mini" src="{{scenicLocation.coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{scenicLocation._id}}" />
+          <image wx:if="{{scenicLocations[0]}}" class="img-mini" src="{{scenicLocations[0].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{scenicLocations[0]._id}}" />
           <view wx:else class="img-mini"></view>
-          <view class="img-mini"></view>
-          <view class="img-mini"></view>
+          <image wx:if="{{scenicLocations[1]}}" class="img-mini" src="{{scenicLocations[1].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{scenicLocations[1]._id}}" />
+          <view wx:else class="img-mini"></view>
+          <image wx:if="{{scenicLocations[2]}}" class="img-mini" src="{{scenicLocations[2].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{scenicLocations[2]._id}}" />
+          <view wx:else class="img-mini"></view>
         </view>
       </view>
     </view>
@@ -63,18 +59,21 @@
           <text class="card-sub-blue">精品民宿/舒适酒店</text>
         </view>
         <view class="hotel-imgs">
-          <image wx:if="{{hotelLocation}}" class="img-tall" src="{{hotelLocation.coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{hotelLocation._id}}" />
+          <image wx:if="{{hotelLocations[0]}}" class="img-tall" src="{{hotelLocations[0].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{hotelLocations[0]._id}}" />
           <view wx:else class="img-tall"></view>
-          <view class="img-tall"></view>
+          <image wx:if="{{hotelLocations[1]}}" class="img-tall" src="{{hotelLocations[1].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{hotelLocations[1]._id}}" />
+          <view wx:else class="img-tall"></view>
         </view>
       </view>
 
       <view class="bento-card card-food" bindtap="onBentoCardTap" data-type="food">
           <text class="food-title">特色农家菜</text>
           <view class="food-imgs">
-            <image wx:if="{{foodLocation}}" class="img-food" src="{{foodLocation.coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{foodLocation._id}}" />
+            <image wx:if="{{foodLocations[0]}}" class="img-food" src="{{foodLocations[0].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{foodLocations[0]._id}}" />
             <view wx:else class="img-food"></view>
-            <view class="img-food"></view>
+            <image wx:if="{{foodLocations[1]}}" class="img-food" src="{{foodLocations[1].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{foodLocations[1]._id}}" />
+            <view wx:else class="img-food"></view>
+
           </view>
       </view>
     </view>
@@ -92,7 +91,9 @@
   <view class="feed-list">
     <view class="feed-card" wx:for="{{feedList}}" wx:key="_id" bindtap="onViewDetail" data-id="{{item._id}}">
       <view class="feed-img-box">
-        <image wx:if="{{item.coverImage}}" class="feed-img" src="{{item.coverImage}}" mode="aspectFill" style="width: 100%; height: 100%;" />
+        <image wx:if="{{item.coverImage}}" class="feed-img" src="{{item.coverImage}}" mode="aspectFill" style="width: 100%; height: 100%;" lazy-load="{{true}}" />
+        <!-- 距离标签 -->
+        <view wx:if="{{item.distanceText}}" class="distance-badge">{{item.distanceText}}</view>
       </view>
 
       <view class="feed-info">

@@ -1,9 +1,9 @@
 <view class="container">
-  <!-- 导航栏 -->
-  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+  <!-- 透明导航栏 -->
+  <view class="nav-bar transparent" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
     <view class="nav-content">
       <view class="nav-left" bindtap="onBack">
-        <view class="icon-back"></view>
+        <t-icon name="chevron-left" size="48rpx" color="#333" />
       </view>
       <text class="nav-title">我的作品</text>
       <view class="nav-right-placeholder"></view>
@@ -11,7 +11,25 @@
   </view>
 
   <!-- 主内容 -->
-  <view class="main-content" style="padding-top: {{statusBarHeight + navBarHeight + 20}}px;">
+  <scroll-view scroll-y class="main-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;" refresher-enabled="{{true}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+
+    <!-- 数据统计卡片 -->
+    <view class="stats-card">
+      <view class="stat-item">
+        <text class="stat-num">{{totalViews}}</text>
+        <text class="stat-label">总浏览</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">{{totalLikes}}</text>
+        <text class="stat-label">总点赞</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">{{totalFavorites}}</text>
+        <text class="stat-label">总收藏</text>
+      </view>
+    </view>
 
     <!-- 标签切换 -->
     <view class="tabs">
@@ -36,7 +54,7 @@
     <!-- 我的模板 -->
     <view class="content-section" wx:if="{{currentTab === 0}}">
       <view wx:if="{{templates.length === 0}}" class="empty">
-        <image class="empty-icon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23CCCCCC'%3E%3Cpath d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z'/%3E%3C/svg%3E"></image>
+        <t-icon name="view-module" size="160rpx" color="#CCCCCC" />
         <text class="empty-text">还没有创建模板</text>
         <text class="empty-tip">快去创建你的第一个模板吧</text>
       </view>
@@ -53,29 +71,29 @@
           <view class="template-info">
             <view class="template-header">
               <text class="template-name">{{item.name}}</text>
-              <view class="status-badge" style="background: {{getStatusColor(item.status)}}">
+              <view class="status-badge status-{{item.status}}">
                 {{getStatusText(item.status)}}
               </view>
             </view>
             <text class="template-desc">{{item.description}}</text>
             <view class="template-meta">
               <view class="meta-item">
-                <text class="meta-icon">👁</text>
+                <t-icon name="browse" size="28rpx" color="#999" />
                 <text class="meta-text">{{item.viewCount || 0}}</text>
               </view>
               <view class="meta-item">
-                <text class="meta-icon">❤️</text>
+                <t-icon name="heart-filled" size="28rpx" color="#FF4444" />
                 <text class="meta-text">{{item.likeCount || 0}}</text>
               </view>
               <view class="meta-item">
-                <text class="meta-icon">📸</text>
+                <t-icon name="image" size="28rpx" color="#999" />
                 <text class="meta-text">{{item.photoSetCount || 0}}</text>
               </view>
             </view>
           </view>
           <view class="template-actions" catchtap="onDeleteTemplate" data-id="{{item._id}}" data-index="{{index}}">
             <view class="action-btn delete">
-              <text class="action-icon">🗑️</text>
+              <t-icon name="delete" size="36rpx" color="#FF4444" />
             </view>
           </view>
         </view>
@@ -85,7 +103,7 @@
     <!-- 我的照片集 -->
     <view class="content-section" wx:if="{{currentTab === 1}}">
       <view wx:if="{{photoSets.length === 0}}" class="empty">
-        <image class="empty-icon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23CCCCCC'%3E%3Cpath d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/%3E%3C/svg%3E"></image>
+        <t-icon name="image" size="160rpx" color="#CCCCCC" />
         <text class="empty-text">还没有上传照片集</text>
         <text class="empty-tip">快去上传你的精彩照片吧</text>
       </view>
@@ -101,10 +119,10 @@
           <image class="photoset-cover" src="{{item.coverPhoto}}" mode="aspectFill"></image>
           <view class="photoset-overlay">
             <view class="photo-count">
-              <text class="count-icon">📷</text>
+              <t-icon name="camera" size="28rpx" color="#FFFFFF" />
               <text class="count-text">{{item.photos.length}}</text>
             </view>
-            <view class="status-badge" style="background: {{getStatusColor(item.status)}}">
+            <view class="status-badge status-{{item.status}}">
               {{getStatusText(item.status)}}
             </view>
           </view>
@@ -112,23 +130,23 @@
             <text class="photoset-title">{{item.title}}</text>
             <view class="photoset-meta">
               <view class="meta-item">
-                <text class="meta-icon">👁</text>
+                <t-icon name="browse" size="28rpx" color="#999" />
                 <text class="meta-text">{{item.viewCount || 0}}</text>
               </view>
               <view class="meta-item">
-                <text class="meta-icon">❤️</text>
+                <t-icon name="heart-filled" size="28rpx" color="#FF4444" />
                 <text class="meta-text">{{item.likeCount || 0}}</text>
               </view>
             </view>
           </view>
           <view class="photoset-actions" catchtap="onDeletePhotoSet" data-id="{{item._id}}" data-index="{{index}}">
             <view class="action-btn delete">
-              <text class="action-icon">🗑️</text>
+              <t-icon name="delete" size="36rpx" color="#FF4444" />
             </view>
           </view>
         </view>
       </view>
     </view>
 
-  </view>
+  </scroll-view>
 </view>
