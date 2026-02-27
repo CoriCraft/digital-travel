@@ -209,6 +209,36 @@ Page({
         return;
       }
 
+      wx.showLoading({ title: '定位中...' });
+
+      // 获取用户当前位置
+      const locationRes = await wx.getLocation({
+        type: 'gcj02'
+      });
+
+      wx.hideLoading();
+
+      // 计算距离（单位：米）
+      const distance = this.calculateDistance(
+        locationRes.latitude,
+        locationRes.longitude,
+        this.data.location.latitude,
+        this.data.location.longitude
+      );
+
+      console.log('当前距离:', distance, '米');
+
+      // 检查距离是否在500米以内
+      const MAX_DISTANCE = 1000; // 500米
+      if (distance > MAX_DISTANCE) {
+        wx.showModal({
+          title: '距离太远',
+          content: `您距离该地点约${Math.round(distance)}米，需要在${MAX_DISTANCE}米范围内才能打卡哦~`,
+          showCancel: false
+        });
+        return;
+      }
+
       wx.showLoading({ title: '打卡中...' });
 
       // 检查是否已经打卡过
@@ -238,7 +268,10 @@ Page({
           userName: userInfo.nickName || '匿名用户',
           userAvatar: userInfo.avatarUrl || '',
           checkInTime: db.serverDate(),
-          createTime: db.serverDate()
+          createTime: db.serverDate(),
+          latitude: locationRes.latitude,
+          longitude: locationRes.longitude,
+          distance: Math.round(distance)
         }
       });
 
@@ -265,11 +298,40 @@ Page({
     } catch (error) {
       console.error('打卡失败:', error);
       wx.hideLoading();
-      wx.showToast({
-        title: '打卡失败，请重试',
-        icon: 'none'
-      });
+
+      // 处理定位失败
+      if (error.errMsg && error.errMsg.includes('getLocation')) {
+        wx.showModal({
+          title: '定位失败',
+          content: '无法获取您的位置信息，请检查定位权限设置',
+          showCancel: false
+        });
+      } else {
+        wx.showToast({
+          title: '打卡失败，请重试',
+          icon: 'none'
+        });
+      }
     }
+  },
+
+  /**
+   * 计算两点之间的距离（米）
+   * 使用 Haversine 公式
+   */
+  calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371e3; // 地球半径（米）
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // 返回距离（米）
   },
 
   /**
@@ -386,6 +448,21 @@ Page({
       return;
     }
 
+    // 检查是否已打卡
+    if (!this.data.hasCheckedIn) {
+      wx.showModal({
+        title: '提示',
+        content: '需要先打卡后才能评价哦~',
+        confirmText: '去打卡',
+        success: (res) => {
+          if (res.confirm) {
+            this.onCheckIn();
+          }
+        }
+      });
+      return;
+    }
+
     // 跳转到写评价页面
     wx.navigateTo({
       url: `/pages/write-review/write-review?locationId=${this.data.locationId}&locationName=${this.data.location.name}`
@@ -393,19 +470,93 @@ Page({
   },
 
   /**
-   * 长按举报评论
+   * 长按评论 - 自己的可删除,别人的可举报
    */
   onReviewReport(e) {
-    const { id, type, content } = e.currentTarget.dataset;
+    const { id, type, content, userid } = e.currentTarget.dataset;
+    const currentUserId = app.globalData.userInfo?.openid;
+
+    // 判断是否是自己的评论
+    const isMyReview = userid === currentUserId;
+
+    const itemList = isMyReview ? ['删除评论'] : ['举报该评论'];
 
     wx.showActionSheet({
-      itemList: ['举报该评论'],
+      itemList,
       success: (res) => {
         if (res.tapIndex === 0) {
-          this.showReportDialog(id, 'review_' + type, content.substring(0, 20));
+          if (isMyReview) {
+            this.deleteReview(id);
+          } else {
+            this.showReportDialog(id, 'review_' + type, content.substring(0, 20));
+          }
         }
       }
     });
+  },
+
+  /**
+   * 删除评论
+   */
+  async deleteReview(reviewId) {
+    try {
+      const result = await wx.showModal({
+        title: '确认删除',
+        content: '确定要删除这条评论吗?',
+        confirmText: '删除',
+        confirmColor: '#ff6b6b'
+      });
+
+      if (!result.confirm) return;
+
+      wx.showLoading({ title: '删除中...' });
+
+      const db = wx.cloud.database();
+
+      // 删除评论
+      await db.collection('location_reviews').doc(reviewId).remove();
+
+      // 重新计算地点评分
+      const reviewsResult = await db.collection('location_reviews')
+        .where({
+          locationId: this.data.locationId,
+          status: 'approved'
+        })
+        .get();
+
+      const allReviews = reviewsResult.data;
+      const totalRating = allReviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+      const avgRating = allReviews.length > 0 ? (totalRating / allReviews.length).toFixed(1) : 0;
+
+      // 更新地点评分
+      await db.collection('locations')
+        .doc(this.data.locationId)
+        .update({
+          data: {
+            rating: parseFloat(avgRating),
+            ratingCount: allReviews.length
+          }
+        });
+
+      wx.hideLoading();
+      wx.showToast({
+        title: '删除成功',
+        icon: 'success'
+      });
+
+      // 重新加载评论列表
+      this.loadReviews(this.data.locationId);
+
+      // 重新加载地点详情(更新评分显示)
+      this.loadLocationDetail(this.data.locationId);
+    } catch (err) {
+      console.error('删除评论失败:', err);
+      wx.hideLoading();
+      wx.showToast({
+        title: '删除失败',
+        icon: 'none'
+      });
+    }
   },
 
   /**

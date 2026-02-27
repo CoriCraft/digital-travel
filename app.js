@@ -60,9 +60,11 @@ App({
           this.globalData.userInfo.avatarUrl = storedUserInfo.avatarUrl || ''
           console.log('从本地存储恢复用户信息:', this.globalData.userInfo)
         } else {
-          // 首次使用，引导用户完善信息
-          console.log('首次使用，用户可稍后完善信息')
-          // 不自动跳转，避免干扰用户正常使用
+          // 首次使用，直接跳转到用户信息页
+          console.log('首次使用，跳转到用户信息页')
+          wx.reLaunch({
+            url: '/pages/user-info/user-info'
+          })
         }
       },
       fail: err => {

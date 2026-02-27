@@ -342,17 +342,95 @@ Page({
   /**
    * 长按举报评论
    */
+  /**
+   * 长按评论 - 自己的可删除,别人的可举报
+   */
   onReviewReport(e) {
-    const { id, type, content } = e.currentTarget.dataset;
+    const { id, type, content, userid } = e.currentTarget.dataset;
+    const app = getApp();
+    const currentUserId = app.globalData.userInfo?.openid;
+
+    // 判断是否是自己的评论
+    const isMyReview = userid === currentUserId;
+
+    const itemList = isMyReview ? ['删除评论'] : ['举报该评论'];
 
     wx.showActionSheet({
-      itemList: ['举报该评论'],
+      itemList,
       success: (res) => {
         if (res.tapIndex === 0) {
-          this.showReportDialog(id, 'review_' + type, content.substring(0, 20));
+          if (isMyReview) {
+            this.deleteReview(id);
+          } else {
+            this.showReportDialog(id, 'review_' + type, content.substring(0, 20));
+          }
         }
       }
     });
+  },
+
+  /**
+   * 删除评论
+   */
+  async deleteReview(reviewId) {
+    try {
+      const result = await wx.showModal({
+        title: '确认删除',
+        content: '确定要删除这条评论吗?',
+        confirmText: '删除',
+        confirmColor: '#ff6b6b'
+      });
+
+      if (!result.confirm) return;
+
+      wx.showLoading({ title: '删除中...' });
+
+      const db = wx.cloud.database();
+
+      // 删除评论
+      await db.collection('goods_reviews').doc(reviewId).remove();
+
+      // 重新计算商品评分
+      const reviewsResult = await db.collection('goods_reviews')
+        .where({
+          goodsId: this.data.goodsId,
+          status: 'approved'
+        })
+        .get();
+
+      const allReviews = reviewsResult.data;
+      const totalRating = allReviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+      const avgRating = allReviews.length > 0 ? (totalRating / allReviews.length).toFixed(1) : 0;
+
+      // 更新商品评分
+      await db.collection('goods')
+        .doc(this.data.goodsId)
+        .update({
+          data: {
+            rating: parseFloat(avgRating),
+            reviewCount: allReviews.length
+          }
+        });
+
+      wx.hideLoading();
+      wx.showToast({
+        title: '删除成功',
+        icon: 'success'
+      });
+
+      // 重新加载评论列表
+      this.loadReviews();
+
+      // 重新加载商品详情(更新评分显示)
+      this.loadGoodsDetail();
+    } catch (err) {
+      console.error('删除评论失败:', err);
+      wx.hideLoading();
+      wx.showToast({
+        title: '删除失败',
+        icon: 'none'
+      });
+    }
   },
 
   /**

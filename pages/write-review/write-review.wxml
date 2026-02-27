@@ -21,7 +21,7 @@
     <view class="rating-section">
       <text class="section-label">评分</text>
       <view class="rating-stars">
-        <text class="star {{index < rating ? 'active' : ''}}" wx:for="{{[1,2,3,4,5]}}" wx:key="index" bindtap="onRatingChange" data-rating="{{index + 1}}">★</text>
+        <text class="star {{index + 1 <= rating ? 'active' : ''}}" wx:for="{{[1,2,3,4,5]}}" wx:key="index" bindtap="onRatingChange" data-rating="{{index + 1}}">★</text>
       </view>
     </view>
 

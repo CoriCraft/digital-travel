@@ -5,9 +5,11 @@ Page({
   data: {
     statusBarHeight: 0,
     navBarHeight: 0,
-    currentTab: 0, // 0-模板, 1-照片集
-    templates: [],
-    photoSets: [],
+    photos: [], // 照片列表
+    leftColumnPhotos: [], // 左列照片
+    rightColumnPhotos: [], // 右列照片
+    leftHeight: 0, // 左列高度
+    rightHeight: 0, // 右列高度
     loading: false,
     refreshing: false,
     totalViews: 0,
@@ -30,14 +32,6 @@ Page({
    */
   onBack() {
     wx.navigateBack()
-  },
-
-  /**
-   * 切换标签
-   */
-  onTabChange(e) {
-    const { index } = e.currentTarget.dataset
-    this.setData({ currentTab: index })
   },
 
   /**
@@ -68,41 +62,45 @@ Page({
 
     const db = wx.cloud.database()
 
-    // 加载我创建的模板
-    db.collection('templates')
+    // 加载我上传的照片
+    db.collection('photos')
       .where({
-        creatorId: userInfo.openid
+        userId: userInfo.openid,
+        status: 'approved' // 只显示已审核通过的照片，排除已删除的
       })
       .orderBy('createTime', 'desc')
       .get()
       .then(res => {
-        console.log('我的模板:', res.data)
-        this.setData({ templates: res.data })
-        this.calculateStatistics()
-      })
-      .catch(err => {
-        console.error('加载模板失败:', err)
-      })
+        console.log('[我的作品] 照片列表加载成功，数量:', res.data.length)
 
-    // 加载我上传的照片集
-    db.collection('photoSets')
-      .where({
-        userId: userInfo.openid
-      })
-      .orderBy('createTime', 'desc')
-      .get()
-      .then(res => {
-        console.log('我的照片集:', res.data)
+        // 打印每张照片的URL信息
+        res.data.forEach((photo, index) => {
+          console.log(`[我的作品] 照片${index + 1}:`, {
+            _id: photo._id,
+            hasThumbnail: !!photo.thumbnailUrl,
+            thumbnailUrl: photo.thumbnailUrl,
+            photoUrl: photo.photoUrl
+          });
+        });
+
+        // 智能瀑布流分列
         this.setData({
-          photoSets: res.data,
+          photos: res.data,
+          leftColumnPhotos: [],
+          rightColumnPhotos: [],
+          leftHeight: 0,
+          rightHeight: 0,
           loading: false,
           refreshing: false
-        })
+        }, () => {
+          this.buildWaterfall(res.data);
+        });
+
         wx.hideLoading()
         this.calculateStatistics()
       })
       .catch(err => {
-        console.error('加载照片集失败:', err)
+        console.error('加载照片失败:', err)
         this.setData({
           loading: false,
           refreshing: false
@@ -112,24 +110,70 @@ Page({
   },
 
   /**
+   * 智能瀑布流分列
+   * 使用照片 ID 哈希值来生成稳定的高度估算
+   */
+  buildWaterfall(photos) {
+    let {
+      leftColumnPhotos,
+      rightColumnPhotos,
+      leftHeight,
+      rightHeight
+    } = this.data;
+
+    photos.forEach((photo, index) => {
+      // 使用照片 ID 的哈希值生成稳定的高度
+      const hash = this.simpleHash(photo._id);
+      const heightVariation = (hash % 300) - 150; // -150 到 +150 的变化
+      const baseHeight = 450; // 基础高度
+      const cardHeight = baseHeight + heightVariation + 80; // 图片 + 删除按钮区域
+
+      // 添加 originalIndex 用于点击跳转
+      const photoWithIndex = { ...photo, originalIndex: index };
+
+      // 分配到较短的列
+      if (leftHeight <= rightHeight) {
+        leftColumnPhotos.push(photoWithIndex);
+        leftHeight += cardHeight;
+      } else {
+        rightColumnPhotos.push(photoWithIndex);
+        rightHeight += cardHeight;
+      }
+    });
+
+    this.setData({
+      leftColumnPhotos,
+      rightColumnPhotos,
+      leftHeight,
+      rightHeight
+    });
+  },
+
+  /**
+   * 简单哈希函数
+   */
+  simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+  },
+
+  /**
    * 计算统计数据
    */
   calculateStatistics() {
-    const { templates, photoSets } = this.data
+    const { photos } = this.data
 
     let totalViews = 0
     let totalLikes = 0
     let totalFavorites = 0
 
-    // 统计模板数据
-    templates.forEach(item => {
-      totalViews += item.viewCount || 0
-      totalLikes += item.likeCount || 0
-      totalFavorites += item.favoriteCount || 0
-    })
-
-    // 统计照片集数据
-    photoSets.forEach(item => {
+    // 统计照片数据
+    photos.forEach(item => {
       totalViews += item.viewCount || 0
       totalLikes += item.likeCount || 0
       totalFavorites += item.favoriteCount || 0
@@ -143,137 +187,90 @@ Page({
   },
 
   /**
-   * 点击模板卡片
+   * 点击照片
    */
-  onTemplateTap(e) {
-    const { id } = e.currentTarget.dataset
+  onPhotoTap(e) {
+    const { index } = e.currentTarget.dataset
+    const { photos } = this.data
+
+    // 将照片列表存到缓存
+    wx.setStorageSync('previewPhotos', photos)
+    wx.setStorageSync('previewPhotosTemplateId', '')
+
+    // 跳转到照片预览页面
     wx.navigateTo({
-      url: `/pages/template-detail/template-detail?id=${id}`
+      url: `/pages/photo-preview/photo-preview?currentIndex=${index}`
     })
   },
 
   /**
-   * 点击照片集卡片
+   * 删除照片
    */
-  onPhotoSetTap(e) {
-    const { id } = e.currentTarget.dataset
-    wx.navigateTo({
-      url: `/pages/photoset-detail/photoset-detail?id=${id}`
-    })
-  },
-
-  /**
-   * 删除模板
-   */
-  onDeleteTemplate(e) {
+  onDeletePhoto(e) {
     const { id, index } = e.currentTarget.dataset
 
     wx.showModal({
       title: '确认删除',
-      content: '删除后无法恢复，确定要删除这个模板吗？',
+      content: '删除后无法恢复，确定要删除这张照片吗？',
       confirmText: '删除',
       confirmColor: '#FF4444',
-      success: res => {
+      success: (res) => {
         if (res.confirm) {
-          wx.showLoading({ title: '删除中...' })
-
-          const db = wx.cloud.database()
-          db.collection('templates')
-            .doc(id)
-            .remove()
-            .then(() => {
-              wx.hideLoading()
-              wx.showToast({
-                title: '删除成功',
-                icon: 'success'
-              })
-
-              // 从列表中移除
-              const templates = this.data.templates
-              templates.splice(index, 1)
-              this.setData({ templates })
-            })
-            .catch(err => {
-              wx.hideLoading()
-              console.error('删除失败:', err)
-              wx.showToast({
-                title: '删除失败',
-                icon: 'none'
-              })
-            })
+          this.deletePhoto(id, index)
         }
       }
     })
   },
 
   /**
-   * 删除照片集
+   * 执行删除照片
    */
-  onDeletePhotoSet(e) {
-    const { id, index } = e.currentTarget.dataset
+  deletePhoto(photoId, index) {
+    wx.showLoading({ title: '删除中...' })
 
-    wx.showModal({
-      title: '确认删除',
-      content: '删除后无法恢复，确定要删除这个照片集吗？',
-      confirmText: '删除',
-      confirmColor: '#FF4444',
-      success: res => {
-        if (res.confirm) {
-          wx.showLoading({ title: '删除中...' })
+    const db = wx.cloud.database()
+    db.collection('photos')
+      .doc(photoId)
+      .remove()
+      .then(() => {
+        wx.hideLoading()
+        wx.showToast({
+          title: '删除成功',
+          icon: 'success'
+        })
 
-          const db = wx.cloud.database()
-          db.collection('photoSets')
-            .doc(id)
-            .remove()
-            .then(() => {
-              wx.hideLoading()
-              wx.showToast({
-                title: '删除成功',
-                icon: 'success'
-              })
+        // 从列表中移除
+        const { photos } = this.data
+        photos.splice(index, 1)
 
-              // 从列表中移除
-              const photoSets = this.data.photoSets
-              photoSets.splice(index, 1)
-              this.setData({ photoSets })
-            })
-            .catch(err => {
-              wx.hideLoading()
-              console.error('删除失败:', err)
-              wx.showToast({
-                title: '删除失败',
-                icon: 'none'
-              })
-            })
-        }
-      }
-    })
-  },
+        // 重新分列
+        const leftColumn = []
+        const rightColumn = []
+        photos.forEach((photo, idx) => {
+          const photoWithIndex = { ...photo, originalIndex: idx }
+          if (idx % 2 === 0) {
+            leftColumn.push(photoWithIndex)
+          } else {
+            rightColumn.push(photoWithIndex)
+          }
+        })
 
-  /**
-   * 获取状态文本
-   */
-  getStatusText(status) {
-    const statusMap = {
-      'pending': '审核中',
-      'approved': '已通过',
-      'rejected': '已拒绝',
-      'active': '已发布'
-    }
-    return statusMap[status] || '未知'
-  },
+        this.setData({
+          photos,
+          leftColumnPhotos: leftColumn,
+          rightColumnPhotos: rightColumn
+        })
 
-  /**
-   * 获取状态颜色
-   */
-  getStatusColor(status) {
-    const colorMap = {
-      'pending': '#FF9800',
-      'approved': '#4CAF50',
-      'rejected': '#F44336',
-      'active': '#4CAF50'
-    }
-    return colorMap[status] || '#999'
+        this.calculateStatistics()
+      })
+      .catch(err => {
+        console.error('删除照片失败:', err)
+        wx.hideLoading()
+        wx.showToast({
+          title: '删除失败',
+          icon: 'none'
+        })
+      })
   },
 
   onShow() {

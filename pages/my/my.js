@@ -64,7 +64,7 @@ Page({
 
     const db = wx.cloud.database()
 
-    // 统计创建的模板和照片集数量
+    // 统计创建的模板数量
     db.collection('templates')
       .where({
         creatorId: userInfo.openid
@@ -79,7 +79,8 @@ Page({
         console.error('统计模板失败:', err)
       })
 
-    db.collection('photoSets')
+    // 统计打卡的体验地点数量
+    db.collection('check_ins')
       .where({
         userId: userInfo.openid
       })
@@ -90,7 +91,7 @@ Page({
         })
       })
       .catch(err => {
-        console.error('统计照片集失败:', err)
+        console.error('统计体验失败:', err)
       })
   },
 

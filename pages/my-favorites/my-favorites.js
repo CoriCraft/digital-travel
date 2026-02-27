@@ -5,9 +5,8 @@ Page({
   data: {
     statusBarHeight: 0,
     navBarHeight: 0,
-    currentTab: 0, // 0-模板, 1-照片集, 2-商品, 3-地点
+    currentTab: 0, // 0-模板, 1-商品, 2-地点
     templates: [],
-    photoSets: [],
     goods: [],
     locations: [],
     loading: false,
@@ -52,11 +51,10 @@ Page({
   loadFavorites() {
     // 从本地存储获取收藏的ID列表
     const favoriteTemplates = wx.getStorageSync('favoriteTemplates') || []
-    const favoritePhotoSets = wx.getStorageSync('favoritePhotoSets') || []
     const favoriteGoods = wx.getStorageSync('favoriteGoods') || []
     const favoriteLocations = wx.getStorageSync('favoriteLocations') || []
 
-    if (favoriteTemplates.length === 0 && favoritePhotoSets.length === 0 && favoriteGoods.length === 0 && favoriteLocations.length === 0) {
+    if (favoriteTemplates.length === 0 && favoriteGoods.length === 0 && favoriteLocations.length === 0) {
       this.setData({ refreshing: false })
       return
     }
@@ -70,7 +68,7 @@ Page({
     const _ = db.command
 
     let loadedCount = 0
-    const totalCollections = 4
+    const totalCollections = 3
 
     const checkComplete = () => {
       loadedCount++
@@ -97,26 +95,6 @@ Page({
         })
         .catch(err => {
           console.error('加载模板失败:', err)
-          checkComplete()
-        })
-    } else {
-      checkComplete()
-    }
-
-    // 加载收藏的照片集
-    if (favoritePhotoSets.length > 0) {
-      db.collection('photoSets')
-        .where({
-          _id: _.in(favoritePhotoSets)
-        })
-        .get()
-        .then(res => {
-          console.log('收藏的照片集:', res.data)
-          this.setData({ photoSets: res.data })
-          checkComplete()
-        })
-        .catch(err => {
-          console.error('加载照片集失败:', err)
           checkComplete()
         })
     } else {
@@ -199,16 +177,6 @@ Page({
   },
 
   /**
-   * 点击照片集卡片
-   */
-  onPhotoSetTap(e) {
-    const { id } = e.currentTarget.dataset
-    wx.navigateTo({
-      url: `/pages/photoset-detail/photoset-detail?id=${id}`
-    })
-  },
-
-  /**
    * 点击商品卡片
    */
   onGoodsTap(e) {
@@ -248,36 +216,6 @@ Page({
           const templates = this.data.templates
           templates.splice(index, 1)
           this.setData({ templates })
-
-          wx.showToast({
-            title: '已取消收藏',
-            icon: 'success'
-          })
-        }
-      }
-    })
-  },
-
-  /**
-   * 取消收藏照片集
-   */
-  onUnfavoritePhotoSet(e) {
-    const { id, index } = e.currentTarget.dataset
-
-    wx.showModal({
-      title: '取消收藏',
-      content: '确定要取消收藏这个照片集吗？',
-      confirmText: '取消收藏',
-      success: res => {
-        if (res.confirm) {
-          let favoritePhotoSets = wx.getStorageSync('favoritePhotoSets') || []
-          favoritePhotoSets = favoritePhotoSets.filter(photoSetId => photoSetId !== id)
-          wx.setStorageSync('favoritePhotoSets', favoritePhotoSets)
-
-          // 从列表中移除
-          const photoSets = this.data.photoSets
-          photoSets.splice(index, 1)
-          this.setData({ photoSets })
 
           wx.showToast({
             title: '已取消收藏',

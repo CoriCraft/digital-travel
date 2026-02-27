@@ -6,7 +6,7 @@
       <view class="nav-left" bindtap="onBack">
         <t-icon name="close" size="48rpx" />
       </view>
-      <text class="nav-title">上传照片集</text>
+      <text class="nav-title">上传照片</text>
       <view class="nav-right"></view>
     </view>
   </view>
@@ -23,58 +23,25 @@
 
     <!-- 表单区域 -->
     <view class="form-section">
-      <!-- 标题输入 -->
-      <view class="form-item">
-        <view class="form-label">
-          <text class="label-text">标题</text>
-          <text class="required">*</text>
-        </view>
-        <input
-          class="form-input"
-          placeholder="请输入照片集标题"
-          value="{{title}}"
-          bindinput="onTitleInput"
-          maxlength="50"
-        />
-        <view class="input-counter">{{title.length}}/50</view>
-      </view>
-
-      <!-- 描述输入 -->
-      <view class="form-item">
-        <view class="form-label">
-          <text class="label-text">描述</text>
-          <text class="required">*</text>
-        </view>
-        <textarea
-          class="form-textarea"
-          placeholder="请输入照片集描述"
-          value="{{description}}"
-          bindinput="onDescriptionInput"
-          maxlength="200"
-        />
-        <view class="input-counter">{{description.length}}/200</view>
-      </view>
-
       <!-- 照片选择 -->
       <view class="form-item">
         <view class="form-label">
-          <text class="label-text">照片</text>
+          <text class="label-text">选择照片</text>
           <text class="required">*</text>
-          <text class="label-tip">(最多9张)</text>
         </view>
-        <view class="photo-grid">
-          <!-- 已选择的照片 -->
-          <view class="photo-item" wx:for="{{photos}}" wx:key="index">
-            <image class="photo-preview" src="{{item}}" mode="aspectFill" bindtap="onPreviewPhoto" data-index="{{index}}" />
-            <view class="photo-delete" bindtap="onDeletePhoto" data-index="{{index}}">
-              <t-icon name="close" size="32rpx" color="#fff" />
+
+        <!-- 照片预览或上传按钮 -->
+        <view class="photo-container">
+          <view class="photo-preview-wrapper" wx:if="{{photoUrl}}">
+            <image class="photo-preview-large" src="{{photoUrl}}" mode="aspectFill" />
+            <view class="photo-delete-btn" bindtap="onDeletePhoto">
+              <t-icon name="close" size="40rpx" color="#fff" />
             </view>
           </view>
 
-          <!-- 添加照片按钮 -->
-          <view class="photo-add" wx:if="{{photos.length < 9}}" bindtap="onChoosePhotos">
-            <t-icon name="add" size="64rpx" color="#ccc" />
-            <text class="add-text">添加照片</text>
+          <view class="photo-upload-area" wx:else bindtap="onChoosePhoto">
+            <t-icon name="add" size="96rpx" color="#ccc" />
+            <text class="upload-text">点击上传照片</text>
           </view>
         </view>
       </view>

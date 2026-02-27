@@ -7,6 +7,13 @@
   unicode-range: U+0000-FFFF;
 }
 
+/* Disable WeChat Sans font loading */
+@font-face {
+  font-family: 'WeChat Sans';
+  src: local('Arial');
+  unicode-range: U+0000-FFFF;
+}
+
 /* ==================== 主题配色变量 ==================== */
 page {
   --primary-green: #82F45F;

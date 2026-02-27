@@ -53,6 +53,18 @@ Page({
   },
 
   /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow() {
+    if (typeof this.getTabBar === 'function') {
+      const tabBar = this.getTabBar();
+      tabBar.setData({
+        value: 'album',
+      });
+    }
+  },
+
+  /**
    * 返回上一页或首页
    */
   goBack: function() {

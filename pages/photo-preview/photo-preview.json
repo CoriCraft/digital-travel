@@ -1,5 +1,7 @@
 {
   "navigationStyle": "custom",
+  "backgroundColor": "#000000",
+  "backgroundTextStyle": "dark",
   "usingComponents": {
     "t-icon": "tdesign-miniprogram/icon/icon"
   }

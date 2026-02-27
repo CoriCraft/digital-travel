@@ -1,0 +1,48 @@
+<!-- pages/photo-preview/photo-preview.wxml -->
+<view class="preview-container">
+  <!-- 轮播图 -->
+  <swiper class="photo-swiper" current="{{currentIndex}}" bindchange="onSwiperChange">
+    <swiper-item wx:for="{{photos}}" wx:key="_id">
+      <image class="preview-image" src="{{item.photoUrl}}" mode="aspectFit" bindtap="toggleToolbar" />
+    </swiper-item>
+  </swiper>
+
+  <!-- 顶部工具栏 -->
+  <view class="top-toolbar" wx:if="{{showToolbar}}" style="--status-bar-height: {{statusBarHeight}}px;">
+    <view class="toolbar-left" bindtap="onBack">
+      <t-icon name="chevron-left" size="48rpx" color="#fff" />
+    </view>
+    <view class="toolbar-center">
+      <text class="photo-index">{{currentIndex + 1}} / {{photos.length}}</text>
+    </view>
+    <view class="toolbar-right"></view>
+  </view>
+
+  <!-- 发布者信息 -->
+  <view class="author-info" wx:if="{{showToolbar}}" style="--status-bar-height: {{statusBarHeight}}px;">
+    <image class="author-avatar" src="{{currentPhoto.userAvatar || defaultAvatar}}" mode="aspectFill" />
+    <text class="author-name">{{currentPhoto.userName || '匿名用户'}}</text>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-toolbar" wx:if="{{showToolbar}}">
+    <view class="toolbar-actions">
+      <view class="action-item" bindtap="onLike">
+        <t-icon name="{{currentPhoto.isLiked ? 'heart-filled' : 'heart'}}" size="56rpx" color="{{currentPhoto.isLiked ? '#FF4444' : '#fff'}}" />
+        <text class="action-text">{{currentPhoto.likeCount || 0}}</text>
+      </view>
+      <view class="action-item" bindtap="onFavorite">
+        <t-icon name="{{currentPhoto.isFavorited ? 'star-filled' : 'star'}}" size="56rpx" color="{{currentPhoto.isFavorited ? '#FFD700' : '#fff'}}" />
+        <text class="action-text">{{currentPhoto.favoriteCount || 0}}</text>
+      </view>
+      <view class="action-item" wx:if="{{!isMyPhoto}}" bindtap="onReport">
+        <t-icon name="error-circle" size="56rpx" color="#fff" />
+        <text class="action-text">举报</text>
+      </view>
+      <view class="action-item" wx:if="{{isMyPhoto}}" bindtap="onDelete">
+        <t-icon name="delete" size="56rpx" color="#fff" />
+        <text class="action-text">删除</text>
+      </view>
+    </view>
+  </view>
+</view>

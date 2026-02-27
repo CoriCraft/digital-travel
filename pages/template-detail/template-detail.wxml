@@ -14,7 +14,12 @@
   <view class="page-content">
     <!-- 模板信息卡片 -->
     <view class="template-header" wx:if="{{template}}">
-      <image class="template-cover" src="{{template.cover}}" mode="aspectFill" />
+      <image
+        class="template-cover"
+        src="{{template.cover}}"
+        mode="aspectFill"
+        show-menu-by-longpress="{{false}}"
+      />
       <view class="template-info-overlay">
         <view class="template-title-row">
           <text class="template-name">{{template.name}}</text>
@@ -48,6 +53,11 @@
       <t-icon name="{{isLiked ? 'heart-filled' : 'heart'}}" size="48rpx" color="{{isLiked ? '#FF4444' : '#999'}}" />
     </view>
 
+    <!-- 删除按钮 - 固定悬浮（仅创建者可见） -->
+    <view class="delete-fab" wx:if="{{isCreator}}" bindtap="onDeleteTemplate">
+      <t-icon name="delete" size="48rpx" color="#FF4444" />
+    </view>
+
     <!-- 上传按钮 - 固定悬浮 -->
     <view class="upload-fab" bindtap="onUpload">
       <t-icon name="add" size="48rpx" color="#fff" />
@@ -55,45 +65,51 @@
 
     <!-- 排序栏 -->
     <view class="sort-bar">
-      <text class="sort-title">照片集 ({{photoSets.length}})</text>
-      <view class="sort-options">
-        <view class="sort-item" data-type="hot" bindtap="onSortChange">
-          <text class="sort-label" style="{{sortType === 'hot' ? 'color: #82F45F;' : ''}}">热度</text>
-          <t-icon name="caret-down-small" size="32rpx" color="{{sortType === 'hot' ? '#82F45F' : '#999'}}" />
-        </view>
-        <view class="sort-item" data-type="time" bindtap="onSortChange">
-          <text class="sort-label" style="{{sortType === 'time' ? 'color: #82F45F;' : ''}}">发布时间</text>
-          <t-icon name="caret-down-small" size="32rpx" color="{{sortType === 'time' ? '#82F45F' : '#999'}}" />
-        </view>
+      <view class="sort-left">
+        <text class="sort-title">照片 ({{photos.length}})</text>
+      </view>
+      <view class="sort-right">
+        <text class="sort-label" data-type="hot" bindtap="onSortChange" style="{{sortType === 'hot' ? 'color: #ff6b35;' : ''}}">热度</text>
+        <t-icon name="caret-down-small" size="32rpx" color="{{sortType === 'hot' ? '#ff6b35' : '#999'}}" />
+        <text class="sort-label" data-type="time" bindtap="onSortChange" style="{{sortType === 'time' ? 'color: #ff6b35;' : ''}}">时间</text>
+        <t-icon name="caret-down-small" size="32rpx" color="{{sortType === 'time' ? '#ff6b35' : '#999'}}" />
       </view>
     </view>
 
-    <!-- 照片集列表 -->
-    <view class="photoset-list">
-      <view class="photoset-card" wx:for="{{photoSets}}" wx:key="_id" data-id="{{item._id}}" bindtap="onPhotoSetTap">
-        <image class="photoset-cover" src="{{item.coverThumbnail || item.coverPhoto}}" mode="aspectFill" lazy-load="{{true}}" />
-        <view class="photoset-info">
-          <view class="photoset-title-row">
-            <text class="photoset-title">{{item.title}}</text>
-            <view class="official-tag" wx:if="{{item.isOfficial}}">官方</view>
-          </view>
-          <text class="photoset-description">{{item.description}}</text>
-          <view class="photoset-meta">
+    <!-- 照片列表 - 双排瀑布流 -->
+    <view class="photo-list waterfall-container">
+      <!-- 左列 -->
+      <view class="waterfall-column">
+        <view class="photo-card" wx:for="{{leftColumnPhotos}}" wx:key="_id">
+          <image
+            class="photo-image"
+            src="{{item.thumbnailUrl || item.photoUrl}}"
+            mode="widthFix"
+            lazy-load="{{true}}"
+            webp="{{true}}"
+            show-menu-by-longpress="{{true}}"
+            data-index="{{item.originalIndex}}"
+            bindtap="onPhotoTap"
+            bindlongpress="onPhotoLongPress"
+            data-photo-id="{{item._id}}"
+            data-photo-name="{{item.userName}}的照片"
+          />
+          <view class="photo-info">
             <view class="author-info">
               <image class="author-avatar" src="{{item.userAvatar || defaultAvatar}}" mode="aspectFill" />
               <text class="author-name">{{item.userName}}</text>
             </view>
-            <view class="photoset-stats">
+            <view class="photo-stats">
               <view class="stat-item">
-                <t-icon name="browse" size="28rpx" color="#999" />
+                <t-icon name="browse" size="24rpx" color="#999" />
                 <text class="stat-num">{{item.viewCount || 0}}</text>
               </view>
-              <view class="stat-item">
-                <t-icon name="heart-filled" size="28rpx" color="#FF4444" />
+              <view class="stat-item" data-photo-id="{{item._id}}" catchtap="onPhotoLike">
+                <t-icon name="{{item.isLiked ? 'heart-filled' : 'heart'}}" size="24rpx" color="{{item.isLiked ? '#FF4444' : '#999'}}" />
                 <text class="stat-num">{{item.likeCount || 0}}</text>
               </view>
-              <view class="stat-item">
-                <t-icon name="star-filled" size="28rpx" color="#FFD700" />
+              <view class="stat-item" data-photo-id="{{item._id}}" catchtap="onPhotoFavorite">
+                <t-icon name="{{item.isFavorited ? 'star-filled' : 'star'}}" size="24rpx" color="{{item.isFavorited ? '#FFD700' : '#999'}}" />
                 <text class="stat-num">{{item.favoriteCount || 0}}</text>
               </view>
             </view>
@@ -101,12 +117,50 @@
         </view>
       </view>
 
-      <!-- 空状态 -->
-      <view class="empty-state" wx:if="{{photoSets.length === 0 && !loading}}">
-        <t-icon name="image" size="120rpx" color="#ddd" />
-        <text class="empty-text">暂无照片集</text>
-        <text class="empty-tip" wx:if="{{template.allowUserUpload}}">快来上传第一个照片集吧</text>
+      <!-- 右列 -->
+      <view class="waterfall-column">
+        <view class="photo-card" wx:for="{{rightColumnPhotos}}" wx:key="_id">
+          <image
+            class="photo-image"
+            src="{{item.thumbnailUrl || item.photoUrl}}"
+            mode="widthFix"
+            lazy-load="{{true}}"
+            webp="{{true}}"
+            show-menu-by-longpress="{{true}}"
+            data-index="{{item.originalIndex}}"
+            bindtap="onPhotoTap"
+            bindlongpress="onPhotoLongPress"
+            data-photo-id="{{item._id}}"
+            data-photo-name="{{item.userName}}的照片"
+          />
+          <view class="photo-info">
+            <view class="author-info">
+              <image class="author-avatar" src="{{item.userAvatar || defaultAvatar}}" mode="aspectFill" />
+              <text class="author-name">{{item.userName}}</text>
+            </view>
+            <view class="photo-stats">
+              <view class="stat-item">
+                <t-icon name="browse" size="24rpx" color="#999" />
+                <text class="stat-num">{{item.viewCount || 0}}</text>
+              </view>
+              <view class="stat-item" data-photo-id="{{item._id}}" catchtap="onPhotoLike">
+                <t-icon name="{{item.isLiked ? 'heart-filled' : 'heart'}}" size="24rpx" color="{{item.isLiked ? '#FF4444' : '#999'}}" />
+                <text class="stat-num">{{item.likeCount || 0}}</text>
+              </view>
+              <view class="stat-item" data-photo-id="{{item._id}}" catchtap="onPhotoFavorite">
+                <t-icon name="{{item.isFavorited ? 'star-filled' : 'star'}}" size="24rpx" color="{{item.isFavorited ? '#FFD700' : '#999'}}" />
+                <text class="stat-num">{{item.favoriteCount || 0}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
       </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{photos.length === 0 && !loading}}">
+      <t-icon name="image" size="120rpx" color="#ddd" />
+      <text class="empty-text">暂无照片</text>
     </view>
   </view>
 </view>

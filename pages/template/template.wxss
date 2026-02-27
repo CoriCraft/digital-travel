@@ -230,30 +230,43 @@
   margin-left: 16rpx;
 }
 
-/* 模板列表 */
+/* 模板列表 - 瀑布流容器 */
 .template-list {
   padding: 0 24rpx 24rpx;
   background-color: transparent;
 }
 
+.waterfall-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.waterfall-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
 /* 模板卡片 */
 .template-card {
   background-color: #fff;
-  border-radius: 24rpx;
+  border-radius: 16rpx;
   overflow: hidden;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
-  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  break-inside: avoid;
 }
 
 .template-image-wrapper {
   position: relative;
   width: 100%;
-  height: 400rpx;
 }
 
 .template-image {
   width: 100%;
-  height: 100%;
+  display: block;
 }
 
 .official-badge {
@@ -283,48 +296,57 @@
 }
 
 .template-info {
-  padding: 24rpx;
+  padding: 16rpx;
 }
 
 .template-title {
-  font-size: 32rpx;
-  font-weight: 700;
+  font-size: 28rpx;
+  font-weight: 600;
   color: #333;
-  margin-bottom: 16rpx;
+  margin-bottom: 12rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .template-meta {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 8rpx;
 }
 
 .author-info {
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 6rpx;
 }
 
 .author-name {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .stats-info {
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 6rpx;
+  flex-wrap: wrap;
 }
 
 .stat-text {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #666;
-  margin-right: 16rpx;
+  margin-right: 12rpx;
 }
 
 /* 提示消息 */
 .template-tip {
-  margin: 24rpx 0;
+  margin: 0 0 24rpx 0;
   padding: 16rpx 24rpx;
   background-color: transparent;
   border-radius: 0;
@@ -332,6 +354,7 @@
   align-items: center;
   gap: 8rpx;
   justify-content: center;
+  width: 100%;
 }
 
 .tip-text {

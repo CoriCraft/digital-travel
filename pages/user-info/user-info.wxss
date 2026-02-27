@@ -76,20 +76,39 @@ page {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 60rpx;
+  align-items: center;
   margin-bottom: 80rpx;
+}
+
+.profile-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 50rpx;
+  margin-bottom: 40rpx;
 }
 
 .form-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
+}
+
+.avatar-item {
+  margin-bottom: 20rpx;
+}
+
+.nickname-item {
+  width: 100%;
 }
 
 .form-label {
   font-size: 28rpx;
   color: #666;
   margin-bottom: 30rpx;
+  font-weight: 500;
 }
 
 /* 头像选择 */
@@ -98,10 +117,10 @@ page {
   margin: 0;
   border: none;
   background: transparent;
+  position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 20rpx;
+  justify-content: center;
 }
 
 .avatar-btn::after {
@@ -109,17 +128,51 @@ page {
 }
 
 .avatar {
-  width: 160rpx;
-  height: 160rpx;
+  width: 180rpx;
+  height: 180rpx;
   border-radius: 50%;
   background: #f0f0f0;
-  border: 4rpx solid #3ECE79;
+  border: 6rpx solid #3ECE79;
   box-shadow: 0 8rpx 24rpx rgba(62, 206, 121, 0.2);
 }
 
-.avatar-tip {
+.avatar-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 56rpx;
+  height: 56rpx;
+  background: linear-gradient(135deg, #3ECE79 0%, #2AB566 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4rpx solid #fff;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+}
+
+/* 提示文本 */
+.tip-text {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 20rpx 30rpx;
+  background: rgba(62, 206, 121, 0.08);
+  border-radius: 12rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tip-icon {
+  font-size: 32rpx;
+  line-height: 1;
+}
+
+.tip-content {
   font-size: 24rpx;
-  color: #999;
+  color: #666;
+  line-height: 1.5;
+  flex: 1;
 }
 
 /* 昵称输入 */

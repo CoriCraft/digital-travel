@@ -10,9 +10,7 @@
         <t-icon name="arrow-left" size="48rpx" color="#333" />
       </view>
       <view class="nav-title">商品详情</view>
-      <view class="nav-right">
-        <t-icon name="share" size="44rpx" color="#333" />
-      </view>
+      <view class="nav-right-placeholder"></view>
     </view>
   </view>
 
@@ -22,7 +20,7 @@
   </view>
 
   <!-- 页面主体 -->
-  <scroll-view wx:else class="page-scroll" scroll-y enable-flex style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+  <scroll-view wx:else class="page-scroll" scroll-y enable-flex style="padding-top: {{statusBarHeight + navBarHeight + 24}}px;">
 
     <!-- 商品主图 -->
     <view class="product-hero">
@@ -31,16 +29,19 @@
 
     <!-- 商品信息 -->
     <view class="product-info">
-      <view class="product-price-row">
-        <view class="price-box">
-          <text class="price-symbol">¥</text>
-          <text class="price-value">{{goods.price}}</text>
-          <text class="price-original">¥{{goods.originalPrice}}</text>
+      <view class="product-title-row">
+        <text class="product-title">{{goods.name}}</text>
+        <view class="fav-icon" bindtap="toggleFavorite">
+          <t-icon name="{{isFavorite ? 'star-filled' : 'star'}}" size="48rpx" color="{{isFavorite ? '#FFD700' : '#999'}}" />
         </view>
-        <view class="sold-count">已售 {{goods.sold}}</view>
       </view>
 
-      <view class="product-title">{{goods.name}}</view>
+      <!-- 评分显示 -->
+      <view class="product-rating" wx:if="{{goods.rating > 0}}">
+        <text class="rating-star">⭐</text>
+        <text class="rating-num">{{goods.rating}}</text>
+        <text class="rating-count">({{goods.reviewCount}}条评价)</text>
+      </view>
 
       <view class="product-tags" wx:if="{{goods.tags.length > 0}}">
         <block wx:for="{{goods.tags}}" wx:key="*this">
@@ -95,13 +96,13 @@
 
       <!-- 评价列表 -->
       <view wx:if="{{reviews.length > 0}}" class="reviews-list">
-        <view class="review-item" wx:for="{{reviews}}" wx:key="_id" bindlongpress="onReviewReport" data-id="{{item._id}}" data-type="goods" data-content="{{item.content}}">
+        <view class="review-item" wx:for="{{reviews}}" wx:key="_id" bindlongpress="onReviewReport" data-id="{{item._id}}" data-type="goods" data-content="{{item.content}}" data-userid="{{item.userId}}">
           <view class="review-user">
             <image class="user-avatar" src="{{item.userAvatar || '/static/icons/default-avatar.png'}}" />
             <view class="user-info">
               <text class="user-name">{{item.userName}}</text>
               <view class="review-rating">
-                <text class="star {{index < item.rating ? 'active' : ''}}" wx:for="{{[1,2,3,4,5]}}" wx:for-index="index" wx:key="index">★</text>
+                <text class="star {{starIndex + 1 <= item.rating ? 'active' : ''}}" wx:for="{{[1,2,3,4,5]}}" wx:key="starIndex" wx:for-item="starItem" wx:for-index="starIndex">★</text>
               </view>
             </view>
             <text class="review-time">{{item.createTime}}</text>
@@ -117,19 +118,7 @@
       </view>
     </view>
 
-    <view style="height: 120rpx;"></view>
+    <view style="height: 40rpx;"></view>
   </scroll-view>
-
-  <!-- 底部购买栏 -->
-  <view class="bottom-bar" wx:if="{{!loading}}">
-    <view class="fav-btn" bindtap="toggleFavorite">
-      <t-icon name="{{isFavorite ? 'star-filled' : 'star'}}" size="40rpx" color="{{isFavorite ? '#FFD700' : '#666'}}" />
-      <text class="fav-text">{{isFavorite ? '已收藏' : '收藏'}}</text>
-    </view>
-
-    <view class="buy-btn" bindtap="onBuyNow">
-      立即购买
-    </view>
-  </view>
 
 </view>

@@ -9,7 +9,11 @@ Page({
   data: {
     templateId: '',
     template: null,
-    photoSets: [],
+    photos: [], // 照片列表（替代photoSets）
+    leftColumnPhotos: [], // 左列照片
+    rightColumnPhotos: [], // 右列照片
+    leftHeight: 0, // 左列高度
+    rightHeight: 0, // 右列高度
     sortType: 'hot', // hot-热度, time-时间
     loading: false,
     statusBarHeight: 0,
@@ -17,7 +21,8 @@ Page({
     menuButtonRight: 0, // 胶囊按钮右侧距离
     defaultAvatar: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="50" fill="%23E8F5E9"/%3E%3Cpath d="M50 45c8.284 0 15-6.716 15-15s-6.716-15-15-15-15 6.716-15 15 6.716 15 15 15zm0 5c-13.807 0-25 11.193-25 25v10h50V75c0-13.807-11.193-25-25-25z" fill="%233ECE79"/%3E%3C/svg%3E',
     isFavorite: false,
-    isLiked: false
+    isLiked: false,
+    isCreator: false // 是否是创建者
   },
 
   /**
@@ -33,7 +38,7 @@ Page({
     });
 
     this.loadTemplateDetail();
-    this.loadPhotoSets();
+    this.loadPhotos(); // 独立加载照片列表
     this.checkFavoriteStatus();
     this.checkLikeStatus();
   },
@@ -54,6 +59,8 @@ Page({
       this.setData({
         template: cachedData.data
       });
+      // 检查是否是创建者
+      this.checkIsCreator(cachedData.data);
       // 仍然增加观看量（如果符合条件）
       this.increaseViewCount();
       return;
@@ -71,6 +78,9 @@ Page({
           template: res.data
         });
 
+        // 检查是否是创建者
+        this.checkIsCreator(res.data);
+
         // 保存到缓存
         wx.setStorageSync(cacheKey, {
           data: res.data,
@@ -87,6 +97,20 @@ Page({
           icon: 'none'
         });
       });
+  },
+
+  /**
+   * 检查是否是创建者
+   */
+  checkIsCreator(template) {
+    const userInfo = app.globalData.userInfo || {};
+    const currentOpenId = userInfo.openid || '';
+    const creatorId = template.creatorId || '';
+
+    const isCreator = currentOpenId && creatorId && currentOpenId === creatorId;
+    console.log('是否是创建者:', isCreator, '当前用户:', currentOpenId, '创建者:', creatorId);
+
+    this.setData({ isCreator });
   },
 
   /**
@@ -125,72 +149,181 @@ Page({
   },
 
   /**
-   * 加载照片集列表
+   * 加载照片列表（从photos集合中查询）
    */
-  loadPhotoSets() {
+  loadPhotos() {
     if (this.data.loading) return;
 
     const { templateId } = this.data;
-    const cacheKey = `photosets_cache_${templateId}`;
+    const cacheKey = `photos_cache_${templateId}`;
     const cachedData = wx.getStorageSync(cacheKey);
     const now = Date.now();
-    const cacheExpire = 5 * 60 * 1000; // 缓存5分钟
+    const cacheExpire = 1 * 60 * 1000; // 缓存1分钟（从10分钟改为1分钟）
 
     // 如果有缓存且未过期，使用缓存数据
     if (cachedData && cachedData.timestamp && (now - cachedData.timestamp < cacheExpire)) {
-      console.log('使用缓存的照片集列表');
+      console.log('使用缓存的照片数据');
+      const allPhotos = cachedData.data;
+
+      // 检查每张照片的点赞状态
+      this.checkPhotosLikeStatus(allPhotos);
+
+      // 获取图片临时链接（用于预览）
+      this.getTempFileURLs(allPhotos);
+
+      // 设置照片数据
       this.setData({
-        photoSets: cachedData.data,
+        photos: allPhotos,
         loading: false
+      }, () => {
+        // 数据设置完成后进行排序
+        this.sortPhotos();
       });
-      this.sortPhotoSets();
       return;
     }
 
     // 缓存过期或不存在，从数据库加载
-    console.log('从数据库加载照片集列表');
+    console.log('从数据库加载照片数据');
     this.setData({ loading: true });
-    wx.showLoading({ title: '加载中...' });
 
     const db = wx.cloud.database();
-    db.collection('photoSets')
+
+    // 从photos集合中查询该模板的所有照片
+    db.collection('photos')
       .where({
         templateId: templateId,
         status: 'approved'
       })
+      .orderBy('createTime', 'desc')
       .get()
       .then(res => {
-        console.log('照片集列表:', res.data);
+        console.log('[模板详情] 照片列表加载成功，数量:', res.data.length);
 
-        // 为每个照片集添加缩略图URL
-        const photoSetsWithThumbnail = res.data.map(photoSet => ({
-          ...photoSet,
-          coverThumbnail: getThumbnailUrl(photoSet.coverPhoto, 400)
-        }));
+        const allPhotos = res.data;
 
-        this.setData({
-          photoSets: photoSetsWithThumbnail,
-          loading: false
+        // 打印每张照片的URL信息
+        allPhotos.forEach((photo, index) => {
+          console.log(`[模板详情] 照片${index + 1}:`, {
+            _id: photo._id,
+            hasThumbnail: !!photo.thumbnailUrl,
+            thumbnailUrl: photo.thumbnailUrl,
+            photoUrl: photo.photoUrl
+          });
         });
 
         // 保存到缓存
         wx.setStorageSync(cacheKey, {
-          data: photoSetsWithThumbnail,
+          data: allPhotos,
           timestamp: now
         });
 
-        this.sortPhotoSets();
-        wx.hideLoading();
+        // 检查每张照片的点赞状态
+        this.checkPhotosLikeStatus(allPhotos);
+
+        // 获取图片临时链接（用于预览）
+        this.getTempFileURLs(allPhotos);
+
+        // 设置照片数据
+        this.setData({
+          photos: allPhotos,
+          loading: false
+        }, () => {
+          // 数据设置完成后进行排序
+          this.sortPhotos();
+        });
       })
       .catch(err => {
-        console.error('加载照片集失败:', err);
+        console.error('加载照片失败:', err);
         this.setData({ loading: false });
-        wx.hideLoading();
         wx.showToast({
           title: '加载失败',
           icon: 'none'
         });
       });
+  },
+
+  /**
+   * 获取图片临时链接并缓存
+   */
+  getTempFileURLs(photos) {
+    // 分离 cloud:// 和 https:// 链接
+    const cloudFiles = [];
+    const cloudIndexMap = {}; // 记录 cloud:// 文件对应的照片索引
+
+    photos.forEach((photo, index) => {
+      if (photo.photoUrl && photo.photoUrl.startsWith('cloud://')) {
+        cloudFiles.push(photo.photoUrl);
+        cloudIndexMap[photo.photoUrl] = index;
+      }
+    });
+
+    // 如果没有 cloud:// 链接，直接预加载图片
+    if (cloudFiles.length === 0) {
+      console.log('所有图片都是 HTTP 链接，开始预加载');
+      this.preloadImages(photos);
+      return;
+    }
+
+    wx.cloud.getTempFileURL({
+      fileList: cloudFiles
+    }).then(res => {
+      console.log('获取临时链接成功:', res.fileList);
+
+      // 将临时链接映射到照片对象
+      res.fileList.forEach(item => {
+        if (item.status === 0) {
+          const photoIndex = cloudIndexMap[item.fileID];
+          if (photoIndex !== undefined) {
+            photos[photoIndex].tempPhotoUrl = item.tempFileURL;
+          }
+        } else {
+          // 文件不存在或获取失败
+          console.warn('获取临时链接失败:', item.fileID, 'status:', item.status, 'errMsg:', item.errMsg);
+        }
+      });
+
+      // 更新页面数据
+      this.setData({
+        photos: photos
+      });
+
+      // 预加载图片
+      this.preloadImages(photos);
+    }).catch(err => {
+      console.error('获取临时链接失败:', err);
+      // 即使获取临时链接失败，也尝试预加载（可能有些是HTTP链接）
+      this.preloadImages(photos);
+    });
+  },
+
+  /**
+   * 预加载图片到缓存
+   */
+  preloadImages(photos) {
+    // 限制预加载数量，避免占用太多内存
+    const maxPreload = 10;
+
+    // 使用临时链接或原始链接（如果是 HTTP 链接）
+    const urlsToPreload = photos.slice(0, maxPreload).map(p => {
+      // 优先使用临时链接，如果没有则使用原始链接（可能是 HTTP 链接）
+      const url = p.tempPhotoUrl || p.photoUrl;
+      // 只预加载 HTTP/HTTPS 链接
+      return url && (url.startsWith('http://') || url.startsWith('https://')) ? url : null;
+    }).filter(url => url !== null);
+
+    console.log(`预加载前 ${urlsToPreload.length} 张图片`);
+
+    urlsToPreload.forEach(url => {
+      wx.getImageInfo({
+        src: url,
+        success: () => {
+          console.log('预加载成功:', url);
+        },
+        fail: (err) => {
+          console.error('预加载失败:', url, err);
+        }
+      });
+    });
   },
 
   /**
@@ -201,42 +334,170 @@ Page({
     if (type === this.data.sortType) return;
 
     this.setData({ sortType: type });
-    this.sortPhotoSets();
+
+    // 重新排序照片
+    this.sortPhotos();
   },
 
   /**
-   * 排序照片集列表
+   * 排序照片
    */
-  sortPhotoSets() {
-    const { photoSets, sortType } = this.data;
-    let sortedPhotoSets = [...photoSets];
+  sortPhotos() {
+    const { photos, sortType } = this.data;
+    if (!photos || photos.length === 0) return;
 
+    console.log('开始排序照片，当前排序类型:', sortType);
+    console.log('照片数据:', photos.map(p => ({ id: p._id, sortOrder: p.sortOrder, userName: p.userName })));
+
+    let sortedPhotos = [...photos];
+
+    // 分离固定排序和动态排序的照片
+    const pinnedPhotos = sortedPhotos.filter(p => (p.sortOrder || 0) > 0);
+    const dynamicPhotos = sortedPhotos.filter(p => (p.sortOrder || 0) <= 0);
+
+    console.log('置顶照片数量:', pinnedPhotos.length);
+    console.log('普通照片数量:', dynamicPhotos.length);
+
+    // 固定排序的照片按 sortOrder 升序排列
+    pinnedPhotos.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+    // 动态排序的照片根据排序类型排序
     if (sortType === 'hot') {
-      // 按热度排序 (点赞数 + 浏览数)
-      sortedPhotoSets.sort((a, b) => {
-        const hotA = (a.likeCount || 0) + (a.viewCount || 0);
-        const hotB = (b.likeCount || 0) + (b.viewCount || 0);
-        return hotB - hotA;
+      // 热度排序：计算热度分数
+      dynamicPhotos.forEach(photo => {
+        const viewCount = photo.viewCount || 0;
+        const likeCount = photo.likeCount || 0;
+        const favoriteCount = photo.favoriteCount || 0;
+        photo.hotScore = viewCount * 0.1 + likeCount * 2 + favoriteCount * 3;
       });
+      dynamicPhotos.sort((a, b) => b.hotScore - a.hotScore);
     } else if (sortType === 'time') {
-      // 按创建时间排序
-      sortedPhotoSets.sort((a, b) => {
-        const timeA = a.createTime?.$date || a.createTime || 0;
-        const timeB = b.createTime?.$date || b.createTime || 0;
-        return timeB - timeA;
-      });
+      // 时间排序：按创建时间降序
+      dynamicPhotos.sort((a, b) => (b.createTime || 0) - (a.createTime || 0));
     }
 
-    this.setData({ photoSets: sortedPhotoSets });
+    // 合并：固定排序在前，动态排序在后
+    sortedPhotos = [...pinnedPhotos, ...dynamicPhotos];
+
+    console.log('排序后照片顺序:', sortedPhotos.map(p => ({ id: p._id, sortOrder: p.sortOrder, userName: p.userName })));
+
+    // 重置瀑布流
+    this.setData({
+      photos: sortedPhotos,
+      leftColumnPhotos: [],
+      rightColumnPhotos: [],
+      leftHeight: 0,
+      rightHeight: 0
+    }, () => {
+      // 智能瀑布流分列
+      this.buildWaterfall(sortedPhotos);
+    });
   },
 
   /**
-   * 点击照片集卡片
+   * 智能瀑布流分列
+   * 使用图片 ID 哈希值来生成稳定的高度估算
    */
-  onPhotoSetTap(e) {
-    const { id } = e.currentTarget.dataset;
+  buildWaterfall(photos) {
+    let {
+      leftColumnPhotos,
+      rightColumnPhotos,
+      leftHeight,
+      rightHeight
+    } = this.data;
+
+    photos.forEach((photo, index) => {
+      // 使用照片 ID 的哈希值生成稳定的高度
+      const hash = this.simpleHash(photo._id);
+      const heightVariation = (hash % 300) - 150; // -150 到 +150 的变化
+      const baseHeight = 450; // 基础高度
+      const cardHeight = baseHeight + heightVariation + 120; // 图片 + 底部信息栏
+
+      // 添加 originalIndex 用于点击跳转
+      const photoWithIndex = { ...photo, originalIndex: index };
+
+      // 打印每张照片在列表中使用的URL
+      const displayUrl = photo.thumbnailUrl || photo.photoUrl;
+      console.log(`[模板详情] 列表显示照片${index + 1}:`, {
+        _id: photo._id,
+        useThumbnail: !!photo.thumbnailUrl,
+        displayUrl: displayUrl,
+        estimatedHeight: cardHeight,
+        hash: hash
+      });
+
+      // 分配到较短的列
+      if (leftHeight <= rightHeight) {
+        leftColumnPhotos.push(photoWithIndex);
+        leftHeight += cardHeight;
+      } else {
+        rightColumnPhotos.push(photoWithIndex);
+        rightHeight += cardHeight;
+      }
+    });
+
+    console.log('[瀑布流] 分配完成:', {
+      leftCount: leftColumnPhotos.length,
+      rightCount: rightColumnPhotos.length,
+      leftHeight,
+      rightHeight,
+      diff: Math.abs(leftHeight - rightHeight)
+    });
+
+    this.setData({
+      leftColumnPhotos,
+      rightColumnPhotos,
+      leftHeight,
+      rightHeight
+    });
+  },
+
+  /**
+   * 简单哈希函数
+   */
+  simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+  },
+
+  /**
+   * 点击照片
+   */
+  onPhotoTap(e) {
+    const { index } = e.currentTarget.dataset;
+    const { photos, leftColumnPhotos, rightColumnPhotos, templateId } = this.data;
+
+    // 合并左右列，得到当前显示顺序的照片列表
+    const displayPhotos = [];
+    const maxLength = Math.max(leftColumnPhotos.length, rightColumnPhotos.length);
+    for (let i = 0; i < maxLength; i++) {
+      if (leftColumnPhotos[i]) displayPhotos.push(leftColumnPhotos[i]);
+      if (rightColumnPhotos[i]) displayPhotos.push(rightColumnPhotos[i]);
+    }
+
+    console.log('[点击照片] index:', index, '显示顺序照片数:', displayPhotos.length);
+
+    // 使用 index 从显示顺序中获取照片
+    const photo = displayPhotos[index];
+    if (!photo) {
+      console.error('[点击照片] 照片不存在，index:', index);
+      return;
+    }
+
+    console.log('[点击照片] 点击的照片:', { _id: photo._id, userName: photo.userName });
+
+    // 将显示顺序的照片列表存到缓存，供预览页使用
+    wx.setStorageSync('previewPhotos', displayPhotos);
+    wx.setStorageSync('previewPhotosTemplateId', templateId);
+
+    // 跳转到照片预览页面，传递在显示列表中的索引
     wx.navigateTo({
-      url: `/pages/photoset-detail/photoset-detail?id=${id}`
+      url: `/pages/photo-preview/photo-preview?currentIndex=${index}`
     });
   },
 
@@ -261,29 +522,14 @@ Page({
   },
 
   /**
-   * 上传照片集
+   * 上传照片
    */
   onUpload() {
-    const { template } = this.data;
+    const { templateId } = this.data;
 
-    if (!template) {
-      wx.showToast({
-        title: '模板信息加载中',
-        icon: 'none'
-      });
-      return;
-    }
-
-    if (!template.allowUserUpload) {
-      wx.showToast({
-        title: '该模板不允许上传',
-        icon: 'none'
-      });
-      return;
-    }
-
+    // 跳转到上传照片页面
     wx.navigateTo({
-      url: `/pages/upload-photoset/upload-photoset?templateId=${this.data.templateId}`
+      url: `/pages/upload-photoset/upload-photoset?templateId=${templateId}`
     });
   },
 
@@ -435,6 +681,237 @@ Page({
   },
 
   /**
+   * 检查照片点赞状态
+   */
+  checkPhotosLikeStatus(photos) {
+    const likedPhotos = wx.getStorageSync('likedPhotos') || [];
+    const favoritedPhotos = wx.getStorageSync('favoritedPhotos') || [];
+    photos.forEach(photo => {
+      photo.isLiked = likedPhotos.includes(photo._id);
+      photo.isFavorited = favoritedPhotos.includes(photo._id);
+    });
+  },
+
+  /**
+   * 照片点赞
+   */
+  onPhotoLike(e) {
+    const { photoId } = e.currentTarget.dataset;
+    const { photos, leftColumnPhotos, rightColumnPhotos, templateId } = this.data;
+
+    // 找到对应的照片
+    const photo = photos.find(p => p._id === photoId);
+    if (!photo) return;
+
+    const db = wx.cloud.database();
+    const _ = db.command;
+    let likedPhotos = wx.getStorageSync('likedPhotos') || [];
+
+    if (photo.isLiked) {
+      // 取消点赞
+      likedPhotos = likedPhotos.filter(id => id !== photoId);
+      db.collection('photos')
+        .doc(photoId)
+        .update({
+          data: { likeCount: _.inc(-1) }
+        })
+        .then(() => {
+          console.log('照片点赞量-1');
+          // 清除照片列表缓存
+          wx.removeStorageSync(`photos_cache_${templateId}`);
+        });
+      wx.showToast({
+        title: '已取消点赞',
+        icon: 'success'
+      });
+    } else {
+      // 点赞
+      likedPhotos.push(photoId);
+      db.collection('photos')
+        .doc(photoId)
+        .update({
+          data: { likeCount: _.inc(1) }
+        })
+        .then(() => {
+          console.log('照片点赞量+1');
+          // 清除照片列表缓存
+          wx.removeStorageSync(`photos_cache_${templateId}`);
+        });
+      wx.showToast({
+        title: '点赞成功',
+        icon: 'success'
+      });
+    }
+
+    // 更新本地存储
+    wx.setStorageSync('likedPhotos', likedPhotos);
+
+    // 更新 UI
+    photo.isLiked = !photo.isLiked;
+    photo.likeCount = (photo.likeCount || 0) + (photo.isLiked ? 1 : -1);
+
+    // 更新瀑布流数据
+    const updatedLeftColumn = leftColumnPhotos.map(p =>
+      p._id === photoId ? { ...p, isLiked: photo.isLiked, likeCount: photo.likeCount } : p
+    );
+    const updatedRightColumn = rightColumnPhotos.map(p =>
+      p._id === photoId ? { ...p, isLiked: photo.isLiked, likeCount: photo.likeCount } : p
+    );
+
+    this.setData({
+      photos,
+      leftColumnPhotos: updatedLeftColumn,
+      rightColumnPhotos: updatedRightColumn
+    });
+  },
+
+  /**
+   * 照片收藏
+   */
+  onPhotoFavorite(e) {
+    const { photoId } = e.currentTarget.dataset;
+    const { photos, leftColumnPhotos, rightColumnPhotos, templateId } = this.data;
+
+    const photo = photos.find(p => p._id === photoId);
+    if (!photo) return;
+
+    const db = wx.cloud.database();
+    const _ = db.command;
+    let favoritedPhotos = wx.getStorageSync('favoritedPhotos') || [];
+
+    if (photo.isFavorited) {
+      // 取消收藏
+      favoritedPhotos = favoritedPhotos.filter(id => id !== photoId);
+      db.collection('photos')
+        .doc(photoId)
+        .update({
+          data: { favoriteCount: _.inc(-1) }
+        })
+        .then(() => {
+          console.log('照片收藏量-1');
+          // 清除照片列表缓存
+          wx.removeStorageSync(`photos_cache_${templateId}`);
+        });
+      wx.showToast({
+        title: '已取消收藏',
+        icon: 'success'
+      });
+    } else {
+      // 收藏
+      favoritedPhotos.push(photoId);
+      db.collection('photos')
+        .doc(photoId)
+        .update({
+          data: { favoriteCount: _.inc(1) }
+        })
+        .then(() => {
+          console.log('照片收藏量+1');
+          // 清除照片列表缓存
+          wx.removeStorageSync(`photos_cache_${templateId}`);
+        });
+      wx.showToast({
+        title: '收藏成功',
+        icon: 'success'
+      });
+    }
+
+    // 更新本地存储
+    wx.setStorageSync('favoritedPhotos', favoritedPhotos);
+
+    // 更新 UI
+    photo.isFavorited = !photo.isFavorited;
+    photo.favoriteCount = (photo.favoriteCount || 0) + (photo.isFavorited ? 1 : -1);
+
+    // 更新瀑布流数据
+    const updatedLeftColumn = leftColumnPhotos.map(p =>
+      p._id === photoId ? { ...p, isFavorited: photo.isFavorited, favoriteCount: photo.favoriteCount } : p
+    );
+    const updatedRightColumn = rightColumnPhotos.map(p =>
+      p._id === photoId ? { ...p, isFavorited: photo.isFavorited, favoriteCount: photo.favoriteCount } : p
+    );
+
+    this.setData({
+      photos,
+      leftColumnPhotos: updatedLeftColumn,
+      rightColumnPhotos: updatedRightColumn
+    });
+  },
+
+  /**
+   * 长按照片举报
+   */
+  onPhotoLongPress(e) {
+    const { photoId, photoName } = e.currentTarget.dataset;
+
+    wx.showActionSheet({
+      itemList: ['举报该照片'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this.showReportDialog(photoId, 'photo', photoName);
+        }
+      }
+    });
+  },
+
+  /**
+   * 显示举报对话框
+   */
+  showReportDialog(targetId, targetType, targetName) {
+    const reportReasons = [
+      '色情低俗',
+      '违法违规',
+      '虚假信息',
+      '侵权内容',
+      '垃圾广告',
+      '其他原因'
+    ];
+
+    wx.showActionSheet({
+      itemList: reportReasons,
+      success: async (res) => {
+        const reason = reportReasons[res.tapIndex];
+        await this.submitReport(targetId, targetType, targetName, reason);
+      }
+    });
+  },
+
+  /**
+   * 提交举报
+   */
+  async submitReport(targetId, targetType, targetName, reason) {
+    try {
+      wx.showLoading({ title: '提交中...' });
+
+      const db = wx.cloud.database();
+      await db.collection('reports').add({
+        data: {
+          targetId,
+          targetType,
+          targetName,
+          reason,
+          reporterOpenId: app.globalData.userInfo?.openid || '',
+          reporterName: app.globalData.userInfo?.nickName || '匿名用户',
+          status: 'pending',
+          createTime: new Date(),
+        }
+      });
+
+      wx.hideLoading();
+      wx.showToast({
+        title: '举报成功',
+        icon: 'success'
+      });
+    } catch (err) {
+      console.error('举报失败:', err);
+      wx.hideLoading();
+      wx.showToast({
+        title: '举报失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  /**
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady() {},
@@ -459,8 +936,11 @@ Page({
    */
   onPullDownRefresh() {
     this.loadTemplateDetail();
-    this.loadPhotoSets();
-    wx.stopPullDownRefresh();
+    // 重新加载模板详情后，会自动调用loadPhotos
+    setTimeout(() => {
+      this.loadPhotos();
+      wx.stopPullDownRefresh();
+    }, 500);
   },
 
   /**
@@ -491,18 +971,105 @@ Page({
   },
 
   /**
-   * 更新照片集列表中的单个数据（从照片集详情页返回时调用）
+   * 删除模板
    */
-  updatePhotoSetItem(photoSetId, updates) {
-    const photoSets = this.data.photoSets;
-    const index = photoSets.findIndex(item => item._id === photoSetId);
-    if (index !== -1) {
-      // 只更新变化的字段
-      Object.assign(photoSets[index], updates);
-      this.setData({
-        [`photoSets[${index}]`]: photoSets[index]
+  onDeleteTemplate() {
+    wx.showModal({
+      title: '确认删除',
+      content: '删除后将无法恢复，确定要删除这个模板吗？',
+      confirmText: '删除',
+      confirmColor: '#FF4444',
+      success: (res) => {
+        if (res.confirm) {
+          this.deleteTemplate();
+        }
+      }
+    });
+  },
+
+  /**
+   * 执行删除模板
+   */
+  async deleteTemplate() {
+    const { templateId, photos } = this.data;
+
+    wx.showLoading({ title: '检查中...' });
+
+    try {
+      const db = wx.cloud.database();
+      const userInfo = app.globalData.userInfo || {};
+      const currentOpenId = userInfo.openid || '';
+
+      // 1. 检查是否有其他用户上传的照片
+      const hasOtherUserPhotos = photos.some(photo => {
+        const userId = photo.userId || '';
+        return userId && userId !== currentOpenId;
       });
-      console.log('已更新照片集数据:', photoSetId, updates);
+
+      if (hasOtherUserPhotos) {
+        wx.hideLoading();
+        wx.showModal({
+          title: '无法删除',
+          content: '该模板中包含其他用户上传的照片，无法删除',
+          showCancel: false,
+          confirmText: '知道了'
+        });
+        return;
+      }
+
+      wx.showLoading({ title: '删除中...' });
+
+      // 2. 删除所有照片记录（只删除自己上传的）
+      const myPhotos = photos.filter(photo => photo.userId === currentOpenId);
+      if (myPhotos.length > 0) {
+        const deletePromises = myPhotos.map(photo => {
+          return db.collection('photos')
+            .where({
+              _id: photo._id,
+              userId: currentOpenId
+            })
+            .remove();
+        });
+        await Promise.all(deletePromises);
+        console.log(`已删除 ${myPhotos.length} 张照片记录`);
+      }
+
+      // 3. 删除模板记录
+      await db.collection('templates')
+        .where({
+          _id: templateId,
+          creatorId: currentOpenId
+        })
+        .remove();
+      console.log('已删除模板记录');
+
+      // 4. 清除缓存
+      wx.removeStorageSync(`template_cache_${templateId}`);
+      wx.removeStorageSync(`photos_cache_${templateId}`);
+      console.log('已清除模板和照片缓存');
+
+      // 设置刷新标记，返回模板列表时会自动刷新
+      wx.setStorageSync('template_list_need_refresh', true);
+
+      wx.hideLoading();
+      wx.showToast({
+        title: '删除成功',
+        icon: 'success',
+        duration: 2000
+      });
+
+      // 延迟返回上一页
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 2000);
+
+    } catch (err) {
+      console.error('删除模板失败:', err);
+      wx.hideLoading();
+      wx.showToast({
+        title: err.message || '删除失败',
+        icon: 'none'
+      });
     }
   }
 })

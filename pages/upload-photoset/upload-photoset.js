@@ -1,6 +1,6 @@
 // pages/upload-photoset/upload-photoset.js
 const app = getApp()
-const { checkImageSecurity, compressImage } = require('../../utils/util.js')
+const { checkImageSecurity, generateThumbnail } = require('../../utils/util.js')
 
 Page({
   /**
@@ -9,10 +9,8 @@ Page({
   data: {
     templateId: '',
     template: null,
-    title: '',
-    description: '',
-    photos: [], // 已选择的照片临时路径数组
-    uploadedPhotos: [], // 已上传的云存储文件ID数组
+    photo: '', // 单张照片临时路径
+    photoUrl: '', // 照片预览URL
     uploading: false,
     statusBarHeight: 0,
     navBarHeight: 0,
@@ -59,7 +57,7 @@ Page({
    * 返回上一页
    */
   onBack() {
-    if (this.data.photos.length > 0) {
+    if (this.data.photo) {
       wx.showModal({
         title: '提示',
         content: '确定要放弃上传吗?',
@@ -75,88 +73,61 @@ Page({
   },
 
   /**
-   * 标题输入
-   */
-  onTitleInput(e) {
-    this.setData({
-      title: e.detail.value
-    });
-  },
-
-  /**
-   * 描述输入
-   */
-  onDescriptionInput(e) {
-    this.setData({
-      description: e.detail.value
-    });
-  },
-
-  /**
    * 选择照片
    */
-  async onChoosePhotos() {
-    const { photos } = this.data;
-    const remainCount = 9 - photos.length; // 最多9张
-
-    if (remainCount <= 0) {
-      wx.showToast({
-        title: '最多上传9张照片',
-        icon: 'none'
-      });
-      return;
-    }
-
-    wx.chooseImage({
-      count: remainCount,
+  async onChoosePhoto() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
       sizeType: ['original', 'compressed'],
       sourceType: ['album', 'camera'],
       success: async (res) => {
-        const tempFilePaths = res.tempFilePaths;
+        const tempFile = res.tempFiles[0];
+        const tempFilePath = tempFile.tempFilePath;
 
-        wx.showLoading({ title: `审核图片中 0/${tempFilePaths.length}` });
+        wx.showLoading({ title: '审核图片中...' });
 
         try {
-          // 逐个审核图片，必须全部通过
-          for (let i = 0; i < tempFilePaths.length; i++) {
-            wx.showLoading({ title: `审核图片中 ${i + 1}/${tempFilePaths.length}` });
-
-            const checkResult = await checkImageSecurity(tempFilePaths[i]);
-
-            if (!checkResult.success) {
-              wx.hideLoading();
-              wx.showModal({
-                title: '图片审核失败',
-                content: `第${i + 1}张图片：${checkResult.errMsg}\n\n所有图片必须通过审核才能添加，请重新选择`,
-                showCancel: false
-              });
-              return; // 有一张不通过就全部拒绝
-            }
-          }
+          // 图片内容安全审核
+          const checkResult = await checkImageSecurity(tempFilePath);
 
           wx.hideLoading();
 
-          // 全部通过，添加到列表
-          const newPhotos = [...photos, ...tempFilePaths];
+          if (!checkResult.success) {
+            wx.showModal({
+              title: '图片审核失败',
+              content: checkResult.errMsg,
+              showCancel: false
+            });
+            return;
+          }
+
+          // 审核通过，设置照片
           this.setData({
-            photos: newPhotos
+            photo: tempFilePath,
+            photoUrl: tempFilePath
           });
 
           wx.showToast({
-            title: `已添加${tempFilePaths.length}张照片`,
+            title: '照片选择成功',
             icon: 'success'
           });
         } catch (err) {
           console.error('图片审核异常:', err);
           wx.hideLoading();
-          wx.showToast({
-            title: '图片审核失败，请重试',
-            icon: 'none'
+          wx.showModal({
+            title: '审核异常',
+            content: '图片审核服务暂时不可用，请稍后重试',
+            showCancel: false
           });
         }
       },
-      fail: err => {
-        console.error('选择照片失败:', err);
+      fail: (err) => {
+        console.error('选择图片失败:', err);
+        wx.showToast({
+          title: '选择图片失败',
+          icon: 'none'
+        });
       }
     });
   },
@@ -164,53 +135,23 @@ Page({
   /**
    * 删除照片
    */
-  onDeletePhoto(e) {
-    const { index } = e.currentTarget.dataset;
-    const { photos } = this.data;
-
-    photos.splice(index, 1);
-    this.setData({ photos });
-  },
-
-  /**
-   * 预览照片
-   */
-  onPreviewPhoto(e) {
-    const { index } = e.currentTarget.dataset;
-    const { photos } = this.data;
-
-    wx.previewImage({
-      current: photos[index],
-      urls: photos
+  onDeletePhoto() {
+    this.setData({
+      photo: '',
+      photoUrl: ''
     });
   },
 
   /**
-   * 上传照片集
+   * 上传照片
    */
   async onSubmit() {
-    const { title, description, photos, templateId, uploading } = this.data;
+    const { photo, templateId, uploading } = this.data;
 
     // 验证表单
-    if (!title.trim()) {
+    if (!photo) {
       wx.showToast({
-        title: '请输入标题',
-        icon: 'none'
-      });
-      return;
-    }
-
-    if (!description.trim()) {
-      wx.showToast({
-        title: '请输入描述',
-        icon: 'none'
-      });
-      return;
-    }
-
-    if (photos.length === 0) {
-      wx.showToast({
-        title: '请至少选择一张照片',
+        title: '请选择照片',
         icon: 'none'
       });
       return;
@@ -219,73 +160,81 @@ Page({
     if (uploading) return;
 
     this.setData({ uploading: true });
-    wx.showLoading({ title: '压缩图片中...' });
 
     try {
-      // 先压缩所有照片
-      const compressedPhotos = [];
-      for (let i = 0; i < photos.length; i++) {
-        wx.showLoading({ title: `压缩图片 ${i + 1}/${photos.length}` });
-        const compressed = await compressImage(photos[i], 85);
-        compressedPhotos.push(compressed);
-      }
+      // 1. 生成缩略图
+      wx.showLoading({ title: '生成缩略图...' });
+      console.log('[照片上传] 开始生成缩略图，原图路径:', photo);
+      const thumbnailPath = await generateThumbnail(photo, 60);
+      console.log('[照片上传] 缩略图生成成功，路径:', thumbnailPath);
 
-      // 上传所有照片到云存储
-      const uploadedPhotos = [];
-      for (let i = 0; i < compressedPhotos.length; i++) {
-        const filePath = compressedPhotos[i];
-        const cloudPath = `photosets/${templateId}/${Date.now()}_${i}.jpg`;
+      // 2. 上传缩略图到云存储
+      wx.showLoading({ title: '上传缩略图...' });
+      const thumbnailCloudPath = `photos/${templateId}/thumb_${Date.now()}.jpg`;
+      const thumbnailResult = await wx.cloud.uploadFile({
+        cloudPath: thumbnailCloudPath,
+        filePath: thumbnailPath
+      });
+      console.log('[照片上传] 缩略图上传成功，fileID:', thumbnailResult.fileID);
 
-        const uploadResult = await wx.cloud.uploadFile({
-          cloudPath,
-          filePath
-        });
-
-        uploadedPhotos.push(uploadResult.fileID);
-
-        // 更新进度
-        wx.showLoading({
-          title: `上传中 ${i + 1}/${compressedPhotos.length}`
-        });
-      }
+      // 3. 上传原图到云存储
+      wx.showLoading({ title: '上传原图...' });
+      const originalCloudPath = `photos/${templateId}/original_${Date.now()}.jpg`;
+      const originalResult = await wx.cloud.uploadFile({
+        cloudPath: originalCloudPath,
+        filePath: photo
+      });
+      console.log('[照片上传] 原图上传成功，fileID:', originalResult.fileID);
 
       // 获取用户信息
       const userInfo = app.globalData.userInfo || {};
 
-      // 创建照片集记录
+      // 创建照片记录（保存缩略图和原图两个URL）
       const db = wx.cloud.database();
-      const createResult = await db.collection('photoSets').add({
+      const _ = db.command;
+      const createResult = await db.collection('photos').add({
         data: {
           templateId,
-          title: title.trim(),
-          description: description.trim(),
-          photos: uploadedPhotos,
-          coverPhoto: uploadedPhotos[0], // 第一张作为封面
+          thumbnailUrl: thumbnailResult.fileID,  // 缩略图URL
+          photoUrl: originalResult.fileID,        // 原图URL
           userId: userInfo.openid || '',
           userName: userInfo.nickName || '匿名用户',
           userAvatar: userInfo.avatarUrl || '',
           isOfficial: false,
           status: 'approved', // 已审核通过（前置审核）
-          contentCheckStatus: 'passed', // 内容审核状态：passed-通过, rejected-拒绝, pending-待审核
-          contentCheckTime: db.serverDate(), // 内容审核时间
-          contentCheckMethod: 'auto', // 审核方式：auto-自动审核, manual-人工审核
+          contentCheckStatus: 'passed',
+          contentCheckTime: db.serverDate(),
+          contentCheckMethod: 'auto',
           viewCount: 0,
           likeCount: 0,
+          favoriteCount: 0,
+          sortOrder: 0, // 排序字段：0表示按热度排序
           createTime: db.serverDate(),
           updateTime: db.serverDate()
         }
       });
 
-      console.log('照片集创建成功:', createResult);
+      console.log('[照片上传] 照片记录创建成功:', {
+        _id: createResult._id,
+        thumbnailUrl: thumbnailResult.fileID,
+        photoUrl: originalResult.fileID
+      });
 
-      // 清除模板详情页的照片集缓存，确保新照片集能立即显示
-      const cacheKey = `photosets_cache_${templateId}`;
-      wx.removeStorageSync(cacheKey);
-      console.log('已清除照片集缓存:', cacheKey);
+      // 更新模板的照片数量
+      await db.collection('templates').doc(templateId).update({
+        data: {
+          photoSetCount: _.inc(1)
+        }
+      });
+
+      console.log('模板照片数量已更新');
+
+      // 清除照片列表缓存
+      wx.removeStorageSync(`photos_cache_${templateId}`);
 
       wx.hideLoading();
       wx.showToast({
-        title: '提交成功',
+        title: '上传成功',
         icon: 'success',
         duration: 2000
       });

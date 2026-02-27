@@ -79,10 +79,6 @@
                   <view wx:else class="tag-plain">{{tag}}</view>
                 </block>
               </view>
-
-              <view class="goods-bottom">
-                <text class="goods-sold">已售 {{item.sold}}</text>
-              </view>
             </view>
           </view>
         </block>
@@ -104,10 +100,6 @@
                   <view wx:elif="{{item.tagType === 'green'}}" class="tag-green">{{tag}}</view>
                   <view wx:else class="tag-plain">{{tag}}</view>
                 </block>
-              </view>
-
-              <view class="goods-bottom">
-                <text class="goods-sold">已售 {{item.sold}}</text>
               </view>
             </view>
           </view>

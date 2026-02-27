@@ -10,27 +10,27 @@
     "list": [
       {
         "text": "创意模板",
-        "iconPath": "/static/tab-template.png",
+        "iconPath": "/static/images/default-avatar.png",
         "pagePath": "pages/template/template"
       },
       {
         "text": "线下体验",
-        "iconPath": "/static/tab-experience.png",
+        "iconPath": "/static/images/default-avatar.png",
         "pagePath": "pages/experience/experience"
       },
       {
         "text": "产品购买",
-        "iconPath": "/static/tab-purchase.png",
+        "iconPath": "/static/images/default-avatar.png",
         "pagePath": "pages/purchase/purchase"
       },
       {
         "text": "电子相册",
-        "iconPath": "/static/tab-album.png",
+        "iconPath": "/static/images/default-avatar.png",
         "pagePath": "pages/album/album"
       },
       {
         "text": "我的",
-        "iconPath": "/static/tab-my.png",
+        "iconPath": "/static/images/default-avatar.png",
         "pagePath": "pages/my/my"
       }
     ]
@@ -39,8 +39,8 @@
     "pages/template/template",
     "pages/user-info/user-info",
     "pages/template-detail/template-detail",
+    "pages/photo-preview/photo-preview",
     "pages/create-template/create-template",
-    "pages/photoset-detail/photoset-detail",
     "pages/upload-photoset/upload-photoset",
     "pages/my-works/my-works",
     "pages/my-favorites/my-favorites",
@@ -54,9 +54,7 @@
     "pages/purchase/purchase",
     "pages/album/album",
     "pages/my/my",
-    "pages/debug/debug",
-    "pages/good-info/good-info",
-    "pages/test-security/test-security"
+    "pages/good-info/good-info"
   ],
   "window": {
     "navigationStyle": "custom",
@@ -72,16 +70,6 @@
   "requiredPrivateInfos": [
     "chooseLocation",
     "getLocation"
-  ],
-  "navigateToMiniProgramAppIdList": [
-    "wxe5f52902cf4de896",
-    "wx8ac5d9e8e1be3527",
-    "wxefd4cdd5bdf52cbe",
-    "wx91d27dbf599dff74",
-    "wx8a7b431baea0ad19",
-    "wx3c12bd8a9a0e4801",
-    "wxbd687630cd02ce1d",
-    "wx1bfccbb25a60fd88"
   ],
   "style": "v2",
   "componentFramework": "glass-easel",

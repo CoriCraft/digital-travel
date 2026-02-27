@@ -90,22 +90,27 @@
         </view>
       </view>
 
-      <!-- 封面图片 -->
+      <!-- 照片上传（1-9张） -->
       <view class="form-item">
         <view class="form-label">
           <text class="required">*</text>
-          <text>封面图片</text>
+          <text>照片（1-9张，第一张作为封面）</text>
         </view>
-        <view class="cover-upload">
-          <view class="cover-preview" wx:if="{{coverImageUrl}}">
-            <image class="cover-image" src="{{coverImageUrl}}" mode="aspectFill" />
-            <view class="cover-delete" bindtap="onDeleteCover">
-              <t-icon name="close" size="40rpx" color="#fff" />
+        <view class="photos-grid">
+          <!-- 已上传的照片 -->
+          <view class="photo-item" wx:for="{{photos}}" wx:key="index">
+            <image class="photo-image" src="{{item}}" mode="aspectFill" />
+            <view class="photo-delete" bindtap="onDeletePhoto" data-index="{{index}}">
+              <t-icon name="close" size="32rpx" color="#fff" />
             </view>
+            <view class="cover-badge" wx:if="{{index === 0}}">封面</view>
           </view>
-          <view class="cover-upload-btn" wx:else bindtap="onChooseCover">
-            <t-icon name="add" size="80rpx" color="#999" />
-            <text class="upload-hint">点击上传封面</text>
+          <!-- 上传按钮 -->
+          <view class="photo-upload-btn" wx:if="{{photos.length < 9}}" bindtap="onChoosePhotos">
+            <view class="upload-btn-content">
+              <t-icon name="add" size="64rpx" color="#999" />
+              <text class="upload-hint">{{photos.length === 0 ? '上传照片' : '继续添加'}}</text>
+            </view>
           </view>
         </view>
       </view>

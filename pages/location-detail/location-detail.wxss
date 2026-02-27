@@ -376,7 +376,13 @@
 }
 
 .btn-checked {
-  background: #f5f5f5;
-  color: #999;
-  border: 2rpx solid #e0e0e0;
+  background: linear-gradient(90deg, #82F45F 0%, #8FF1EC 100%);
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(130, 244, 95, 0.4);
+  position: relative;
+}
+
+.btn-checked::before {
+  content: '✓ ';
+  font-weight: bold;
 }

@@ -12,7 +12,7 @@
     <!-- 图标 -->
     <view
       slot="icon"
-      class="icon-wrapper {{ value === item.value ? 'is-active' : 'is-inactive' }}"
+      class="icon-wrapper {{ value === item.value ? 'is-active' : 'is-inactive' }} {{ item.value === 'album' || item.value === 'my' ? 'icon-adjust-up' : '' }}"
     >
       <image
         src="{{ item.icon }}"

@@ -279,7 +279,7 @@
 .float-help {
   position: fixed;
   right: 40rpx;
-  bottom: 220rpx;
+  bottom: 180rpx;
   width: 110rpx;
   height: 110rpx;
   background: #ffffff;

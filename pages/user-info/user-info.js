@@ -41,6 +41,15 @@ Page({
   },
 
   /**
+   * 昵称输入失焦
+   */
+  onNicknameBlur(e) {
+    const userName = e.detail.value
+    this.setData({ userName: userName.trim() })
+    this.checkCanSubmit()
+  },
+
+  /**
    * 检查是否可以提交
    */
   checkCanSubmit() {
@@ -86,6 +95,9 @@ Page({
         icon: 'success',
         duration: 1500
       })
+
+      // 标记需要选择位置
+      wx.setStorageSync('need_choose_location_after_login', true)
 
       // 延迟跳转到首页
       setTimeout(() => {

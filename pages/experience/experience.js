@@ -13,13 +13,13 @@ Page({
     navBarHeight: 0,
     location: "当前位置",
     searchKeyword: "", // 搜索关键词
-    currentCategory: 1, // 默认选中"推荐"
+    currentCategory: 0, // 默认选中"推荐"
     categoryList: [
-      { label: '关注', value: 0 },
-      { label: '推荐', value: 1 },
-      { label: '附近', value: 2 },
+      { label: '推荐', value: 0 },
+      { label: '附近', value: 1 },
+      { label: '住宿', value: 2 },
       { label: '美食', value: 3 },
-      { label: '出片点', value: 4 },
+      { label: '景点', value: 4 },
       { label: '玩乐', value: 5 },
     ],
     // Bento Box 数据
@@ -27,6 +27,7 @@ Page({
     scenicLocations: [],     // 景点游玩（3张）
     hotelLocations: [],      // 酒店民宿（2张）
     foodLocations: [],       // 特色美食（2张）
+    hotLocationIds: [],      // 在 bento box 中显示的地点 ID 列表
     // Feed 列表数据
     feedList: [],
     page: 0,
@@ -116,13 +117,12 @@ Page({
    */
   async loadBentoBoxData() {
     try {
-      // 查询精选地点（isFeatured=true），按 featuredOrder 排序
+      // 查询精选地点（isFeatured=true）
       const { data } = await db.collection('locations')
         .where({
           isFeatured: true,
           status: 'active'
         })
-        .orderBy('featuredOrder', 'asc')
         .get();
 
       // 转换云存储路径为临时URL
@@ -150,17 +150,57 @@ Page({
         });
       }
 
-      // 按类型分类，每个类型取前N个（按 featuredOrder 排序）
-      const leisureLocations = data.filter(item => item.type === 'leisure').slice(0, 2);
-      const scenicLocations = data.filter(item => item.type === 'scenic').slice(0, 3);
-      const hotelLocations = data.filter(item => item.type === 'hotel').slice(0, 2);
-      const foodLocations = data.filter(item => item.type === 'food').slice(0, 2);
+      // 按类型分类
+      const leisureData = data.filter(item => item.type === 'leisure');
+      const scenicData = data.filter(item => item.type === 'scenic');
+      const hotelData = data.filter(item => item.type === 'hotel');
+      const foodData = data.filter(item => item.type === 'food');
+
+      // 对每个类型应用 sortOrder 排序逻辑
+      const sortByOrder = (items) => {
+        const pinned = items.filter(item => (item.sortOrder || 0) > 0);
+        const dynamic = items.filter(item => (item.sortOrder || 0) <= 0);
+
+        // 置顶按 sortOrder 升序
+        pinned.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+        // 动态按默认算法排序：评分高 → 打卡多 → _id
+        dynamic.sort((a, b) => {
+          // 优先按评分降序
+          const ratingDiff = (b.rating || 0) - (a.rating || 0);
+          if (ratingDiff !== 0) return ratingDiff;
+
+          // 评分相同,按打卡数降序
+          const checkInDiff = (b.checkInCount || 0) - (a.checkInCount || 0);
+          if (checkInDiff !== 0) return checkInDiff;
+
+          // 都相同,按 _id 排序(保证稳定性)
+          return a._id.localeCompare(b._id);
+        });
+
+        return [...pinned, ...dynamic];
+      };
+
+      // 每个类型取前N个
+      const leisureLocations = sortByOrder(leisureData).slice(0, 2);
+      const scenicLocations = sortByOrder(scenicData).slice(0, 3);
+      const hotelLocations = sortByOrder(hotelData).slice(0, 2);
+      const foodLocations = sortByOrder(foodData).slice(0, 2);
+
+      // 收集所有在 bento box 中显示的地点 ID
+      const hotLocationIds = [
+        ...leisureLocations.map(item => item._id),
+        ...scenicLocations.map(item => item._id),
+        ...hotelLocations.map(item => item._id),
+        ...foodLocations.map(item => item._id)
+      ];
 
       this.setData({
         leisureLocations,
         scenicLocations,
         hotelLocations,
-        foodLocations
+        foodLocations,
+        hotLocationIds
       });
     } catch (error) {
       console.error('加载 Bento Box 数据失败:', error);
@@ -202,18 +242,27 @@ Page({
         ]);
       }
 
+      // 根据当前分类添加筛选条件
+      const currentCategory = this.data.currentCategory;
+      if (currentCategory === 2) {
+        // 住宿
+        whereCondition.type = 'hotel';
+      } else if (currentCategory === 3) {
+        // 美食
+        whereCondition.type = 'food';
+      } else if (currentCategory === 4) {
+        // 景点
+        whereCondition.type = 'scenic';
+      } else if (currentCategory === 5) {
+        // 玩乐
+        whereCondition.type = 'leisure';
+      }
+
+      // 查询数据（不在数据库层面排序，改为前端排序）
       let query = db.collection('locations').where(whereCondition);
 
-      // 根据当前分类筛选
-      const currentCategory = this.data.currentCategory;
-      if (currentCategory === 0) {
-        // 关注：暂时显示所有，后续可以根据用户关注列表筛选
-        query = query;
-      } else if (currentCategory === 1) {
-        // 推荐：按评分排序
-        query = query.orderBy('rating', 'desc');
-      } else if (currentCategory === 2) {
-        // 附近：按地理位置距离排序
+      // 附近模式需要特殊处理
+      if (currentCategory === 1) {
         try {
           const location = await this.getUserLocation();
           if (location) {
@@ -229,33 +278,18 @@ Page({
                   })
                 }
               ]));
-            // 保存用户位置用于计算距离
             this.userLocation = location;
           } else {
-            query = query.orderBy('checkInCount', 'desc');
             this.userLocation = null;
           }
         } catch (err) {
           console.error('获取位置失败:', err);
-          query = query.orderBy('checkInCount', 'desc');
           this.userLocation = null;
         }
-      } else if (currentCategory === 3) {
-        // 美食
-        query = query.where({ type: 'food' }).orderBy('rating', 'desc');
-      } else if (currentCategory === 4) {
-        // 出片点：按热度排序
-        query = query.where({ isHot: true }).orderBy('checkInCount', 'desc');
-      } else if (currentCategory === 5) {
-        // 玩乐
-        query = query.where({ type: 'leisure' }).orderBy('rating', 'desc');
       }
 
-      // 分页查询
-      const { data } = await query
-        .skip(page * pageSize)
-        .limit(pageSize)
-        .get();
+      // 获取所有数据（用于前端排序和分页）
+      const { data } = await query.get();
 
       // 转换云存储路径为临时URL
       const fileList = data.map(item => item.coverImage).filter(url => url && url.startsWith('cloud://'));
@@ -264,13 +298,11 @@ Page({
           fileList: fileList
         });
 
-        // 创建路径映射
         const urlMap = {};
         tempFiles.forEach(file => {
           urlMap[file.fileID] = file.tempFileURL;
         });
 
-        // 替换为临时URL
         data.forEach(item => {
           if (item.coverImage && urlMap[item.coverImage]) {
             item.coverImage = urlMap[item.coverImage];
@@ -279,7 +311,7 @@ Page({
       }
 
       // 如果是附近模式且有用户位置，计算距离
-      if (currentCategory === 2 && this.userLocation) {
+      if (currentCategory === 1 && this.userLocation) {
         data.forEach(item => {
           if (item.latitude && item.longitude) {
             const distance = this.calculateDistance(
@@ -294,8 +326,63 @@ Page({
         });
       }
 
-      const feedList = reset ? data : [...this.data.feedList, ...data];
-      const hasMore = data.length === pageSize;
+      // 标记热门地点（在 bento box 中显示的地点）
+      const hotLocationIds = this.data.hotLocationIds || [];
+      data.forEach(item => {
+        item.isHot = hotLocationIds.includes(item._id);
+      });
+
+      // 前端排序：分离置顶、热门和普通地点
+      const pinnedLocations = data.filter(item => (item.sortOrder || 0) > 0);
+      const hotLocations = data.filter(item => (item.sortOrder || 0) <= 0 && item.isHot);
+      const normalLocations = data.filter(item => (item.sortOrder || 0) <= 0 && !item.isHot);
+
+      // 置顶地点按 sortOrder 升序排列
+      pinnedLocations.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+      // 热门地点保持 bento box 的顺序（按在 hotLocationIds 中的索引排序）
+      hotLocations.sort((a, b) => {
+        return hotLocationIds.indexOf(a._id) - hotLocationIds.indexOf(b._id);
+      });
+
+      // 普通地点按不同规则排序
+      if (currentCategory === 0) {
+        // 推荐：按评分 → 打卡数 → _id
+        normalLocations.sort((a, b) => {
+          const ratingDiff = (b.rating || 0) - (a.rating || 0);
+          if (ratingDiff !== 0) return ratingDiff;
+
+          const checkInDiff = (b.checkInCount || 0) - (a.checkInCount || 0);
+          if (checkInDiff !== 0) return checkInDiff;
+
+          return a._id.localeCompare(b._id);
+        });
+      } else if (currentCategory === 1) {
+        // 附近：按距离排序
+        normalLocations.sort((a, b) => (a.distance || 999999) - (b.distance || 999999));
+      } else {
+        // 其他分类：按评分 → 打卡数 → _id
+        normalLocations.sort((a, b) => {
+          const ratingDiff = (b.rating || 0) - (a.rating || 0);
+          if (ratingDiff !== 0) return ratingDiff;
+
+          const checkInDiff = (b.checkInCount || 0) - (a.checkInCount || 0);
+          if (checkInDiff !== 0) return checkInDiff;
+
+          return a._id.localeCompare(b._id);
+        });
+      }
+
+      // 合并：置顶 → 热门(bento box顺序) → 普通
+      const sortedData = [...pinnedLocations, ...hotLocations, ...normalLocations];
+
+      // 前端分页
+      const start = page * pageSize;
+      const end = start + pageSize;
+      const paginatedData = sortedData.slice(start, end);
+
+      const feedList = reset ? paginatedData : [...this.data.feedList, ...paginatedData];
+      const hasMore = end < sortedData.length;
 
       this.setData({
         feedList,
@@ -442,15 +529,15 @@ Page({
     if (!type) return;
 
     // 根据类型切换到对应的tab
-    let categoryValue = 1; // 默认推荐
+    let categoryValue = 0; // 默认推荐
     if (type === 'food') {
       categoryValue = 3; // 美食
     } else if (type === 'leisure') {
       categoryValue = 5; // 玩乐
     } else if (type === 'scenic') {
-      categoryValue = 1; // 推荐（景点）
+      categoryValue = 4; // 景点
     } else if (type === 'hotel') {
-      categoryValue = 1; // 推荐（酒店）
+      categoryValue = 2; // 住宿
     }
 
     // 切换tab并滚动到feed区域

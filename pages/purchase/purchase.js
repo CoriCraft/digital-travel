@@ -152,57 +152,54 @@ Page({
   },
 
   /**
-   * 加载轮播商品（手动推荐 + 行为热度混合）
+   * 加载轮播商品（置顶商品 + 热度混合）
    */
   async loadBannerGoods() {
     try {
       const db = wx.cloud.database();
 
-      // 1. 先获取手动推荐的商品
-      const { data: recommendedGoods } = await db.collection('goods')
-        .where({
-          status: 'active',
-          isRecommend: true
-        })
-        .orderBy('recommendOrder', 'asc')
-        .limit(5)
+      // 1. 获取所有活跃商品
+      const { data: allGoods } = await db.collection('goods')
+        .where({ status: 'active' })
         .get();
 
-      let bannerGoods = [...recommendedGoods];
+      // 2. 分离置顶商品和普通商品
+      const pinnedGoods = allGoods.filter(g => (g.sortOrder || 0) > 0);
+      const dynamicGoods = allGoods.filter(g => (g.sortOrder || 0) <= 0);
 
-      // 2. 如果手动推荐不足5个，用热度算法补充
+      // 3. 置顶商品按 sortOrder 升序排列
+      pinnedGoods.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+      // 4. 普通商品按热度排序
+      const goodsWithHot = dynamicGoods.map(item => ({
+        ...item,
+        hotScore: this.calculateHotScore(item)
+      })).sort((a, b) => b.hotScore - a.hotScore);
+
+      // 5. 合并：优先展示置顶商品，不足5个用热门商品补充
+      let bannerGoods = [...pinnedGoods];
       if (bannerGoods.length < 5) {
-        const { data: allGoods } = await db.collection('goods')
-          .where({ status: 'active' })
-          .get();
-
-        // 计算热度
-        const goodsWithHot = allGoods
-          .filter(item => !item.isRecommend)  // 排除已推荐的
-          .map(item => ({
-            ...item,
-            hotScore: this.calculateHotScore(item)
-          }))
-          .sort((a, b) => b.hotScore - a.hotScore);
-
-        // 补充到5个
         const needCount = 5 - bannerGoods.length;
         bannerGoods.push(...goodsWithHot.slice(0, needCount));
-
-        console.log('热门商品补充:', goodsWithHot.slice(0, needCount).map(g => ({
-          name: g.name,
-          hotScore: g.hotScore
-        })));
+      } else {
+        // 如果置顶商品超过5个，只取前5个
+        bannerGoods = bannerGoods.slice(0, 5);
       }
 
-      // 3. 处理图片字段
+      console.log('轮播商品:', bannerGoods.map(g => ({
+        name: g.name,
+        sortOrder: g.sortOrder || 0,
+        hotScore: g.hotScore || 0
+      })));
+
+      // 6. 处理图片字段
       bannerGoods.forEach(item => {
         if (!item.img && item.coverImage) {
           item.img = item.coverImage;
         }
       });
 
-      // 4. 转换为轮播格式
+      // 7. 转换为轮播格式
       const recommendList = bannerGoods.map(item => ({
         value: item.img || item.coverImage,
         ariaLabel: item.name
@@ -222,7 +219,8 @@ Page({
 
   /**
    * 计算商品热度分数
-   * 热度公式：浏览量*0.5 + 收藏数*5 + 复制链接*3 + 分享次数*4
+   * 热度公式：浏览量*0.5 + 收藏数*5 + 分享次数*4 + 评价数*3
+   * 引流模式：重点关注用户互动（收藏、分享、评价）
    */
   calculateHotScore(goods) {
     const now = Date.now();
@@ -232,12 +230,12 @@ Page({
     // 新品加权（30天内的商品热度 x1.5）
     const timeFactor = daysSinceCreate < 30 ? 1.5 : 1.0;
 
-    // 热度公式
+    // 热度公式（引流模式）
     const hotScore = (
-      (goods.viewCount || 0) * 0.5 +
-      (goods.favoriteCount || 0) * 5 +
-      (goods.copyCount || 0) * 3 +
-      (goods.shareCount || 0) * 4
+      (goods.viewCount || 0) * 0.5 +        // 浏览量：基础指标
+      (goods.favoriteCount || 0) * 5 +      // 收藏数：用户感兴趣
+      (goods.shareCount || 0) * 4 +         // 分享次数：传播力
+      (goods.reviewCount || 0) * 3          // 评价数：用户参与度
     ) * timeFactor;
 
     return hotScore;
@@ -378,16 +376,29 @@ Page({
           .where(query)
           .get();
 
-        // 计算热度并排序
+        // 计算热度
         const goodsWithHot = queryResult.data.map(item => ({
           ...item,
           hotScore: this.calculateHotScore(item)
-        })).sort((a, b) => b.hotScore - a.hotScore);
+        }));
+
+        // 分离固定排序和动态排序的商品
+        const pinnedGoods = goodsWithHot.filter(g => (g.sortOrder || 0) > 0);
+        const dynamicGoods = goodsWithHot.filter(g => (g.sortOrder || 0) <= 0);
+
+        // 固定排序的商品按 sortOrder 升序排列
+        pinnedGoods.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+        // 动态排序的商品按热度降序排列
+        dynamicGoods.sort((a, b) => b.hotScore - a.hotScore);
+
+        // 合并：固定排序在前，动态排序在后
+        const sortedGoods = [...pinnedGoods, ...dynamicGoods];
 
         // 分页
         const start = (page - 1) * pageSize;
         const end = start + pageSize;
-        queryResult.data = goodsWithHot.slice(start, end);
+        queryResult.data = sortedGoods.slice(start, end);
       } else {
         // 其他分类：按销量排序
         queryResult = await db.collection('goods')

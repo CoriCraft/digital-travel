@@ -52,31 +52,65 @@
     </view>
   </view>
 
-  <!-- 模板列表 -->
+  <!-- 模板列表 - 双排瀑布流 -->
   <view class="template-list">
-    <!-- 模板卡片列表 -->
-    <view class="template-card" wx:for="{{templates}}" wx:key="_id" data-id="{{item._id}}" bindtap="onTemplateTap" bindlongpress="onTemplateReport" data-name="{{item.name}}">
-      <view class="template-image-wrapper">
-        <image class="template-image" src="{{item.coverThumbnail || item.cover}}" mode="aspectFill" lazy-load="{{true}}" />
-        <view class="official-badge" wx:if="{{item.isOfficial}}">官方</view>
-        <view class="hot-badge" wx:if="{{item.isHot}}">🔥 热门</view>
-      </view>
-      <view class="template-info">
-        <text class="template-title">{{item.name}}</text>
-        <view class="template-meta">
-          <view class="author-info">
-            <t-icon name="user" size="28rpx" color="#ff6b35" />
-            <text class="author-name">{{item.creatorName}}</text>
+    <view class="waterfall-container">
+      <!-- 左列 -->
+      <view class="waterfall-column">
+        <view class="template-card" wx:for="{{leftColumnTemplates}}" wx:key="_id" data-id="{{item._id}}" bindtap="onTemplateTap" bindlongpress="onTemplateReport" data-name="{{item.name}}">
+          <view class="template-image-wrapper">
+            <image class="template-image" src="{{item.coverThumbnail || item.cover}}" mode="widthFix" lazy-load="{{true}}" />
+            <view class="official-badge" wx:if="{{item.isOfficial}}">官方</view>
+            <view class="hot-badge" wx:if="{{item.isHot}}">🔥 热门</view>
           </view>
-          <view class="stats-info">
-            <t-icon name="layers" size="28rpx" color="#666" />
-            <text class="stat-text">{{item.photoSetCount}}</text>
-            <t-icon name="browse" size="28rpx" color="#666" />
-            <text class="stat-text">{{item.viewCount || 0}}</text>
-            <t-icon name="heart-filled" size="28rpx" color="#FF4444" />
-            <text class="stat-text">{{item.likeCount || 0}}</text>
-            <t-icon name="star-filled" size="28rpx" color="#FFD700" />
-            <text class="stat-text">{{item.favoriteCount || 0}}</text>
+          <view class="template-info">
+            <text class="template-title">{{item.name}}</text>
+            <view class="template-meta">
+              <view class="author-info">
+                <t-icon name="user" size="24rpx" color="#ff6b35" />
+                <text class="author-name">{{item.creatorName}}</text>
+              </view>
+              <view class="stats-info">
+                <t-icon name="image" size="24rpx" color="#666" />
+                <text class="stat-text">{{item.photoSetCount || 0}}</text>
+                <t-icon name="browse" size="24rpx" color="#666" />
+                <text class="stat-text">{{item.viewCount || 0}}</text>
+                <t-icon name="heart-filled" size="24rpx" color="#FF4444" />
+                <text class="stat-text">{{item.likeCount || 0}}</text>
+                <t-icon name="star-filled" size="24rpx" color="#FFD700" />
+                <text class="stat-text">{{item.favoriteCount || 0}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 右列 -->
+      <view class="waterfall-column">
+        <view class="template-card" wx:for="{{rightColumnTemplates}}" wx:key="_id" data-id="{{item._id}}" bindtap="onTemplateTap" bindlongpress="onTemplateReport" data-name="{{item.name}}">
+          <view class="template-image-wrapper">
+            <image class="template-image" src="{{item.coverThumbnail || item.cover}}" mode="widthFix" lazy-load="{{true}}" />
+            <view class="official-badge" wx:if="{{item.isOfficial}}">官方</view>
+            <view class="hot-badge" wx:if="{{item.isHot}}">🔥 热门</view>
+          </view>
+          <view class="template-info">
+            <text class="template-title">{{item.name}}</text>
+            <view class="template-meta">
+              <view class="author-info">
+                <t-icon name="user" size="24rpx" color="#ff6b35" />
+                <text class="author-name">{{item.creatorName}}</text>
+              </view>
+              <view class="stats-info">
+                <t-icon name="image" size="24rpx" color="#666" />
+                <text class="stat-text">{{item.photoSetCount || 0}}</text>
+                <t-icon name="browse" size="24rpx" color="#666" />
+                <text class="stat-text">{{item.viewCount || 0}}</text>
+                <t-icon name="heart-filled" size="24rpx" color="#FF4444" />
+                <text class="stat-text">{{item.likeCount || 0}}</text>
+                <t-icon name="star-filled" size="24rpx" color="#FFD700" />
+                <text class="stat-text">{{item.favoriteCount || 0}}</text>
+              </view>
+            </view>
           </view>
         </view>
       </view>

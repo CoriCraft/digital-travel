@@ -28,20 +28,12 @@
         data-index="{{1}}"
         bindtap="onTabChange"
       >
-        <text class="tab-text">照片集</text>
-        <view class="tab-badge" wx:if="{{photoSets.length > 0}}">{{photoSets.length}}</view>
-      </view>
-      <view
-        class="tab-item {{currentTab === 2 ? 'active' : ''}}"
-        data-index="{{2}}"
-        bindtap="onTabChange"
-      >
         <text class="tab-text">商品</text>
         <view class="tab-badge" wx:if="{{goods.length > 0}}">{{goods.length}}</view>
       </view>
       <view
-        class="tab-item {{currentTab === 3 ? 'active' : ''}}"
-        data-index="{{3}}"
+        class="tab-item {{currentTab === 2 ? 'active' : ''}}"
+        data-index="{{2}}"
         bindtap="onTabChange"
       >
         <text class="tab-text">地点</text>
@@ -86,51 +78,8 @@
       </view>
     </view>
 
-    <!-- 收藏的照片集 -->
-    <view class="content-section" wx:if="{{currentTab === 1}}">
-      <view wx:if="{{photoSets.length === 0}}" class="empty">
-        <t-icon name="image" size="160rpx" color="#CCCCCC" />
-        <text class="empty-text">还没有收藏照片集</text>
-        <text class="empty-tip">快去收藏你喜欢的照片集吧</text>
-      </view>
-
-      <view wx:else class="photoset-grid">
-        <view
-          wx:for="{{photoSets}}"
-          wx:key="_id"
-          class="photoset-card"
-          data-id="{{item._id}}"
-          bindtap="onPhotoSetTap"
-        >
-          <image class="photoset-cover" src="{{item.coverPhoto}}" mode="aspectFill"></image>
-          <view class="photoset-overlay">
-            <view class="photo-count">
-              <t-icon name="camera" size="28rpx" color="#FFFFFF" />
-              <text class="count-text">{{item.photos.length}}</text>
-            </view>
-          </view>
-          <view class="photoset-info">
-            <text class="photoset-title">{{item.title}}</text>
-            <view class="photoset-meta">
-              <view class="meta-item">
-                <t-icon name="browse" size="28rpx" color="#999" />
-                <text class="meta-text">{{item.viewCount || 0}}</text>
-              </view>
-              <view class="meta-item">
-                <t-icon name="heart-filled" size="28rpx" color="#FF4444" />
-                <text class="meta-text">{{item.likeCount || 0}}</text>
-              </view>
-            </view>
-          </view>
-          <view class="favorite-btn" catchtap="onUnfavoritePhotoSet" data-id="{{item._id}}" data-index="{{index}}">
-            <t-icon name="star-filled" size="40rpx" color="#FFD700" />
-          </view>
-        </view>
-      </view>
-    </view>
-
     <!-- 收藏的商品 -->
-    <view class="content-section" wx:if="{{currentTab === 2}}">
+    <view class="content-section" wx:if="{{currentTab === 1}}">
       <view wx:if="{{goods.length === 0}}" class="empty">
         <t-icon name="cart" size="160rpx" color="#CCCCCC" />
         <text class="empty-text">还没有收藏商品</text>
@@ -164,7 +113,7 @@
     </view>
 
     <!-- 收藏的地点 -->
-    <view class="content-section" wx:if="{{currentTab === 3}}">
+    <view class="content-section" wx:if="{{currentTab === 2}}">
       <view wx:if="{{locations.length === 0}}" class="empty">
         <t-icon name="location" size="160rpx" color="#CCCCCC" />
         <text class="empty-text">还没有收藏地点</text>

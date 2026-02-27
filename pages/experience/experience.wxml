@@ -80,11 +80,11 @@
   </view>
 
   <view class="tab-section">
-    <view class="tab-item {{currentCategory === 0 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="0">关注</view>
-    <view class="tab-item {{currentCategory === 1 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="1">推荐</view>
-    <view class="tab-item {{currentCategory === 2 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="2">附近</view>
+    <view class="tab-item {{currentCategory === 0 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="0">推荐</view>
+    <view class="tab-item {{currentCategory === 1 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="1">附近</view>
+    <view class="tab-item {{currentCategory === 2 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="2">住宿</view>
     <view class="tab-item {{currentCategory === 3 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="3">美食</view>
-    <view class="tab-item {{currentCategory === 4 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="4">出片点</view>
+    <view class="tab-item {{currentCategory === 4 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="4">景点</view>
     <view class="tab-item {{currentCategory === 5 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="5">玩乐</view>
   </view>
 
@@ -92,6 +92,8 @@
     <view class="feed-card" wx:for="{{feedList}}" wx:key="_id" bindtap="onViewDetail" data-id="{{item._id}}">
       <view class="feed-img-box">
         <image wx:if="{{item.coverImage}}" class="feed-img" src="{{item.coverImage}}" mode="aspectFill" style="width: 100%; height: 100%;" lazy-load="{{true}}" />
+        <!-- 热门标签 -->
+        <view wx:if="{{item.isHot}}" class="hot-badge">🔥 热门</view>
         <!-- 距离标签 -->
         <view wx:if="{{item.distanceText}}" class="distance-badge">{{item.distanceText}}</view>
       </view>

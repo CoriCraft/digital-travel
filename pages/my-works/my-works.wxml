@@ -31,117 +31,47 @@
       </view>
     </view>
 
-    <!-- 标签切换 -->
-    <view class="tabs">
-      <view
-        class="tab-item {{currentTab === 0 ? 'active' : ''}}"
-        data-index="{{0}}"
-        bindtap="onTabChange"
-      >
-        <text class="tab-text">我的模板</text>
-        <view class="tab-badge" wx:if="{{templates.length > 0}}">{{templates.length}}</view>
-      </view>
-      <view
-        class="tab-item {{currentTab === 1 ? 'active' : ''}}"
-        data-index="{{1}}"
-        bindtap="onTabChange"
-      >
-        <text class="tab-text">我的照片集</text>
-        <view class="tab-badge" wx:if="{{photoSets.length > 0}}">{{photoSets.length}}</view>
-      </view>
-    </view>
-
-    <!-- 我的模板 -->
-    <view class="content-section" wx:if="{{currentTab === 0}}">
-      <view wx:if="{{templates.length === 0}}" class="empty">
-        <t-icon name="view-module" size="160rpx" color="#CCCCCC" />
-        <text class="empty-text">还没有创建模板</text>
-        <text class="empty-tip">快去创建你的第一个模板吧</text>
-      </view>
-
-      <view wx:else class="template-list">
-        <view
-          wx:for="{{templates}}"
-          wx:key="_id"
-          class="template-card"
-          data-id="{{item._id}}"
-          bindtap="onTemplateTap"
-        >
-          <image class="template-cover" src="{{item.cover}}" mode="aspectFill"></image>
-          <view class="template-info">
-            <view class="template-header">
-              <text class="template-name">{{item.name}}</text>
-              <view class="status-badge status-{{item.status}}">
-                {{getStatusText(item.status)}}
-              </view>
-            </view>
-            <text class="template-desc">{{item.description}}</text>
-            <view class="template-meta">
-              <view class="meta-item">
-                <t-icon name="browse" size="28rpx" color="#999" />
-                <text class="meta-text">{{item.viewCount || 0}}</text>
-              </view>
-              <view class="meta-item">
-                <t-icon name="heart-filled" size="28rpx" color="#FF4444" />
-                <text class="meta-text">{{item.likeCount || 0}}</text>
-              </view>
-              <view class="meta-item">
-                <t-icon name="image" size="28rpx" color="#999" />
-                <text class="meta-text">{{item.photoSetCount || 0}}</text>
-              </view>
-            </view>
-          </view>
-          <view class="template-actions" catchtap="onDeleteTemplate" data-id="{{item._id}}" data-index="{{index}}">
-            <view class="action-btn delete">
-              <t-icon name="delete" size="36rpx" color="#FF4444" />
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 我的照片集 -->
-    <view class="content-section" wx:if="{{currentTab === 1}}">
-      <view wx:if="{{photoSets.length === 0}}" class="empty">
+    <!-- 我的照片 -->
+    <view class="content-section">
+      <view wx:if="{{photos.length === 0}}" class="empty">
         <t-icon name="image" size="160rpx" color="#CCCCCC" />
-        <text class="empty-text">还没有上传照片集</text>
+        <text class="empty-text">还没有上传照片</text>
         <text class="empty-tip">快去上传你的精彩照片吧</text>
       </view>
 
-      <view wx:else class="photoset-list">
-        <view
-          wx:for="{{photoSets}}"
-          wx:key="_id"
-          class="photoset-card"
-          data-id="{{item._id}}"
-          bindtap="onPhotoSetTap"
-        >
-          <image class="photoset-cover" src="{{item.coverPhoto}}" mode="aspectFill"></image>
-          <view class="photoset-overlay">
-            <view class="photo-count">
-              <t-icon name="camera" size="28rpx" color="#FFFFFF" />
-              <text class="count-text">{{item.photos.length}}</text>
-            </view>
-            <view class="status-badge status-{{item.status}}">
-              {{getStatusText(item.status)}}
-            </view>
-          </view>
-          <view class="photoset-info">
-            <text class="photoset-title">{{item.title}}</text>
-            <view class="photoset-meta">
-              <view class="meta-item">
-                <t-icon name="browse" size="28rpx" color="#999" />
-                <text class="meta-text">{{item.viewCount || 0}}</text>
-              </view>
-              <view class="meta-item">
-                <t-icon name="heart-filled" size="28rpx" color="#FF4444" />
-                <text class="meta-text">{{item.likeCount || 0}}</text>
+      <view wx:else class="photo-waterfall">
+        <!-- 左列 -->
+        <view class="waterfall-column">
+          <view
+            wx:for="{{leftColumnPhotos}}"
+            wx:key="_id"
+            class="photo-card"
+            data-index="{{item.originalIndex}}"
+            bindtap="onPhotoTap"
+          >
+            <image class="photo-image" src="{{item.thumbnailUrl || item.photoUrl}}" mode="widthFix" lazy-load="{{true}}" />
+            <view class="photo-actions" catchtap="onDeletePhoto" data-id="{{item._id}}" data-index="{{item.originalIndex}}">
+              <view class="action-btn delete">
+                <t-icon name="delete" size="32rpx" color="#FF4444" />
               </view>
             </view>
           </view>
-          <view class="photoset-actions" catchtap="onDeletePhotoSet" data-id="{{item._id}}" data-index="{{index}}">
-            <view class="action-btn delete">
-              <t-icon name="delete" size="36rpx" color="#FF4444" />
+        </view>
+
+        <!-- 右列 -->
+        <view class="waterfall-column">
+          <view
+            wx:for="{{rightColumnPhotos}}"
+            wx:key="_id"
+            class="photo-card"
+            data-index="{{item.originalIndex}}"
+            bindtap="onPhotoTap"
+          >
+            <image class="photo-image" src="{{item.thumbnailUrl || item.photoUrl}}" mode="widthFix" lazy-load="{{true}}" />
+            <view class="photo-actions" catchtap="onDeletePhoto" data-id="{{item._id}}" data-index="{{item.originalIndex}}">
+              <view class="action-btn delete">
+                <t-icon name="delete" size="32rpx" color="#FF4444" />
+              </view>
             </view>
           </view>
         </view>

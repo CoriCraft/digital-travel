@@ -19,6 +19,10 @@ Page({
       { label: '场景打卡', value: 3 },
     ],
     templates: [], // 模板列表
+    leftColumnTemplates: [], // 左列模板
+    rightColumnTemplates: [], // 右列模板
+    leftHeight: 0, // 左列高度
+    rightHeight: 0, // 右列高度
     sortType: 'hot', // 排序类型: hot-热度, time-时间
     loading: false,
     searchKeyword: '', // 搜索关键词
@@ -57,8 +61,18 @@ Page({
         value: "template",
       });
     }
-    // 不需要重新加载整个列表，只需要更新可能变化的数据
-    // 收藏量、点赞量、观看量等会在详情页更新，返回时自动同步
+
+    // 检查是否需��刷新列表
+    const needRefresh = wx.getStorageSync('template_list_need_refresh');
+    if (needRefresh) {
+      console.log('检测到需要刷新��板列表');
+      wx.removeStorageSync('template_list_need_refresh');
+      this.loadTemplates();
+    }
+
+
+    // 检查位置信息是否过期，自动弹出位置选择
+    this.checkLocationExpired();
   },
 
   /**
@@ -74,7 +88,26 @@ Page({
   /**
    * 页面相关事件处理函数--监听用户下拉动作
    */
-  onPullDownRefresh() {},
+  onPullDownRefresh() {
+    console.log('下拉刷新模板列表');
+
+    // 重置分页和数据
+    this.setData({
+      currentPage: 0,
+      templates: [],
+      leftColumnTemplates: [],
+      rightColumnTemplates: [],
+      hasMore: true
+    });
+
+    // 重新加载模板列表
+    this.loadTemplates();
+
+    // 延迟停止下拉刷新动画
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 500);
+  },
 
   /**
    * 页面上拉触底事件的处理函数
@@ -100,6 +133,36 @@ Page({
   onLocationTap() {
     // 点击位置时手动选择位置
     this.chooseLocation();
+  },
+
+  /**
+   * 检查位置信息是否过期
+   */
+  checkLocationExpired() {
+    // 检查是否是刚完成用户信息设置
+    const needChooseLocationAfterLogin = wx.getStorageSync('need_choose_location_after_login');
+    if (needChooseLocationAfterLogin) {
+      wx.removeStorageSync('need_choose_location_after_login');
+      console.log('用户信息设置完成，引导选择位置');
+      setTimeout(() => {
+        this.onLocationTap();
+      }, 500);
+      return;
+    }
+
+    // 正常检查位置缓存
+    const cacheKey = 'user_location_cache';
+    const cachedData = wx.getStorageSync(cacheKey);
+    const now = Date.now();
+    const cacheExpire = 7 * 24 * 60 * 60 * 1000; // 缓存7天
+
+    // 如果没有缓存或已过期，提示用户选择（但不自动弹出）
+    if (!cachedData || !cachedData.timestamp || (now - cachedData.timestamp >= cacheExpire)) {
+      console.log('位置信息缺失或已过期');
+      this.setData({
+        location: '选择位置'
+      });
+    }
   },
 
   /**
@@ -370,16 +433,54 @@ Page({
 
         // 如果是热度排序，按热度分数排序
         if (needClientSort) {
-          templatesWithHot = templatesWithHot.sort((a, b) => b.hotScore - a.hotScore);
+          // 分离固定排序和动态排序的模板
+          const pinnedTemplates = templatesWithHot.filter(t => (t.sortOrder || 0) > 0);
+          const dynamicTemplates = templatesWithHot.filter(t => (t.sortOrder || 0) <= 0);
+
+          // 固定排序的模板按 sortOrder 升序排列
+          pinnedTemplates.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+          // 动态排序的模板按热度分数降序排列
+          dynamicTemplates.sort((a, b) => b.hotScore - a.hotScore);
+
+          // 合并：固定排序在前，动态排序在后
+          templatesWithHot = [...pinnedTemplates, ...dynamicTemplates];
 
           // 分页处理
           const startIndex = skip;
           const endIndex = startIndex + pageSize;
           templatesWithHot = templatesWithHot.slice(startIndex, endIndex);
+        } else {
+          // 时间排序也需要支持置顶
+          const pinnedTemplates = templatesWithHot.filter(t => (t.sortOrder || 0) > 0);
+          const dynamicTemplates = templatesWithHot.filter(t => (t.sortOrder || 0) <= 0);
+
+          // 固定排序的模板按 sortOrder 升序排列
+          pinnedTemplates.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+          // 动态排序的模板按创建时间降序排列（已经从数据库排好序了）
+          // 合并：固定排序在前，动态排序在后
+          templatesWithHot = [...pinnedTemplates, ...dynamicTemplates];
         }
 
         const newTemplates = loadMore ? [...this.data.templates, ...templatesWithHot] : templatesWithHot;
         const hasMore = needClientSort ? (skip + pageSize < res.data.length) : (res.data.length === pageSize);
+
+        // 智能瀑布流分列
+        if (loadMore) {
+          // 加载更多：在现有基础上继续分配
+          this.buildWaterfall(templatesWithHot);
+        } else {
+          // 首次加载：重置后分配
+          this.setData({
+            leftColumnTemplates: [],
+            rightColumnTemplates: [],
+            leftHeight: 0,
+            rightHeight: 0
+          }, () => {
+            this.buildWaterfall(newTemplates);
+          });
+        }
 
         this.setData({
           templates: newTemplates,
@@ -411,8 +512,58 @@ Page({
   },
 
   /**
+   * 智能瀑布流分列
+   * 根据图片比例预估卡片高度，动态分配到较短的列
+   */
+  buildWaterfall(templates) {
+    let {
+      leftColumnTemplates,
+      rightColumnTemplates,
+      leftHeight,
+      rightHeight
+    } = this.data;
+
+    templates.forEach((item) => {
+      // 使用模板 ID 的哈希值生成稳定的高度
+      const hash = this.simpleHash(item._id);
+      const heightVariation = (hash % 300) - 150; // -150 到 +150 的变化
+      const baseHeight = 500; // 基础高度
+      const cardHeight = baseHeight + heightVariation + 200; // 图片 + 文本区域
+
+      // 分配到较短的列
+      if (leftHeight <= rightHeight) {
+        leftColumnTemplates.push(item);
+        leftHeight += cardHeight;
+      } else {
+        rightColumnTemplates.push(item);
+        rightHeight += cardHeight;
+      }
+    });
+
+    this.setData({
+      leftColumnTemplates,
+      rightColumnTemplates,
+      leftHeight,
+      rightHeight
+    });
+  },
+
+  /**
+   * 简单哈希函数
+   */
+  simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+  },
+
+  /**
    * 计算热门模板
-   * 热度算法：热度分数 = 浏览量 * 0.1 + 点赞数 * 2 + 收藏数 * 3 + 照片集数量 * 5
+   * 热度算法：热度分数 = 浏览量 * 0.1 + 点赞数 * 2 + 收藏数 * 3 + 照片数量 * 5
    * 只有热度分数排名前30%的模板才显示"热门"标签
    */
   calculateHotTemplates(templates) {
@@ -425,12 +576,12 @@ Page({
       const viewCount = template.viewCount || 0;
       const likeCount = template.likeCount || 0;
       const favoriteCount = template.favoriteCount || 0;
-      const photoSetCount = template.photoSetCount || 0;
+      const photoCount = template.photoSetCount || 0; // 复用 photoSetCount 字段表示照片数量
 
       // 热度分数计算
-      const hotScore = viewCount * 0.1 + likeCount * 2 + favoriteCount * 3 + photoSetCount * 5;
+      const hotScore = viewCount * 0.1 + likeCount * 2 + favoriteCount * 3 + photoCount * 5;
 
-      console.log(`模板 ${template.name}: 浏览${viewCount}, 点赞${likeCount}, 收藏${favoriteCount}, 照片集${photoSetCount}, 热度=${hotScore}`);
+      console.log(`模板 ${template.name}: 浏览${viewCount}, 点赞${likeCount}, 收藏${favoriteCount}, 照片${photoCount}, 热度=${hotScore}`);
 
       return {
         ...template,

@@ -95,6 +95,7 @@ Page({
 
       if (this.data.type === 'goods') {
         // 创建商品评论
+        console.log('开始创建商品评论, goodsId:', this.data.goodsId);
         await db.collection('goods_reviews').add({
           data: {
             goodsId: this.data.goodsId,
@@ -108,15 +109,38 @@ Page({
             createTime: db.serverDate()
           }
         });
+        console.log('商品评论创建成功');
 
-        // 更新商品的评论数
-        await db.collection('goods')
+        // 获取该商品的所有评论，重新计算平均评分
+        console.log('开始查询所有评论...');
+        const reviewsResult = await db.collection('goods_reviews')
+          .where({
+            goodsId: this.data.goodsId,
+            status: 'approved'
+          })
+          .get();
+
+        const allReviews = reviewsResult.data;
+        const totalRating = allReviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+        const avgRating = allReviews.length > 0 ? (totalRating / allReviews.length).toFixed(1) : 0;
+
+        console.log('商品评分统计:', {
+          总评论数: allReviews.length,
+          总评分: totalRating,
+          平均评分: avgRating
+        });
+
+        // 更新商品的评分和评论数
+        console.log('开始更新商品评分...');
+        const updateResult = await db.collection('goods')
           .doc(this.data.goodsId)
           .update({
             data: {
-              reviewCount: db.command.inc(1)
+              rating: parseFloat(avgRating),
+              reviewCount: allReviews.length
             }
           });
+        console.log('商品评分更新结果:', updateResult);
       } else {
         // 创建地点评论
         await db.collection('location_reviews').add({
@@ -133,12 +157,31 @@ Page({
           }
         });
 
+        // 获取该地点的所有评论，重新计算平均评分
+        const reviewsResult = await db.collection('location_reviews')
+          .where({
+            locationId: this.data.locationId,
+            status: 'approved'
+          })
+          .get();
+
+        const allReviews = reviewsResult.data;
+        const totalRating = allReviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+        const avgRating = allReviews.length > 0 ? (totalRating / allReviews.length).toFixed(1) : 0;
+
+        console.log('评分统计:', {
+          总评论数: allReviews.length,
+          总评分: totalRating,
+          平均评分: avgRating
+        });
+
         // 更新地点的评分和评论数
         await db.collection('locations')
           .doc(this.data.locationId)
           .update({
             data: {
-              ratingCount: db.command.inc(1)
+              rating: parseFloat(avgRating),
+              ratingCount: allReviews.length
             }
           });
       }
