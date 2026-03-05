@@ -186,6 +186,10 @@ Page({
         bannerGoods = bannerGoods.slice(0, 5);
       }
 
+      // 收集轮播商品的ID，用于标记热门
+      const bannerGoodsIds = bannerGoods.map(g => g._id);
+      this.bannerGoodsIds = bannerGoodsIds; // 保存到实例变量
+
       console.log('轮播商品:', bannerGoods.map(g => ({
         name: g.name,
         sortOrder: g.sortOrder || 0,
@@ -392,6 +396,11 @@ Page({
         // 动态排序的商品按热度降序排列
         dynamicGoods.sort((a, b) => b.hotScore - a.hotScore);
 
+        // 标记热门商品（动态商品中的前3名）
+        dynamicGoods.forEach((item, index) => {
+          item.isHot = index < 3;
+        });
+
         // 合并：固定排序在前，动态排序在后
         const sortedGoods = [...pinnedGoods, ...dynamicGoods];
 
@@ -433,6 +442,10 @@ Page({
       // SVG图片直接使用coverImage，无需转换
       data.forEach(item => {
         item.img = item.coverImage;
+        // 标记轮播商品为热门
+        if (this.bannerGoodsIds && this.bannerGoodsIds.includes(item._id)) {
+          item.isHot = true;
+        }
       });
 
       console.log('开始构建瀑布流');

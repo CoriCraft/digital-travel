@@ -580,7 +580,7 @@ Page({
    */
   goHome() {
     wx.switchTab({
-      url: '/pages/index/index'
+      url: '/pages/template/template'
     });
   },
 

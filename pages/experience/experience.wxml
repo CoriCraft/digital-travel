@@ -1,12 +1,27 @@
 <view class="page-container" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
 
+  <!-- 导航栏 -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="goHome">
+        <t-icon name="home" size="48rpx" color="#333" />
+      </view>
+      <view class="nav-title">线下体验</view>
+      <view class="nav-right">
+        <!-- 右侧图标已移除 -->
+      </view>
+    </view>
+  </view>
+
   <!-- 搜索框 -->
-  <search-bar
-    placeholder="搜索地点、美食、景点..."
-    value="{{searchKeyword}}"
-    bind:input="onSearchInput"
-    bind:search="onSearch"
-  />
+  <view class="search-bar-wrapper">
+    <search-bar
+      placeholder="搜索地点、美食、景点..."
+      value="{{searchKeyword}}"
+      bind:input="onSearchInput"
+      bind:search="onSearch"
+    />
+  </view>
 
   <view class="grid-section">
     <view class="grid-col left-col">
@@ -80,8 +95,8 @@
     <view class="feed-card" wx:for="{{feedList}}" wx:key="_id" bindtap="onViewDetail" data-id="{{item._id}}">
       <view class="feed-img-box">
         <image wx:if="{{item.coverImage}}" class="feed-img" src="{{item.coverImage}}" mode="aspectFill" style="width: 100%; height: 100%;" lazy-load="{{true}}" />
-        <!-- TOP 标签 -->
-        <view wx:if="{{item.isHot}}" class="top-badge">TOP</view>
+        <!-- 热门标签 -->
+        <view wx:if="{{item.isHot}}" class="hot-badge">🔥 热门</view>
         <!-- 距离标签 -->
         <view wx:if="{{item.distanceText}}" class="distance-badge">{{item.distanceText}}</view>
       </view>

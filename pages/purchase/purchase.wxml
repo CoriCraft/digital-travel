@@ -66,7 +66,8 @@
           <view class="goods-card" bindtap="onGoodsTap" data-item="{{item}}">
             <view class="card-img-box">
               <image src="{{item.img}}" mode="widthFix" class="goods-img" lazy-load="{{true}}" />
-              <view class="ai-badge" wx:if="{{index === 0}}">AI定制</view>
+              <!-- 热门标签 -->
+              <view class="hot-badge" wx:if="{{item.isHot}}">🔥 热门</view>
             </view>
             <view class="goods-info">
               <view class="goods-name">{{item.name}}</view>
@@ -89,6 +90,8 @@
           <view class="goods-card" bindtap="onGoodsTap" data-item="{{item}}">
             <view class="card-img-box">
               <image src="{{item.img}}" mode="widthFix" class="goods-img" lazy-load="{{true}}" />
+              <!-- 热门标签 -->
+              <view class="hot-badge" wx:if="{{item.isHot}}">🔥 热门</view>
             </view>
             <view class="goods-info">
               <view class="goods-name">{{item.name}}</view>

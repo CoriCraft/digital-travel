@@ -1,13 +1,13 @@
 /* pages/experience/experience.wxss */
 
-/* --- 顶部导航 --- */
-.custom-nav {
+/* --- 导航栏 --- */
+.nav-bar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
+  right: 0;
   background: transparent;
-  z-index: 999;
+  z-index: 1000;
 }
 
 .nav-content {
@@ -29,17 +29,18 @@
   justify-content: flex-end;
 }
 
-.nav-icon {
-  width: 48rpx;
-  height: 48rpx;
-}
-
 .nav-title {
   flex: 1;
   text-align: center;
-  font-size: 30rpx;
-  font-weight: 500;
-  color: #282828;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 搜索框容器 */
+.search-bar-wrapper {
+  padding: 0 24rpx;
+  margin-bottom: 20rpx;
 }
 
 .page-container {
@@ -357,22 +358,14 @@
   position: absolute;
   top: 20rpx;
   left: 20rpx;
-  background: linear-gradient(135deg, #ff6b6b 0%, #ff8c42 100%);
-  color: #fff;
+  padding: 8rpx 16rpx;
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 100%);
+  border-radius: 8rpx;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.3);
   font-size: 24rpx;
   font-weight: 700;
-  padding: 10rpx 16rpx;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.3);
+  color: #fff;
   z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hot-icon {
-  width: 70rpx;
-  height: 20rpx;
 }
 
 .feed-img {

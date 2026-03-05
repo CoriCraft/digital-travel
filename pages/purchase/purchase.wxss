@@ -204,6 +204,21 @@
   display: block;
 }
 
+/* 热门标签 */
+.card-img-box .hot-badge {
+  position: absolute;
+  top: 12rpx;
+  left: 12rpx;
+  padding: 8rpx 16rpx;
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 100%);
+  border-radius: 8rpx;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.3);
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #fff;
+  z-index: 10;
+}
+
 .ai-badge {
   position: absolute;
   top: 12rpx;
