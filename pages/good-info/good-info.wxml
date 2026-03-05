@@ -69,14 +69,19 @@
         <text class="detail-text">商品详情</text>
       </view>
 
-      <!-- 如果有详情图片则显示 -->
-      <block wx:if="{{goods.detailImages && goods.detailImages.length > 0}}">
-        <image wx:for="{{goods.detailImages}}" wx:key="*this" class="detail-img" src="{{item}}" mode="widthFix" />
+      <!-- 优先显示 images 字段的多张图片 -->
+      <block wx:if="{{goods.images && goods.images.length > 0}}">
+        <image wx:for="{{goods.images}}" wx:key="*this" class="detail-img" src="{{item}}" mode="widthFix" show-menu-by-longpress="{{true}}" />
       </block>
 
-      <!-- 否则显示商品主图 -->
+      <!-- 其次显示 detailImages -->
+      <block wx:elif="{{goods.detailImages && goods.detailImages.length > 0}}">
+        <image wx:for="{{goods.detailImages}}" wx:key="*this" class="detail-img" src="{{item}}" mode="widthFix" show-menu-by-longpress="{{true}}" />
+      </block>
+
+      <!-- 最后显示商品主图 -->
       <block wx:else>
-        <image class="detail-img" src="{{goods.img}}" mode="widthFix" />
+        <image class="detail-img" src="{{goods.img}}" mode="widthFix" show-menu-by-longpress="{{true}}" />
       </block>
     </view>
 

@@ -65,6 +65,15 @@ Page({
   },
 
   /**
+   * 返回首页
+   */
+  goHome: function() {
+    wx.switchTab({
+      url: '/pages/template/template'
+    });
+  },
+
+  /**
    * 返回上一页或首页
    */
   goBack: function() {
@@ -98,6 +107,15 @@ Page({
       success: (res) => {
         console.log('点击了第' + (res.tapIndex + 1) + '个按钮');
       }
+    });
+  },
+
+  /**
+   * 点击帮助按钮
+   */
+  onHelpTap: function() {
+    wx.navigateTo({
+      url: '/pages/help-center/help-center'
     });
   }
 })

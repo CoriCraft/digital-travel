@@ -11,7 +11,7 @@ Page({
   data: {
     statusBarHeight: 0,
     navBarHeight: 0,
-    location: "当前位置",
+    location: "方山风景区",
     searchKeyword: "", // 搜索关键词
     currentCategory: 0, // 默认选中"推荐"
     categoryList: [
@@ -68,11 +68,16 @@ Page({
       });
     }
 
-    // 读取全局位置
-    const cachedLocation = wx.getStorageSync('selectedLocation');
-    if (cachedLocation && Date.now() - cachedLocation.timestamp < 7 * 24 * 60 * 60 * 1000) {
+    // 读取全局位置（使用与创意模板相同的缓存键）
+    const cachedLocation = wx.getStorageSync('user_location_cache');
+    if (cachedLocation && cachedLocation.timestamp && Date.now() - cachedLocation.timestamp < 7 * 24 * 60 * 60 * 1000) {
       this.setData({
-        location: cachedLocation.displayText || cachedLocation.name || '当前位置'
+        location: cachedLocation.displayText || '当前位置'
+      });
+    } else {
+      // 缓存过期或不存在，显示默认位置
+      this.setData({
+        location: '方山风景区'
       });
     }
   },
@@ -571,6 +576,15 @@ Page({
   },
 
   /**
+   * 返回首页
+   */
+  goHome() {
+    wx.switchTab({
+      url: '/pages/index/index'
+    });
+  },
+
+  /**
    * 页面上拉触底事件的处理函数
    */
   onReachBottom() {
@@ -584,5 +598,14 @@ Page({
     this.loadBentoBoxData();
     this.loadFeedList(true);
     wx.stopPullDownRefresh();
+  },
+
+  /**
+   * 点击帮助按钮
+   */
+  onHelpTap() {
+    wx.navigateTo({
+      url: '/pages/help-center/help-center'
+    });
   }
 })

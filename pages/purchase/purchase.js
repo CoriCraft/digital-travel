@@ -515,4 +515,13 @@ Page({
     }
   },
 
+  /**
+   * 点击帮助按钮
+   */
+  onHelpTap() {
+    wx.navigateTo({
+      url: '/pages/help-center/help-center'
+    });
+  }
+
 });

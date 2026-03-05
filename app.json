@@ -44,6 +44,7 @@
     "pages/upload-photoset/upload-photoset",
     "pages/my-works/my-works",
     "pages/my-favorites/my-favorites",
+    "pages/my-likes/my-likes",
     "pages/messages/messages",
     "pages/help-center/help-center",
     "pages/feedback/feedback",

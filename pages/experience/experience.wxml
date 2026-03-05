@@ -1,15 +1,3 @@
-<view class="custom-nav" style="padding-top:{{statusBarHeight}}px; height:{{navBarHeight}}px;">
-  <view class="nav-content">
-    <view class="nav-left">
-      <t-icon name="home" size="48rpx" color="#333" />
-    </view>
-    <view class="nav-title">线下体验</view>
-    <view class="nav-right">
-      <!-- 右侧图标已移除 -->
-    </view>
-  </view>
-</view>
-
 <view class="page-container" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
 
   <!-- 搜索框 -->
@@ -92,8 +80,8 @@
     <view class="feed-card" wx:for="{{feedList}}" wx:key="_id" bindtap="onViewDetail" data-id="{{item._id}}">
       <view class="feed-img-box">
         <image wx:if="{{item.coverImage}}" class="feed-img" src="{{item.coverImage}}" mode="aspectFill" style="width: 100%; height: 100%;" lazy-load="{{true}}" />
-        <!-- 热门标签 -->
-        <view wx:if="{{item.isHot}}" class="hot-badge">🔥 热门</view>
+        <!-- TOP 标签 -->
+        <view wx:if="{{item.isHot}}" class="top-badge">TOP</view>
         <!-- 距离标签 -->
         <view wx:if="{{item.distanceText}}" class="distance-badge">{{item.distanceText}}</view>
       </view>
@@ -125,7 +113,7 @@
   </view>
 
   <!-- 全局悬浮帮助按钮 -->
-  <view class="float-help-bubble">
+  <view class="float-help-bubble" bindtap="onHelpTap">
     <image class="help-icon-svg" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8IS0tIOawlOaXoTIgLS0+CiAgPHBhdGggZD0iTTIwIDM2QzguOTU0MyAzNiAzIDI5LjI4NDMgMyAyMEMzIDEwLjcxNTcgOC45NTQzIDQgMjAgNEMzMS4wNDU3IDQgMzcgMTAuNzE1NyAzNyAyMEMzNyAyMy4wOTIxIDM2LjEyMjYgMjYuMDIzNCAzNC41NTA4IDI4LjYyNjlMMzcgMzZMMjkuNjI2OSAzMy41NTA4QzI3LjAyMzQgMzUuMTIyNiAyNC4wOTIxIDM2IDIwIDM2WiIgc3Ryb2tlPSIjOEVDOTREIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPCEtLSDljYzljacgLS0+CiAgPHBhdGggZD0iTTIwIDE0VjI2IiBzdHJva2U9IiM4RUM5NEQiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNMTQgMjBIMjYiIHN0cm9rZT0iIzhFQzk0RCIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4=" />
     <text class="help-text">帮助</text>
   </view>

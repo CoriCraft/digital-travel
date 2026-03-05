@@ -13,8 +13,8 @@ Page({
     userAvatar: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="50" fill="%23E8F5E9"/%3E%3Cpath d="M50 45c8.284 0 15-6.716 15-15s-6.716-15-15-15-15 6.716-15 15 6.716 15 15 15zm0 5c-13.807 0-25 11.193-25 25v10h50V75c0-13.807-11.193-25-25-25z" fill="%233ECE79"/%3E%3C/svg%3E',
     userName: '微信用户',
     userPhone: '',
-    templateCount: 0,
-    experienceCount: 0,
+    checkInCount: 0,
+    registerDays: 1,
     unreadCount: 0
   },
 
@@ -64,35 +64,27 @@ Page({
 
     const db = wx.cloud.database()
 
-    // 统计创建的模板数量
-    db.collection('templates')
-      .where({
-        creatorId: userInfo.openid
-      })
-      .count()
-      .then(res => {
-        this.setData({
-          templateCount: res.total
-        })
-      })
-      .catch(err => {
-        console.error('统计模板失败:', err)
-      })
-
-    // 统计打卡的体验地点数量
+    // 统计打卡拍摄点数量
     db.collection('check_ins')
       .where({
         userId: userInfo.openid
       })
       .count()
       .then(res => {
-        this.setData({
-          experienceCount: res.total
-        })
+        this.setData({ checkInCount: res.total })
       })
       .catch(err => {
-        console.error('统计体验失败:', err)
+        console.error('统计打卡失败:', err)
       })
+
+    // 计算注册天数（基于本地首次登录时间）
+    let firstLogin = wx.getStorageSync('firstLoginTime')
+    if (!firstLogin) {
+      firstLogin = Date.now()
+      wx.setStorageSync('firstLoginTime', firstLogin)
+    }
+    const days = Math.max(1, Math.ceil((Date.now() - firstLogin) / (1000 * 60 * 60 * 24)))
+    this.setData({ registerDays: days })
   },
 
   /**
@@ -216,6 +208,15 @@ Page({
   },
 
   /**
+   * 导航到喜欢页面
+   */
+  navigateToLikes() {
+    wx.navigateTo({
+      url: '/pages/my-likes/my-likes'
+    })
+  },
+
+  /**
    * 加载未读消息数量
    */
   async loadUnreadCount() {
@@ -312,6 +313,15 @@ Page({
 
     // 每次显示页面时重新加载用户信息
     this.loadUserInfo()
+  },
+
+  /**
+   * 返回首页
+   */
+  goHome() {
+    wx.switchTab({
+      url: '/pages/template/template'
+    });
   },
 
   /**

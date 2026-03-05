@@ -1,0 +1,107 @@
+<view class="container">
+  <!-- 透明导航栏 -->
+  <view class="nav-bar transparent" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <t-icon name="chevron-left" size="48rpx" color="#333" />
+      </view>
+      <text class="nav-title">我的喜欢</text>
+      <view class="nav-right-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- 主内容 -->
+  <scroll-view scroll-y class="main-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;" refresher-enabled="{{true}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+
+    <!-- 标签切换 -->
+    <view class="tabs">
+      <view
+        class="tab-item {{currentTab === 0 ? 'active' : ''}}"
+        data-index="{{0}}"
+        bindtap="onTabChange"
+      >
+        <text class="tab-text">模板</text>
+        <view class="tab-badge" wx:if="{{templates.length > 0}}">{{templates.length}}</view>
+      </view>
+      <view
+        class="tab-item {{currentTab === 1 ? 'active' : ''}}"
+        data-index="{{1}}"
+        bindtap="onTabChange"
+      >
+        <text class="tab-text">照片</text>
+        <view class="tab-badge" wx:if="{{photos.length > 0}}">{{photos.length}}</view>
+      </view>
+    </view>
+
+    <!-- 喜欢的模板 -->
+    <view class="content-section" wx:if="{{currentTab === 0}}">
+      <view wx:if="{{templates.length === 0}}" class="empty">
+        <t-icon name="thumb-up" size="160rpx" color="#CCCCCC" />
+        <text class="empty-text">还没有点赞模板</text>
+        <text class="empty-tip">快去点赞你喜欢的模板吧</text>
+      </view>
+
+      <view wx:else class="template-grid">
+        <view
+          wx:for="{{templates}}"
+          wx:key="_id"
+          class="template-card"
+          data-id="{{item._id}}"
+          bindtap="onTemplateTap"
+        >
+          <image class="template-cover" src="{{item.cover}}" mode="aspectFill"></image>
+          <view class="template-info">
+            <text class="template-name">{{item.name}}</text>
+            <view class="template-meta">
+              <view class="meta-item">
+                <t-icon name="image" size="28rpx" color="#999" />
+                <text class="meta-text">{{item.photoSetCount || 0}}</text>
+              </view>
+              <view class="meta-item">
+                <t-icon name="heart-filled" size="28rpx" color="#FF4444" />
+                <text class="meta-text">{{item.likeCount || 0}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="like-btn" catchtap="onUnlikeTemplate" data-id="{{item._id}}" data-index="{{index}}">
+            <t-icon name="thumb-up-filled" size="40rpx" color="#FF6B35" />
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 喜欢的照片 -->
+    <view class="content-section" wx:if="{{currentTab === 1}}">
+      <view wx:if="{{photos.length === 0}}" class="empty">
+        <t-icon name="thumb-up" size="160rpx" color="#CCCCCC" />
+        <text class="empty-text">还没有点赞照片</text>
+        <text class="empty-tip">快去点赞你喜欢的照片吧</text>
+      </view>
+
+      <view wx:else class="photo-grid">
+        <view
+          wx:for="{{photos}}"
+          wx:key="_id"
+          class="photo-card"
+          data-id="{{item._id}}"
+          data-template-id="{{item.templateId}}"
+          bindtap="onPhotoTap"
+        >
+          <image class="photo-img" src="{{item.photoUrl}}" mode="aspectFill"></image>
+          <view class="photo-overlay">
+            <view class="photo-stats">
+              <view class="stat-item">
+                <t-icon name="heart-filled" size="24rpx" color="#fff" />
+                <text class="stat-text">{{item.likeCount || 0}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="like-btn-small" catchtap="onUnlikePhoto" data-id="{{item._id}}" data-index="{{index}}">
+            <t-icon name="thumb-up-filled" size="32rpx" color="#FF6B35" />
+          </view>
+        </view>
+      </view>
+    </view>
+
+  </scroll-view>
+</view>

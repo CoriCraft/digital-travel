@@ -110,7 +110,7 @@
     <view style="height: 120rpx;"></view>
   </scroll-view>
 
-  <view class="float-help">
+  <view class="float-help" bindtap="onHelpTap">
     <image src="/static/icons/help.svg" class="help-icon"></image>
     <text>帮助</text>
   </view>
