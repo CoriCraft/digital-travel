@@ -66,6 +66,9 @@ Page({
       });
       // 检查是否是创建者
       this.checkIsCreator(cachedData.data);
+      // 检查收藏和点赞状态
+      this.checkFavoriteStatus();
+      this.checkLikeStatus();
       // 仍然增加观看量（如果符合条件）
       this.increaseViewCount();
       return;
@@ -85,6 +88,10 @@ Page({
 
         // 检查是否是创建者
         this.checkIsCreator(res.data);
+
+        // 检查收藏和点赞状态
+        this.checkFavoriteStatus();
+        this.checkLikeStatus();
 
         // 保存到缓存
         wx.setStorageSync(cacheKey, {
