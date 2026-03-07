@@ -1,5 +1,6 @@
 // pages/my-likes/my-likes.js
 const app = getApp()
+const interaction = require('../../utils/interaction.js')
 
 function getDB() {
   return wx.cloud.database()
