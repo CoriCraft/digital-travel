@@ -2,6 +2,10 @@
 const app = getApp()
 const { checkImageSecurity } = require('../../utils/util.js')
 
+function getDB() {
+  return wx.cloud.database()
+}
+
 Page({
   data: {
     statusBarHeight: 0,
@@ -143,7 +147,7 @@ Page({
 
     try {
       const userInfo = app.globalData.userInfo
-      const db = wx.cloud.database()
+      const db = getDB()
 
       // 上传图片到云存储
       let imageUrls = []
@@ -219,7 +223,7 @@ Page({
         return
       }
 
-      const db = wx.cloud.database()
+      const db = getDB()
       const { data } = await db.collection('feedbacks')
         .where({
           userId: userInfo.openid

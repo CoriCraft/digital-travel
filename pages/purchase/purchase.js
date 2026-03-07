@@ -1,6 +1,10 @@
 // pages/purchase/purchase.js
 const app = getApp();
 
+function getDB() {
+  return wx.cloud.database()
+}
+
 Page({
   /**
    * 页面的初始数据
@@ -156,7 +160,7 @@ Page({
    */
   async loadBannerGoods() {
     try {
-      const db = wx.cloud.database();
+      const db = getDB();
 
       // 1. 获取所有活跃商品
       const { data: allGoods } = await db.collection('goods')
@@ -342,7 +346,7 @@ Page({
     this.setData({ loading: true });
 
     try {
-      const db = wx.cloud.database();
+      const db = getDB();
       const _ = db.command;
       const { currentCategory, searchKeyword, page, pageSize } = this.data;
 
@@ -474,7 +478,7 @@ Page({
     });
 
     try {
-      const db = wx.cloud.database();
+      const db = getDB();
       const _ = db.command;
       const { currentCategory, searchKeyword, pageSize } = this.data;
 

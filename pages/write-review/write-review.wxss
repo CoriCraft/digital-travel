@@ -29,6 +29,15 @@
   color: #1a1a1a;
 }
 
+.back-icon {
+  width: 30px;
+  height: 35px;
+  background-image: url("data:image/svg+xml,%3Csvg width='30' height='35' viewBox='0 0 30 35' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.5 11.6666L7.5 17.5M7.5 17.5L12.5 23.3333M7.5 17.5L22.5 17.5' stroke='%23000E08' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .nav-title {
   margin-left: 16rpx;
   font-size: 36rpx;

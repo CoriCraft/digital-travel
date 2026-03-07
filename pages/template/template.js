@@ -1,6 +1,11 @@
 // pages/template/template.js
 const app = getApp()
 const { getThumbnailUrl } = require('../../utils/util.js')
+const interaction = require('../../utils/interaction.js')
+
+function getDB() {
+  return wx.cloud.database()
+}
 
 Page({
   /**
@@ -29,6 +34,7 @@ Page({
     pageSize: 20, // 每页数量
     currentPage: 0, // 当前页码
     hasMore: true, // 是否还有更多数据
+    featuredTemplate: null, // 创作模板展示的固定模板（热度第一名）
   },
 
   /**
@@ -42,6 +48,8 @@ Page({
     });
     // 获取当前位置
     this.getCurrentLocation();
+    // 加载热度第一名作为创作模板展示
+    this.loadFeaturedTemplate();
     // 加载模板列表
     this.loadTemplates();
   },
@@ -293,7 +301,7 @@ Page({
   },
 
   onTabChange(e) {
-    const { value } = e.detail;
+    const { value } = e.currentTarget.dataset;
     this.setData({
       currentTemplateFilter: value,
       currentPage: 0,
@@ -361,7 +369,7 @@ Page({
       wx.showLoading({ title: '加载中...' });
     }
 
-    const db = wx.cloud.database();
+    const db = getDB();
     const _ = db.command;
     const { currentTemplateFilter, searchKeyword, pageSize, currentPage, sortType } = this.data;
 
@@ -491,6 +499,9 @@ Page({
 
         wx.hideLoading();
 
+        // 批量检查模板的收藏和点赞状态
+        this.batchCheckTemplateStatus(templatesWithHot);
+
         // 如果是加载更多且没有更多数据，提示用户
         if (loadMore && !hasMore) {
           wx.showToast({
@@ -508,6 +519,103 @@ Page({
           title: '加载失败',
           icon: 'none'
         });
+      });
+  },
+
+  /**
+   * 加载上传用户头像
+   */
+  loadUploaderAvatars(templateId) {
+    const db = getDB();
+
+    // 查询该模板下的照片，获取上传用户头像
+    db.collection('photos')
+      .where({
+        templateId: templateId,
+        status: 'approved'
+      })
+      .field({
+        userAvatar: true,
+        userId: true
+      })
+      .limit(10) // 最多获取10个用户
+      .get()
+      .then(res => {
+        // 去重并过滤空头像
+        const avatars = [];
+        const userIds = new Set();
+
+        res.data.forEach(item => {
+          if (item.userAvatar && item.userId && !userIds.has(item.userId)) {
+            avatars.push(item.userAvatar);
+            userIds.add(item.userId);
+          }
+        });
+
+        // 更新 featuredTemplate 的头像数据
+        if (this.data.featuredTemplate) {
+          this.setData({
+            featuredTemplate: {
+              ...this.data.featuredTemplate,
+              uploaderAvatars: avatars
+            }
+          });
+        }
+      })
+      .catch(err => {
+        console.error('加载上传用户头像失败:', err);
+      });
+  },
+
+  /**
+   * 加载热度第一名模板作为创作模板展示
+   */
+  loadFeaturedTemplate() {
+    const db = getDB();
+    const _ = db.command;
+
+    db.collection('templates')
+      .where({
+        status: _.in(['active', 'approved'])
+      })
+      .orderBy('createTime', 'desc')
+      .limit(100) // 获取足够多的数据用于热度计算
+      .get()
+      .then(res => {
+        if (res.data.length === 0) return;
+
+        // 计算热度分数
+        let templatesWithHot = this.calculateHotTemplates(res.data);
+
+        // 添加缩略图
+        templatesWithHot = templatesWithHot.map(template => ({
+          ...template,
+          coverThumbnail: getThumbnailUrl(template.cover, 400)
+        }));
+
+        // 分离固定排序和动态排序的模板
+        const pinnedTemplates = templatesWithHot.filter(t => (t.sortOrder || 0) > 0);
+        const dynamicTemplates = templatesWithHot.filter(t => (t.sortOrder || 0) <= 0);
+
+        // 固定排序的模板按 sortOrder 升序排列
+        pinnedTemplates.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+        // 动态排序的模板按热度分数降序排列
+        dynamicTemplates.sort((a, b) => b.hotScore - a.hotScore);
+
+        // 合并：固定排序在前，动态排序在后
+        const sortedTemplates = [...pinnedTemplates, ...dynamicTemplates];
+
+        // 取第一名
+        const featuredTemplate = sortedTemplates[0];
+
+        this.setData({ featuredTemplate });
+
+        // 加载该模板的上传用户头像
+        this.loadUploaderAvatars(featuredTemplate._id);
+      })
+      .catch(err => {
+        console.error('加载热度第一名模板失败:', err);
       });
   },
 
@@ -608,6 +716,69 @@ Page({
     console.log(`标记了 ${hotCount} 个热门模板`);
 
     return result;
+  },
+
+  /**
+   * 批量检查模板的收藏和点赞状态
+   */
+  async batchCheckTemplateStatus(templates) {
+    if (!templates || templates.length === 0) return;
+
+    try {
+      // 准备批量查询的目标列表
+      const targets = templates.map(t => ({
+        targetId: t._id,
+        targetType: 'template'
+      }));
+
+      // 批量检查收藏状态
+      const favoriteResults = await interaction.batchCheckStatus(targets, 'favorite');
+
+      // 批量检查点赞状态
+      const likeResults = await interaction.batchCheckStatus(targets, 'like');
+
+      // 更新模板列表中的状态
+      const updatedTemplates = this.data.templates.map(template => {
+        const isFavorited = favoriteResults[template._id] || false;
+        const isLiked = likeResults[template._id] || false;
+        return {
+          ...template,
+          isFavorited,
+          isLiked
+        };
+      });
+
+      // 更新左右列的模板状态
+      const updatedLeftColumn = this.data.leftColumnTemplates.map(template => {
+        const isFavorited = favoriteResults[template._id] || false;
+        const isLiked = likeResults[template._id] || false;
+        return {
+          ...template,
+          isFavorited,
+          isLiked
+        };
+      });
+
+      const updatedRightColumn = this.data.rightColumnTemplates.map(template => {
+        const isFavorited = favoriteResults[template._id] || false;
+        const isLiked = likeResults[template._id] || false;
+        return {
+          ...template,
+          isFavorited,
+          isLiked
+        };
+      });
+
+      this.setData({
+        templates: updatedTemplates,
+        leftColumnTemplates: updatedLeftColumn,
+        rightColumnTemplates: updatedRightColumn
+      });
+
+      console.log('批量状态检查完成');
+    } catch (error) {
+      console.error('批量检查状态失败:', error);
+    }
   },
 
   /**
@@ -714,7 +885,7 @@ Page({
     try {
       wx.showLoading({ title: '提交中...' });
 
-      const db = wx.cloud.database();
+      const db = getDB();
       await db.collection('reports').add({
         data: {
           targetId,

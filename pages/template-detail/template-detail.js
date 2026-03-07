@@ -1,6 +1,11 @@
 // pages/template-detail/template-detail.js
 const app = getApp()
 const { getThumbnailUrl } = require('../../utils/util.js')
+const interaction = require('../../utils/interaction.js')
+
+function getDB() {
+  return wx.cloud.database()
+}
 
 Page({
   /**
@@ -68,7 +73,7 @@ Page({
 
     // 缓存过期或不存在，从数据库加载
     console.log('从数据库加载模板数据');
-    const db = wx.cloud.database();
+    const db = getDB();
     db.collection('templates')
       .doc(templateId)
       .get()
@@ -125,7 +130,7 @@ Page({
 
     // 如果距离上次观看超过1小时，才增加观看量
     if (now - lastViewTime > oneHour) {
-      const db = wx.cloud.database();
+      const db = getDB();
       const _ = db.command;
 
       db.collection('templates')
@@ -186,7 +191,7 @@ Page({
     console.log('从数据库加载照片数据');
     this.setData({ loading: true });
 
-    const db = wx.cloud.database();
+    const db = getDB();
 
     // 从photos集合中查询该模板的所有照片
     db.collection('photos')
@@ -536,166 +541,108 @@ Page({
   /**
    * 检查收藏状态
    */
-  checkFavoriteStatus() {
-    const favoriteTemplates = wx.getStorageSync('favoriteTemplates') || []
-    const isFavorite = favoriteTemplates.includes(this.data.templateId)
+  async checkFavoriteStatus() {
+    const isFavorite = await interaction.checkFavoriteStatus(this.data.templateId, 'template')
     this.setData({ isFavorite })
   },
 
   /**
    * 检查点赞状态
    */
-  checkLikeStatus() {
-    const likedTemplates = wx.getStorageSync('likedTemplates') || []
-    const isLiked = likedTemplates.includes(this.data.templateId)
+  async checkLikeStatus() {
+    const isLiked = await interaction.checkLikeStatus(this.data.templateId, 'template')
     this.setData({ isLiked })
   },
 
   /**
    * 切换收藏状态
    */
-  onToggleFavorite() {
-    const { isFavorite, templateId, template } = this.data
-    let favoriteTemplates = wx.getStorageSync('favoriteTemplates') || []
+  async onToggleFavorite() {
+    const { isFavorite, templateId } = this.data
 
-    const db = wx.cloud.database()
-    const _ = db.command
+    // 乐观更新UI
+    this.setData({ isFavorite: !isFavorite })
 
-    if (isFavorite) {
-      // 取消收藏
-      favoriteTemplates = favoriteTemplates.filter(id => id !== templateId)
-      // 数据库收藏量 -1，但不能小于 0
-      const currentCount = template.favoriteCount || 0
-      if (currentCount > 0) {
-        db.collection('templates')
-          .doc(templateId)
-          .update({
-            data: { favoriteCount: _.inc(-1) }
-          })
-          .then(() => {
-            console.log('收藏量-1')
-            // 清除缓存并重新加载
-            wx.removeStorageSync(`template_cache_${templateId}`)
-            this.loadTemplateDetail()
-          })
-          .catch(err => {
-            console.error('更新收藏量失败:', err)
-          })
-      } else {
-        // 如果已经是 0，直接设置为 0
-        db.collection('templates')
-          .doc(templateId)
-          .update({
-            data: { favoriteCount: 0 }
-          })
-          .then(() => {
-            console.log('收藏量设置为0')
-            wx.removeStorageSync(`template_cache_${templateId}`)
-            this.loadTemplateDetail()
-          })
-      }
+    // 调用统一接口
+    const result = await interaction.toggleFavorite(templateId, 'template', 'templates')
+
+    if (result.success) {
+      // 更新成功，显示提示
       wx.showToast({
-        title: '已取消收藏',
+        title: result.isFavorite ? '收藏成功' : '已取消收藏',
         icon: 'success'
       })
+
+      // 清除缓存并重新加载模板详情以更新计数
+      wx.removeStorageSync(`template_cache_${templateId}`)
+      this.loadTemplateDetail()
     } else {
-      // 添加收藏
-      favoriteTemplates.push(templateId)
-      // 数据库收藏量 +1
-      db.collection('templates')
-        .doc(templateId)
-        .update({
-          data: { favoriteCount: _.inc(1) }
-        })
-        .then(() => {
-          console.log('收藏量+1')
-          // 清除缓存并重新加载
-          wx.removeStorageSync(`template_cache_${templateId}`)
-          this.loadTemplateDetail()
-        })
-        .catch(err => {
-          console.error('更新收藏量失败:', err)
-        })
+      // 更新失败，回滚UI
+      this.setData({ isFavorite: isFavorite })
       wx.showToast({
-        title: '收藏成功',
-        icon: 'success'
+        title: result.message || '操作失败',
+        icon: 'none'
       })
     }
-
-    wx.setStorageSync('favoriteTemplates', favoriteTemplates)
-    this.setData({ isFavorite: !isFavorite })
   },
 
   /**
    * 切换点赞状态
    */
-  onToggleLike() {
+  async onToggleLike() {
     const { isLiked, templateId } = this.data
-    let likedTemplates = wx.getStorageSync('likedTemplates') || []
 
-    const db = wx.cloud.database()
-    const _ = db.command
+    // 乐观更新UI
+    this.setData({ isLiked: !isLiked })
 
-    if (isLiked) {
-      // 取消点赞
-      likedTemplates = likedTemplates.filter(id => id !== templateId)
-      // 数据库点赞量 -1
-      db.collection('templates')
-        .doc(templateId)
-        .update({
-          data: { likeCount: _.inc(-1) }
-        })
-        .then(() => {
-          console.log('点赞量-1')
-          // 清除缓存并重新加载模板详情以更新点赞量显示
-          wx.removeStorageSync(`template_cache_${templateId}`)
-          this.loadTemplateDetail()
-        })
+    // 调用统一接口
+    const result = await interaction.toggleLike(templateId, 'template', 'templates')
+
+    if (result.success) {
+      // 更新成功，显示提示
       wx.showToast({
-        title: '已取消点赞',
+        title: result.isLiked ? '点赞成功' : '已取消点赞',
         icon: 'success'
       })
+
+      // 清除缓存并重新加载模板详情以更新计数
+      wx.removeStorageSync(`template_cache_${templateId}`)
+      this.loadTemplateDetail()
     } else {
-      // 添加点赞
-      likedTemplates.push(templateId)
-      // 数据库点赞量 +1
-      db.collection('templates')
-        .doc(templateId)
-        .update({
-          data: { likeCount: _.inc(1) }
-        })
-        .then(() => {
-          console.log('点赞量+1')
-          // 清除缓存并重新加载模板详情以更新点赞量显示
-          wx.removeStorageSync(`template_cache_${templateId}`)
-          this.loadTemplateDetail()
-        })
+      // 更新失败，回滚UI
+      this.setData({ isLiked: isLiked })
       wx.showToast({
-        title: '点赞成功',
-        icon: 'success'
+        title: result.message || '操作失败',
+        icon: 'none'
       })
     }
-
-    wx.setStorageSync('likedTemplates', likedTemplates)
-    this.setData({ isLiked: !isLiked })
   },
 
   /**
    * 检查照片点赞状态
    */
-  checkPhotosLikeStatus(photos) {
-    const likedPhotos = wx.getStorageSync('likedPhotos') || [];
-    const favoritedPhotos = wx.getStorageSync('favoritedPhotos') || [];
+  async checkPhotosLikeStatus(photos) {
+    if (!photos || photos.length === 0) return;
+
+    // 批量检查点赞状态
+    const likeTargets = photos.map(p => ({ targetId: p._id, targetType: 'photo' }));
+    const likeResults = await interaction.batchCheckStatus(likeTargets, 'like');
+
+    // 批量检查收藏状态
+    const favoriteTargets = photos.map(p => ({ targetId: p._id, targetType: 'photo' }));
+    const favoriteResults = await interaction.batchCheckStatus(favoriteTargets, 'favorite');
+
+    // 更新照片状态
     photos.forEach(photo => {
-      photo.isLiked = likedPhotos.includes(photo._id);
-      photo.isFavorited = favoritedPhotos.includes(photo._id);
+      photo.isLiked = likeResults[photo._id] || false;
+      photo.isFavorited = favoriteResults[photo._id] || false;
     });
   },
 
   /**
    * 照片点赞
    */
-  onPhotoLike(e) {
+  async onPhotoLike(e) {
     const { photoId } = e.currentTarget.dataset;
     const { photos, leftColumnPhotos, rightColumnPhotos, templateId } = this.data;
 
@@ -703,138 +650,106 @@ Page({
     const photo = photos.find(p => p._id === photoId);
     if (!photo) return;
 
-    const db = wx.cloud.database();
-    const _ = db.command;
-    let likedPhotos = wx.getStorageSync('likedPhotos') || [];
+    const isLiked = photo.isLiked;
 
-    if (photo.isLiked) {
-      // 取消点赞
-      likedPhotos = likedPhotos.filter(id => id !== photoId);
-      db.collection('photos')
-        .doc(photoId)
-        .update({
-          data: { likeCount: _.inc(-1) }
-        })
-        .then(() => {
-          console.log('照片点赞量-1');
-          // 清除照片列表缓存
-          wx.removeStorageSync(`photos_cache_${templateId}`);
-        });
-      wx.showToast({
-        title: '已取消点赞',
-        icon: 'success'
-      });
-    } else {
-      // 点赞
-      likedPhotos.push(photoId);
-      db.collection('photos')
-        .doc(photoId)
-        .update({
-          data: { likeCount: _.inc(1) }
-        })
-        .then(() => {
-          console.log('照片点赞量+1');
-          // 清除照片列表缓存
-          wx.removeStorageSync(`photos_cache_${templateId}`);
-        });
-      wx.showToast({
-        title: '点赞成功',
-        icon: 'success'
-      });
-    }
-
-    // 更新本地存储
-    wx.setStorageSync('likedPhotos', likedPhotos);
-
-    // 更新 UI
-    photo.isLiked = !photo.isLiked;
+    // 乐观更新UI
+    photo.isLiked = !isLiked;
     photo.likeCount = (photo.likeCount || 0) + (photo.isLiked ? 1 : -1);
 
-    // 更新瀑布流数据
-    const updatedLeftColumn = leftColumnPhotos.map(p =>
-      p._id === photoId ? { ...p, isLiked: photo.isLiked, likeCount: photo.likeCount } : p
-    );
-    const updatedRightColumn = rightColumnPhotos.map(p =>
-      p._id === photoId ? { ...p, isLiked: photo.isLiked, likeCount: photo.likeCount } : p
-    );
+    // 更新瀑布流中的照片
+    this.updatePhotoInColumns(photo);
 
     this.setData({
       photos,
-      leftColumnPhotos: updatedLeftColumn,
-      rightColumnPhotos: updatedRightColumn
+      leftColumnPhotos,
+      rightColumnPhotos
+    });
+
+    // 调用统一接口
+    const result = await interaction.toggleLike(photoId, 'photo', 'photos');
+
+    if (result.success) {
+      wx.showToast({
+        title: result.isLiked ? '点赞成功' : '已取消点赞',
+        icon: 'success'
+      });
+
+      // 清除照片列表缓存
+      wx.removeStorageSync(`photos_cache_${templateId}`);
+    } else {
+      // 更新失败，回滚UI
+      photo.isLiked = isLiked;
+      photo.likeCount = (photo.likeCount || 0) + (isLiked ? 1 : -1);
+      this.updatePhotoInColumns(photo);
+
+      this.setData({
+        photos,
+        leftColumnPhotos,
+        rightColumnPhotos
+      });
+
+      wx.showToast({
+        title: result.message || '操作失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  /**
+   * 照片收藏
+   */
     });
   },
 
   /**
    * 照片收藏
    */
-  onPhotoFavorite(e) {
+  async onPhotoFavorite(e) {
     const { photoId } = e.currentTarget.dataset;
     const { photos, leftColumnPhotos, rightColumnPhotos, templateId } = this.data;
 
     const photo = photos.find(p => p._id === photoId);
     if (!photo) return;
 
-    const db = wx.cloud.database();
-    const _ = db.command;
-    let favoritedPhotos = wx.getStorageSync('favoritedPhotos') || [];
+    const isFavorited = photo.isFavorited;
 
-    if (photo.isFavorited) {
-      // 取消收藏
-      favoritedPhotos = favoritedPhotos.filter(id => id !== photoId);
-      db.collection('photos')
-        .doc(photoId)
-        .update({
-          data: { favoriteCount: _.inc(-1) }
-        })
-        .then(() => {
-          console.log('照片收藏量-1');
-          // 清除照片列表缓存
-          wx.removeStorageSync(`photos_cache_${templateId}`);
-        });
-      wx.showToast({
-        title: '已取消收藏',
-        icon: 'success'
-      });
-    } else {
-      // 收藏
-      favoritedPhotos.push(photoId);
-      db.collection('photos')
-        .doc(photoId)
-        .update({
-          data: { favoriteCount: _.inc(1) }
-        })
-        .then(() => {
-          console.log('照片收藏量+1');
-          // 清除照片列表缓存
-          wx.removeStorageSync(`photos_cache_${templateId}`);
-        });
-      wx.showToast({
-        title: '收藏成功',
-        icon: 'success'
-      });
-    }
-
-    // 更新本地存储
-    wx.setStorageSync('favoritedPhotos', favoritedPhotos);
-
-    // 更新 UI
-    photo.isFavorited = !photo.isFavorited;
+    // 乐观更新 UI
+    photo.isFavorited = !isFavorited;
     photo.favoriteCount = (photo.favoriteCount || 0) + (photo.isFavorited ? 1 : -1);
-
-    // 更新瀑布流数据
-    const updatedLeftColumn = leftColumnPhotos.map(p =>
-      p._id === photoId ? { ...p, isFavorited: photo.isFavorited, favoriteCount: photo.favoriteCount } : p
-    );
-    const updatedRightColumn = rightColumnPhotos.map(p =>
-      p._id === photoId ? { ...p, isFavorited: photo.isFavorited, favoriteCount: photo.favoriteCount } : p
-    );
-
+    this.updatePhotoInColumns(photo);
     this.setData({
       photos,
-      leftColumnPhotos: updatedLeftColumn,
-      rightColumnPhotos: updatedRightColumn
+      leftColumnPhotos,
+      rightColumnPhotos
     });
+
+    // 调用统一接口
+    const result = await interaction.toggleFavorite(photoId, 'photo', 'photos');
+
+    if (result.success) {
+      wx.showToast({
+        title: result.isFavorite ? '收藏成功' : '已取消收藏',
+        icon: 'success'
+      });
+
+      // 清除照片列表缓存
+      wx.removeStorageSync(`photos_cache_${templateId}`);
+    } else {
+      // 更新失败，回滚 UI
+      photo.isFavorited = isFavorited;
+      photo.favoriteCount = (photo.favoriteCount || 0) + (isFavorited ? 1 : -1);
+      this.updatePhotoInColumns(photo);
+      this.setData({
+        photos,
+        leftColumnPhotos,
+        rightColumnPhotos
+      });
+
+      wx.showToast({
+        title: result.message || '操作失败',
+        icon: 'none'
+      });
+    }
   },
 
   /**
@@ -882,7 +797,7 @@ Page({
     try {
       wx.showLoading({ title: '提交中...' });
 
-      const db = wx.cloud.database();
+      const db = getDB();
       await db.collection('reports').add({
         data: {
           targetId,
@@ -996,7 +911,7 @@ Page({
     wx.showLoading({ title: '检查中...' });
 
     try {
-      const db = wx.cloud.database();
+      const db = getDB();
       const userInfo = app.globalData.userInfo || {};
       const currentOpenId = userInfo.openid || '';
 

@@ -53,8 +53,8 @@
 
 /* 图标 */
 .location-icon {
-  width: var(--nav-bar-height);
-  height: var(--nav-bar-height);
+  width: 32rpx;
+  height: 32rpx;
   margin-right: 8rpx;
 }
 
@@ -78,99 +78,224 @@
 
 /* 横向搜索栏 */
 .search-bar {
-  display: flex;
-  align-items: center;
-  padding: 16rpx 24rpx;
+  padding: 16rpx 24rpx 24rpx 24rpx;
   background: transparent;
 }
 
-/* 图标容器（控制大小 + 居中） */
-.search-icon {
-  width: 56rpx;
-  height: 56rpx;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  margin-right: 16rpx; /* 和输入框的距离 */
-}
-
-/* 控制 t-icon 尺寸 */
-.search-icon t-icon {
-  font-size: 36rpx; /* 核心：控制图标大小 */
-}
-
-/* 输入框占满剩余空间 */
-.search-input {
-  flex: 1;
-}
-
-/* 外层：画胶囊形状 */
 .search-input-wrapper {
-  height: 64rpx;
+  height: 80rpx;
   display: flex;
   align-items: center;
-
-  border: 5rpx solid #3b82f6;
-  border-radius: 33rpx;
   background-color: #fff;
-
-  padding: 0 16rpx;
-  overflow: hidden;
+  border-radius: 40rpx;
+  padding: 0 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 
-/* 输入框本体 */
+.search-icon {
+  margin-right: 12rpx;
+  display: flex;
+  align-items: center;
+}
+
 .search-input-inner {
   flex: 1;
-
-  --td-input-vertical-padding: 0;
-  --td-input-horizontal-padding: 0;
-
   font-size: 28rpx;
+  color: #333;
 }
 
-/* 右侧搜索按钮 */
-.search-btn {
-  width: 44rpx;
-  height: 44rpx;
-  padding: 0 24rpx;
+.input-placeholder {
+  color: #999;
+}
 
+.search-btn {
+  width: 98rpx;
+  height: 54rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border-radius: 22rpx;
-  background-color: #82F45F;
+  background: linear-gradient(98.63deg, #7BDE3A 2.44%, #CFDF17 95.85%);
   color: #fff;
-
-  font-size: 22rpx;
-  box-shadow: 4rpx 4rpx 8rpx rgba(0, 0, 0, 0.18);
+  font-size: 26rpx;
+  font-weight: 600;
+  border-radius: 27rpx;
+  margin-left: 16rpx;
 }
 
-.divider {
+/* 分类标签 (Tab) */
+.template-filter-scroll {
   width: 100%;
-}
-
-.custom-divider {
-  height: 2rpx;        /* 分割线粗细 */
-  background-color: #e6e6e6;
+  box-sizing: border-box;
+  white-space: nowrap;
+  margin-bottom: 24rpx;
+  padding: 0 24rpx;
 }
 
 .template-filter {
-  width: 100%;
-  height: 80rpx;
-
   display: flex;
   align-items: center;
-  box-sizing: border-box;
-  padding: 0 24rpx;
+  gap: 16rpx;
+}
+
+.filter-tag {
+  padding: 12rpx 36rpx;
+  font-size: 28rpx;
+  color: #666;
   background-color: transparent;
+  border: 2rpx solid #9DA89D; /* 修改为设计稿的未选中边框颜色 */
+  border-radius: 34rpx;       /* 17px = 34rpx */
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.filter-tag.active {
+  background: linear-gradient(90deg, #7BDE3E 0%, #D9E817 100%); /* 使用渐变背景 */
+  color: #fff;
+  border-color: transparent; /* 选中时去掉边框 */
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(123, 222, 62, 0.3);
+}
+
+/* 创作模板卡片 */
+.create-template-wrapper {
+  padding: 0 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.create-template-bg {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  /* 注入原版 Figma SVG 文件夹路径和渐变 */
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='100%25' height='100%25' preserveAspectRatio='none' viewBox='9 8 387 130' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M199.265 8H22C14.8203 8 9 13.8203 9 21V125C9 132.18 14.8203 138 22 138H383C390.18 138 396 132.18 396 125V28.8286C396 21.6489 390.18 15.8286 383 15.8286H219.235C216.794 15.8286 214.403 15.1416 212.335 13.8462L206.165 9.9824C204.097 8.687 201.706 8 199.265 8Z' fill='url(%23paint0)'/%3E%3Cdefs%3E%3ClinearGradient id='paint0' x1='192.5' y1='172.666' x2='207.27' y2='8.81252' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23F8FC7E'/%3E%3Cstop offset='1' stop-color='%237FD73D'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  filter: drop-shadow(2rpx 4rpx 10rpx rgba(0, 0, 0, 0.1));
+  padding: 30rpx 20rpx 20rpx 20rpx;
+}
+
+.create-template-bg::before {
+  /* 移除伪元素切角，改用 SVG 背景 */
+  display: none;
+}
+
+.create-template-card {
+  position: relative;
+  background-color: #fff;
+  border-radius: 16rpx;
+  display: flex;
+  padding: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  z-index: 1;
+  overflow: visible;
+}
+
+.create-icon-decoration {
+  position: absolute;
+  width: 196rpx;
+  height: 147rpx;
+  right: -30rpx;
+  top: -40rpx;
+  transform: rotate(8.6deg);
+  filter: drop-shadow(-6rpx 4rpx 8rpx rgba(0, 0, 0, 0.1));
+  z-index: 10;
+}
+
+.create-template-img-box {
+  width: 240rpx;
+  height: 160rpx;
+  background-color: #f0f0f0;
+  border-radius: 12rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.create-template-img {
+  width: 100%;
+  height: 100%;
+}
+
+.create-template-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.create-info-top {
+  display: flex;
+  flex-direction: column;
+}
+
+.create-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 4rpx;
+}
+
+.create-desc {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.create-info-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12rpx;
+}
+
+.create-avatars {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-circle {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  border: 2rpx solid #fff;
+  margin-left: -12rpx;
+  overflow: hidden;
+}
+
+.avatar-circle:first-child {
+  margin-left: 0;
+}
+
+.avatar-more {
+  background-color: rgba(130, 244, 95, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  color: #82F45F;
+  font-weight: 600;
+}
+
+.avatar-text {
+  font-size: 24rpx;
+  color: #82F45F;
+  margin-left: 12rpx;
+  font-weight: 600;
+}
+
+.create-btn {
+  background: linear-gradient(135deg, #FFB347 0%, #FF8C5A 100%);
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+  box-shadow: 0 4rpx 10rpx rgba(255, 140, 90, 0.3);
 }
 
 /* 创作画框按钮 */
 .create-canvas-btn {
-  margin: 24rpx;
+  margin: 0 24rpx 32rpx;
   padding: 32rpx;
   background: linear-gradient(135deg, rgba(143, 241, 236, 0.3) 0%, rgba(130, 244, 95, 0.3) 100%);
   border-radius: 24rpx;
@@ -199,11 +324,13 @@
 }
 
 /* 模板分类标签 */
+
+/* 模板分类标签 */
 .template-category {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24rpx;
+  padding: 24rpx 24rpx;
   background-color: transparent;
 }
 
@@ -247,74 +374,133 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
+  gap: 24rpx; /* 增加一点卡片上下间距，给文件夹切角留空间 */
+  max-width: 48%; /* 限制列宽，让卡片变窄 */
 }
 
-/* 模板卡片 */
+/* 模板卡片：使用 Figma 的双层曲线背景 */
 .template-card {
-  background-color: #fff;
-  border-radius: 16rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  position: relative;
+  width: 100%;
+  background-color: transparent;
+  padding: 28rpx 10rpx 16rpx 10rpx;
   break-inside: avoid;
+}
+
+/* SVG 1：后层浅绿色阴影（带翻转和偏移） */
+.template-card::before {
+  content: '';
+  position: absolute;
+  top: 4rpx;
+  left: 0rpx;
+  right: 8rpx;
+  bottom: 4rpx;
+  /* 将第一段 SVG 注入，保留了 fill-opacity */
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='100%25' height='100%25' preserveAspectRatio='none' viewBox='0 0 181 255' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M83.6308 0H167.81C174.855 0 180.567 5.7117 180.567 12.7575V241.41C180.567 248.456 174.855 254.168 167.81 254.168H12.7575C5.71172 254.168 0 248.456 0 241.41V43.375C0 36.3293 5.7117 30.6176 12.7575 30.6176H53.0304C58.3239 30.6176 63.0675 27.3486 64.952 22.402L69.8752 9.47957C72.0496 3.77189 77.523 0 83.6308 0Z' fill='%239FF4C1' fill-opacity='0.4'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  /* 不进行翻转，保持原始方向 */
+  z-index: 0;
+}
+
+/* SVG 2：前层黄绿渐变主体 */
+.template-card::after {
+  content: '';
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  right: 4rpx;
+  bottom: 4rpx;
+  /* 将第二段带 Gradient 的 SVG 注入，去除了多余的内层 viewBox 空白，确保贴边 */
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='100%25' height='100%25' preserveAspectRatio='none' viewBox='8.96 7.96 186.3 263.01' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M44.4746 7.9697H21.9167C14.7642 7.9697 8.96591 13.768 8.96591 20.9205V258.019C8.96591 265.171 14.7642 270.97 21.9167 270.97H182.307C189.459 270.97 195.258 265.171 195.258 258.019V31.796C195.258 24.6435 189.459 18.8453 182.307 18.8453H65.6017C61.6062 18.8453 57.8344 17.0011 55.3808 13.8478L54.6955 12.9672C52.2419 9.8139 48.4701 7.9697 44.4746 7.9697Z' fill='url(%23paint0)'/%3E%3Cdefs%3E%3ClinearGradient id='paint0' x1='180.335' y1='254.143' x2='-41.0142' y2='116.258' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FCE17E'/%3E%3Cstop offset='1' stop-color='%237FD73D'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  /* 使用真实的 CSS filter 完美还原不规则边框的外阴影 */
+  filter: drop-shadow(2rpx 4rpx 10rpx rgba(0, 0, 0, 0.1));
+  z-index: 1;
+}
+
+/* 提高内容层级，不被背后的两层 SVG 盖住 */
+.template-card-content {
+  position: relative;
+  z-index: 2;
+  border-radius: 16rpx; /* 增加圆角 */
+  overflow: hidden;
+  transform: scale(0.95); /* 调整为 0.95 */
+  transform-origin: center;
 }
 
 .template-image-wrapper {
   position: relative;
   width: 100%;
+  background-color: #f5f5f5;
 }
 
 .template-image {
   width: 100%;
+  height: auto;
   display: block;
 }
 
-.official-badge {
-  position: absolute;
-  top: 16rpx;
-  right: 16rpx;
-  padding: 8rpx 16rpx;
-  background-color: #82F45F;
-  color: #fff;
-  font-size: 24rpx;
-  font-weight: 600;
-  border-radius: 8rpx;
-}
-
-/* 热门标签（显示在模板卡片上） */
+/* 热门标签 */
 .hot-badge {
   position: absolute;
-  top: 16rpx;
-  left: 16rpx;
-  padding: 8rpx 16rpx;
+  top: 12rpx;
+  left: 12rpx;
+  padding: 6rpx 12rpx;
   background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 100%);
   border-radius: 8rpx;
-  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.3);
-  font-size: 24rpx;
+  box-shadow: 0 4rpx 10rpx rgba(255, 107, 53, 0.3);
+  font-size: 20rpx;
   font-weight: 700;
   color: #fff;
 }
 
 .template-info {
-  padding: 16rpx;
+  padding: 20rpx 12rpx 12rpx; /* 增加内边距 */
+  background-color: #fff;
+  border-radius: 0 0 12rpx 12rpx;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx; /* 增加间距 */
 }
 
 .template-title {
+  flex: 1;
   font-size: 28rpx;
-  font-weight: 600;
+  font-weight: 700;
   color: #333;
-  margin-bottom: 12rpx;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-right: 12rpx;
+}
+
+/* 官方标签移至标题旁边 */
+.official-badge-inline {
+  width: 58rpx;
+  height: 37rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #7FD73D;
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: 600;
+  border-radius: 4rpx;
+  flex-shrink: 0;
 }
 
 .template-meta {
   display: flex;
   flex-direction: column;
-  gap: 8rpx;
+  gap: 12rpx; /* 增加间距 */
 }
 
 .author-info {
@@ -339,22 +525,24 @@
 }
 
 .stat-text {
-  font-size: 22rpx;
-  color: #666;
-  margin-right: 12rpx;
+  font-size: 20rpx;
+  color: #999;
+  margin-right: 12rpx; /* 增加间距 */
 }
 
 /* 提示消息 */
+
+/* 提示消息 */
 .template-tip {
-  margin: 0 0 24rpx 0;
-  padding: 16rpx 24rpx;
+  margin: 0 24rpx 24rpx;
+  padding: 16rpx 0;
   background-color: transparent;
   border-radius: 0;
   display: flex;
   align-items: center;
   gap: 8rpx;
   justify-content: center;
-  width: 100%;
+  width: auto;
 }
 
 .tip-text {

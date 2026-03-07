@@ -3,18 +3,19 @@
   display: flex;
   align-items: center;
   gap: 16rpx;
-  padding: 16rpx 24rpx;
+  padding: 16rpx 52rpx 16rpx 24rpx;
 }
 
 .search-input-box {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 12rpx;
-  height: 72rpx;
-  background: #f5f5f5;
-  border-radius: 36rpx;
-  padding: 0 24rpx;
+  gap: 16rpx;
+  height: 82rpx;
+  background: #ffffff;
+  border-radius: 70rpx;
+  padding: 0 32rpx;
+  box-shadow: 4rpx 4rpx 8rpx rgba(0, 0, 0, 0.07);
 }
 
 .search-icon {
@@ -24,22 +25,24 @@
 .search-input {
   flex: 1;
   height: 100%;
-  font-size: 28rpx;
+  font-size: 30rpx;
   color: #333;
 }
 
 .placeholder-style {
-  color: #999;
-  font-size: 28rpx;
+  color: #BABABA;
+  font-size: 30rpx;
 }
 
 .search-btn {
   flex-shrink: 0;
-  padding: 16rpx 32rpx;
-  background: linear-gradient(135deg, #82F45F 0%, #6FD84A 100%);
-  border-radius: 36rpx;
+  height: 54rpx;
+  padding: 0 24rpx;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, #7BDE3E 0%, #D9E817 100%);
+  border-radius: 25rpx;
   color: #fff;
-  font-size: 28rpx;
-  font-weight: 600;
-  box-shadow: 0 4rpx 12rpx rgba(130, 244, 95, 0.3);
+  font-size: 24rpx;
+  font-weight: 500;
 }

@@ -1,7 +1,9 @@
 // pages/experience/experience.js
 const app = getApp()
-const db = wx.cloud.database()
-const _ = db.command
+
+function getDB() {
+  return wx.cloud.database()
+}
 
 Page({
 
@@ -122,6 +124,7 @@ Page({
    */
   async loadBentoBoxData() {
     try {
+      const db = getDB()
       // 查询精选地点（isFeatured=true）
       const { data } = await db.collection('locations')
         .where({
@@ -226,6 +229,7 @@ Page({
     this.setData({ loading: true });
 
     try {
+      const db = getDB()
       const page = reset ? 0 : this.data.page;
       const pageSize = this.data.pageSize;
       const searchKeyword = this.data.searchKeyword;
@@ -238,9 +242,9 @@ Page({
       // 搜索功能：地点名称或描述匹配
       if (searchKeyword && searchKeyword.trim() !== '') {
         const keyword = searchKeyword.trim();
-        whereCondition = _.and([
+        whereCondition = db.command.and([
           whereCondition,
-          _.or([
+          db.command.or([
             { name: db.RegExp({ regexp: keyword, options: 'i' }) },
             { description: db.RegExp({ regexp: keyword, options: 'i' }) }
           ])
@@ -273,7 +277,7 @@ Page({
           if (location) {
             const geoPoint = db.Geo.Point(location.longitude, location.latitude);
             query = db.collection('locations')
-              .where(_.and([
+              .where(db.command.and([
                 whereCondition,
                 {
                   location: db.command.geoNear({

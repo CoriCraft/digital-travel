@@ -3,7 +3,7 @@
   <view class="nav-bar transparent" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
     <view class="nav-content">
       <view class="nav-left" bindtap="onBack">
-        <t-icon name="chevron-left" size="48rpx" color="#333" />
+        <view class="back-icon"></view>
       </view>
       <text class="nav-title">我的喜欢</text>
       <view class="nav-right-placeholder"></view>
@@ -84,7 +84,7 @@
           wx:key="_id"
           class="photo-card"
           data-id="{{item._id}}"
-          data-template-id="{{item.templateId}}"
+          data-index="{{index}}"
           bindtap="onPhotoTap"
         >
           <image class="photo-img" src="{{item.photoUrl}}" mode="aspectFill"></image>

@@ -1,6 +1,9 @@
 // pages/write-review/write-review.js
 const app = getApp()
-const db = wx.cloud.database()
+
+function getDB() {
+  return wx.cloud.database()
+}
 
 Page({
   data: {
@@ -91,6 +94,7 @@ Page({
       // 第二步：内容安全，提交评价
       wx.showLoading({ title: '提交中...', mask: true });
 
+      const db = getDB()
       const userInfo = app.globalData.userInfo;
 
       if (this.data.type === 'goods') {

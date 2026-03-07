@@ -3,7 +3,7 @@
   <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
     <view class="nav-content">
       <view class="nav-left" bindtap="onBack">
-        <t-icon name="chevron-left" size="48rpx" color="#333" />
+        <view class="back-icon"></view>
       </view>
       <view class="nav-title">消息中心</view>
       <view class="nav-right" bindtap="markAllRead">

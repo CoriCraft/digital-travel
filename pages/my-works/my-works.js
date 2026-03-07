@@ -1,6 +1,10 @@
 // pages/my-works/my-works.js
 const app = getApp()
 
+function getDB() {
+  return wx.cloud.database()
+}
+
 Page({
   data: {
     statusBarHeight: 0,
@@ -60,7 +64,7 @@ Page({
       wx.showLoading({ title: '加载中...' })
     }
 
-    const db = wx.cloud.database()
+    const db = getDB()
 
     // 加载我上传的照片
     db.collection('photos')
@@ -228,7 +232,7 @@ Page({
   deletePhoto(photoId, index) {
     wx.showLoading({ title: '删除中...' })
 
-    const db = wx.cloud.database()
+    const db = getDB()
     db.collection('photos')
       .doc(photoId)
       .remove()

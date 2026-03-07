@@ -3,7 +3,7 @@
   <view class="nav-bar transparent" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
     <view class="nav-content">
       <view class="nav-left" bindtap="onBack">
-        <t-icon name="chevron-left" size="48rpx" color="#333" />
+        <view class="back-icon"></view>
       </view>
       <text class="nav-title">我的收藏</text>
       <view class="nav-right-placeholder"></view>
@@ -38,6 +38,14 @@
       >
         <text class="tab-text">地点</text>
         <view class="tab-badge" wx:if="{{locations.length > 0}}">{{locations.length}}</view>
+      </view>
+      <view
+        class="tab-item {{currentTab === 3 ? 'active' : ''}}"
+        data-index="{{3}}"
+        bindtap="onTabChange"
+      >
+        <text class="tab-text">照片</text>
+        <view class="tab-badge" wx:if="{{photos.length > 0}}">{{photos.length}}</view>
       </view>
     </view>
 
@@ -146,6 +154,47 @@
             </view>
           </view>
           <view class="favorite-btn" catchtap="onUnfavoriteLocation" data-id="{{item._id}}" data-index="{{index}}">
+            <t-icon name="star-filled" size="40rpx" color="#FFD700" />
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 收藏的照片 -->
+    <view class="content-section" wx:if="{{currentTab === 3}}">
+      <view wx:if="{{photos.length === 0}}" class="empty">
+        <t-icon name="image" size="160rpx" color="#CCCCCC" />
+        <text class="empty-text">还没有收藏照片</text>
+        <text class="empty-tip">快去收藏你喜欢的照片吧</text>
+      </view>
+
+      <view wx:else class="photo-grid">
+        <view
+          wx:for="{{photos}}"
+          wx:key="_id"
+          class="photo-card"
+          data-id="{{item._id}}"
+          data-index="{{index}}"
+          bindtap="onPhotoTap"
+        >
+          <image class="photo-image" src="{{item.photoUrl}}" mode="aspectFill"></image>
+          <view class="photo-info">
+            <view class="photo-stats">
+              <view class="stat-item">
+                <t-icon name="browse" size="24rpx" color="#DADADA" />
+                <text class="stat-text">{{item.viewCount || 0}}</text>
+              </view>
+              <view class="stat-item">
+                <t-icon name="star-filled" size="24rpx" color="#DADADA" />
+                <text class="stat-text">{{item.favoriteCount || 0}}</text>
+              </view>
+              <view class="stat-item">
+                <t-icon name="heart-filled" size="24rpx" color="#DADADA" />
+                <text class="stat-text">{{item.likeCount || 0}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="favorite-btn" catchtap="onUnfavoritePhoto" data-id="{{item._id}}" data-index="{{index}}">
             <t-icon name="star-filled" size="40rpx" color="#FFD700" />
           </view>
         </view>

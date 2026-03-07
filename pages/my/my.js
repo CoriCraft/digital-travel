@@ -2,6 +2,10 @@
 const app = getApp()
 const { checkImageSecurity, checkOperationLimit, recordOperationTime, getRemainingTime } = require('../../utils/util.js')
 
+function getDB() {
+  return wx.cloud.database()
+}
+
 Page({
 
   /**
@@ -62,7 +66,7 @@ Page({
       return
     }
 
-    const db = wx.cloud.database()
+    const db = getDB()
 
     // 统计打卡拍摄点数量
     db.collection('check_ins')

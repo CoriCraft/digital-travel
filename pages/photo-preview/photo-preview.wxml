@@ -10,7 +10,7 @@
   <!-- 顶部工具栏 -->
   <view class="top-toolbar" wx:if="{{showToolbar}}" style="--status-bar-height: {{statusBarHeight}}px;">
     <view class="toolbar-left" bindtap="onBack">
-      <t-icon name="chevron-left" size="48rpx" color="#fff" />
+      <view class="back-icon back-icon-white"></view>
     </view>
     <view class="toolbar-center">
       <text class="photo-index">{{currentIndex + 1}} / {{photos.length}}</text>

@@ -1,6 +1,11 @@
 // pages/location-detail/location-detail.js
 const app = getApp()
-const db = wx.cloud.database()
+
+function getDB() {
+  return wx.cloud.database()
+}
+
+const interaction = require('../../utils/interaction.js')
 
 Page({
 
@@ -43,6 +48,7 @@ Page({
     try {
       this.setData({ loading: true });
 
+      const db = getDB()
       const { data } = await db.collection('locations')
         .doc(id)
         .get();
@@ -85,73 +91,40 @@ Page({
   /**
    * 检查收藏状态
    */
-  checkFavoriteStatus(locationId) {
-    const favoriteLocations = wx.getStorageSync('favoriteLocations') || [];
-    const isFavorite = favoriteLocations.includes(locationId);
-    this.setData({ isFavorite });
+  async checkFavoriteStatus(locationId) {
+    const isFavorite = await interaction.checkFavoriteStatus(locationId, 'location')
+    this.setData({ isFavorite })
   },
 
   /**
    * 切换收藏状态
    */
-  onToggleFavorite() {
-    const { isFavorite, locationId, location } = this.data;
-    let favoriteLocations = wx.getStorageSync('favoriteLocations') || [];
+  async onToggleFavorite() {
+    const { isFavorite, locationId } = this.data
 
-    const db = wx.cloud.database();
-    const _ = db.command;
+    // 乐观更新UI
+    this.setData({ isFavorite: !isFavorite })
 
-    if (isFavorite) {
-      // 取消收藏
-      favoriteLocations = favoriteLocations.filter(id => id !== locationId);
-      // 数据库收藏量 -1
-      const currentCount = location.favoriteCount || 0;
-      if (currentCount > 0) {
-        db.collection('locations')
-          .doc(locationId)
-          .update({
-            data: { favoriteCount: _.inc(-1) }
-          })
-          .then(() => {
-            console.log('收藏量-1');
-            this.setData({
-              'location.favoriteCount': currentCount - 1
-            });
-          })
-          .catch(err => {
-            console.error('更新收藏量失败:', err);
-          });
-      }
+    // 调用统一接口
+    const result = await interaction.toggleFavorite(locationId, 'location', 'locations')
+
+    if (result.success) {
+      // 更新成功，显示提示
       wx.showToast({
-        title: '已取消收藏',
+        title: result.isFavorite ? '收藏成功' : '已取消收藏',
         icon: 'success'
-      });
+      })
+
+      // 重新加载地点详情以更新计数
+      this.loadLocationDetail(locationId)
     } else {
-      // 添加收藏
-      favoriteLocations.push(locationId);
-      // 数据库收藏量 +1
-      db.collection('locations')
-        .doc(locationId)
-        .update({
-          data: { favoriteCount: _.inc(1) }
-        })
-        .then(() => {
-          console.log('收藏量+1');
-          this.setData({
-            'location.favoriteCount': (location.favoriteCount || 0) + 1
-          });
-        })
-        .catch(err => {
-          console.error('更新收藏量失败:', err);
-        });
+      // 更新失败，回滚UI
+      this.setData({ isFavorite: isFavorite })
       wx.showToast({
-        title: '收藏成功',
-        icon: 'success'
-      });
+        title: result.message || '操作失败',
+        icon: 'none'
+      })
     }
-
-    wx.setStorageSync('favoriteLocations', favoriteLocations);
-    this.setData({ isFavorite: !isFavorite });
   },
 
   /**
@@ -159,6 +132,7 @@ Page({
    */
   async checkCheckInStatus(locationId) {
     try {
+      const db = getDB()
       const userInfo = app.globalData.userInfo;
       if (!userInfo || !userInfo.openid) {
         return;
@@ -241,6 +215,7 @@ Page({
 
       wx.showLoading({ title: '打卡中...' });
 
+      const db = getDB()
       // 检查是否已经打卡过
       const checkResult = await db.collection('check_ins')
         .where({
@@ -395,6 +370,7 @@ Page({
    */
   async loadReviews(locationId) {
     try {
+      const db = getDB()
       const { data } = await db.collection('location_reviews')
         .where({ locationId })
         .orderBy('createTime', 'desc')
@@ -511,7 +487,7 @@ Page({
 
       wx.showLoading({ title: '删除中...' });
 
-      const db = wx.cloud.database();
+      const db = getDB();
 
       // 删除评论
       await db.collection('location_reviews').doc(reviewId).remove();
@@ -588,7 +564,7 @@ Page({
     try {
       wx.showLoading({ title: '提交中...' });
 
-      const db = wx.cloud.database();
+      const db = getDB();
       await db.collection('reports').add({
         data: {
           targetId,

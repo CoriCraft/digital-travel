@@ -1,5 +1,11 @@
 // pages/good-info/good-info.js
 const app = getApp()
+const interaction = require('../../utils/interaction.js')
+
+function getDB() {
+  return wx.cloud.database()
+}
+
 Page({
 
   /**
@@ -44,7 +50,7 @@ Page({
    */
   async loadGoodsDetail() {
     try {
-      const db = wx.cloud.database();
+      const db = getDB();
       const { data } = await db.collection('goods')
         .doc(this.data.goodsId)
         .get();
@@ -79,37 +85,40 @@ Page({
   /**
    * 检查收藏状态
    */
-  checkFavoriteStatus() {
-    const favoriteGoods = wx.getStorageSync('favoriteGoods') || [];
-    const isFavorite = favoriteGoods.includes(this.data.goodsId);
-    this.setData({ isFavorite });
+  async checkFavoriteStatus() {
+    const isFavorite = await interaction.checkFavoriteStatus(this.data.goodsId, 'goods')
+    this.setData({ isFavorite })
   },
 
   /**
    * 切换收藏状态
    */
-  toggleFavorite() {
-    const { goodsId, isFavorite } = this.data;
-    let favoriteGoods = wx.getStorageSync('favoriteGoods') || [];
+  async toggleFavorite() {
+    const { goodsId, isFavorite } = this.data
 
-    if (isFavorite) {
-      // 取消收藏
-      favoriteGoods = favoriteGoods.filter(id => id !== goodsId);
+    // 乐观更新UI
+    this.setData({ isFavorite: !isFavorite })
+
+    // 调用统一接口
+    const result = await interaction.toggleFavorite(goodsId, 'goods', 'goods')
+
+    if (result.success) {
+      // 更新成功，显示提示
       wx.showToast({
-        title: '已取消收藏',
+        title: result.isFavorite ? '收藏成功' : '已取消收藏',
         icon: 'success'
-      });
+      })
+
+      // 重新加载商品详情以更新计数
+      this.loadGoodsDetail()
     } else {
-      // 添加收藏
-      favoriteGoods.push(goodsId);
+      // 更新失败，回滚UI
+      this.setData({ isFavorite: isFavorite })
       wx.showToast({
-        title: '收藏成功',
-        icon: 'success'
-      });
+        title: result.message || '操作失败',
+        icon: 'none'
+      })
     }
-
-    wx.setStorageSync('favoriteGoods', favoriteGoods);
-    this.setData({ isFavorite: !isFavorite });
   },
 
   /**
@@ -147,7 +156,7 @@ Page({
 
     // 如果距离上次复制超过24小时，才增加复制量
     if (now - lastCopyTime > oneDay) {
-      const db = wx.cloud.database();
+      const db = getDB();
       const _ = db.command;
 
       db.collection('goods')
@@ -174,7 +183,7 @@ Page({
    * 增加分享次数统计
    */
   incrementShareCount() {
-    const db = wx.cloud.database();
+    const db = getDB();
     const _ = db.command;
 
     db.collection('goods')
@@ -252,7 +261,7 @@ Page({
    */
   async loadReviews() {
     try {
-      const db = wx.cloud.database();
+      const db = getDB();
       const { data } = await db.collection('goods_reviews')
         .where({
           goodsId: this.data.goodsId,
@@ -385,7 +394,7 @@ Page({
 
       wx.showLoading({ title: '删除中...' });
 
-      const db = wx.cloud.database();
+      const db = getDB();
 
       // 删除评论
       await db.collection('goods_reviews').doc(reviewId).remove();
@@ -463,7 +472,7 @@ Page({
       wx.showLoading({ title: '提交中...' });
 
       const app = getApp();
-      const db = wx.cloud.database();
+      const db = getDB();
       await db.collection('reports').add({
         data: {
           targetId,

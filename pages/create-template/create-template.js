@@ -2,6 +2,10 @@
 const app = getApp()
 const { checkImageSecurity, generateThumbnail } = require('../../utils/util.js')
 
+function getDB() {
+  return wx.cloud.database()
+}
+
 Page({
   data: {
     statusBarHeight: 0,
@@ -471,7 +475,7 @@ Page({
    */
   saveTemplate(thumbnailPaths, originalPaths) {
     return new Promise((resolve, reject) => {
-      const db = wx.cloud.database();
+      const db = getDB();
       const { name, description, category, tags } = this.data;
 
       // 获取用户信息
@@ -523,7 +527,7 @@ Page({
    */
   savePhotosToCollection(templateId, thumbnailPaths, originalPaths) {
     return new Promise((resolve, reject) => {
-      const db = wx.cloud.database();
+      const db = getDB();
       const userInfo = app.globalData.userInfo || {};
       const { name: templateName } = this.data;
 

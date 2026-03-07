@@ -1,5 +1,6 @@
 // app.js
 const miniShopPlugin = requirePlugin('mini-shop-plugin');
+const migration = require('./utils/migration.js');
 
 App({
   onLaunch() {
@@ -35,6 +36,30 @@ App({
 
     // 获取用户信息
     this.getUserInfo()
+
+    // 启动数据迁移（在获取用户信息后执行）
+    setTimeout(() => {
+      this.startDataMigration()
+    }, 2000)
+  },
+
+  /**
+   * 启动数据迁移
+   */
+  async startDataMigration() {
+    try {
+      console.log('[App] 检查数据迁移...')
+      const result = await migration.startMigration()
+
+      if (result.success) {
+        console.log('[App] 数据迁移成功:', result)
+      } else {
+        console.log('[App] 数据迁移未完成:', result.message)
+        // 如果是因为未登录，等待用户登录后会自动重试
+      }
+    } catch (error) {
+      console.error('[App] 数据迁移异常:', error)
+    }
   },
 
   /**

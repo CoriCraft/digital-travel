@@ -1,11 +1,12 @@
-<view class="container">
+<view class="container" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
   <!-- 自定义导航栏 -->
-  <view class="custom-nav" style="--status-bar-height: {{statusBarHeight}}px; --nav-bar-height: {{navBarHeight}}px;">
+  <view class="custom-nav">
     <view class="nav-content">
       <view class="nav-left" bindtap="onBack">
-        <t-icon name="chevron-left" size="48rpx" />
-        <text class="nav-title">创作模板</text>
+        <view class="back-icon"></view>
       </view>
+      <text class="nav-title">创作模板</text>
+      <view class="nav-right-placeholder"></view>
     </view>
   </view>
 
@@ -15,24 +16,28 @@
       <!-- 模板名称 -->
       <view class="form-item">
         <view class="form-label">
-          <text class="required">*</text>
           <text>模板名称</text>
+          <text class="required">*</text>
         </view>
-        <t-input
-          placeholder="请输入模板名称"
-          value="{{name}}"
-          bind:change="onNameInput"
-          maxlength="30"
-        />
+        <view class="custom-input-wrapper">
+          <input
+            class="custom-input"
+            placeholder="请输入模板名称"
+            value="{{name}}"
+            bindinput="onNameInput"
+            maxlength="30"
+          />
+        </view>
       </view>
 
       <!-- 模板描述 -->
       <view class="form-item">
         <view class="form-label">
-          <text class="required">*</text>
           <text>模板描述</text>
+          <text class="required">*</text>
         </view>
         <t-textarea
+          class="desc-textarea"
           placeholder="请输入模板描述"
           value="{{description}}"
           bind:change="onDescInput"
@@ -44,25 +49,30 @@
       <!-- 分类选择 -->
       <view class="form-item">
         <view class="form-label">
-          <text class="required">*</text>
           <text>模板分类</text>
+          <text class="required">*</text>
         </view>
-        <t-radio-group value="{{category}}" bindchange="onCategoryChange">
-          <t-radio
-            wx:for="{{categoryList}}"
-            wx:key="value"
-            value="{{item.value}}"
-            label="{{item.label}}"
-            block
-          />
-        </t-radio-group>
+        <view class="radio-group-container">
+          <t-radio-group value="{{category}}" bindchange="onCategoryChange">
+            <t-radio
+              class="custom-radio"
+              wx:for="{{categoryList}}"
+              wx:key="value"
+              value="{{item.value}}"
+              label="{{item.label}}"
+              icon="circle"
+              borderless
+              block
+            />
+          </t-radio-group>
+        </view>
       </view>
 
       <!-- 标签 -->
       <view class="form-item">
         <view class="form-label">
-          <text class="required">*</text>
           <text>标签（最多5个）</text>
+          <text class="required">*</text>
         </view>
         <view class="tag-input-wrapper">
           <t-input
@@ -93,8 +103,8 @@
       <!-- 照片上传（1-9张） -->
       <view class="form-item">
         <view class="form-label">
-          <text class="required">*</text>
           <text>照片（1-9张，第一张作为封面）</text>
+          <text class="required">*</text>
         </view>
         <view class="photos-grid">
           <!-- 已上传的照片 -->
@@ -108,16 +118,23 @@
           <!-- 上传按钮 -->
           <view class="photo-upload-btn" wx:if="{{photos.length < 9}}" bindtap="onChoosePhotos">
             <view class="upload-btn-content">
-              <t-icon name="add" size="64rpx" color="#999" />
+              <t-icon name="add" size="82rpx" color="#C4C4C4" />
               <text class="upload-hint">{{photos.length === 0 ? '上传照片' : '继续添加'}}</text>
             </view>
           </view>
         </view>
       </view>
 
+      <!-- 提示信息 -->
+      <view class="form-tips">
+        <t-icon name="error-circle" size="32rpx" color="#FF5238" />
+        <text class="tips-text">创建的模板需要审核通过后才会显示</text>
+      </view>
+
       <!-- 提交按钮 -->
       <view class="submit-section">
         <t-button
+          class="submit-btn"
           theme="primary"
           size="large"
           bindtap="onSubmit"
@@ -126,12 +143,6 @@
         >
           {{submitting ? '创建中...' : '创建模板'}}
         </t-button>
-      </view>
-
-      <!-- 提示信息 -->
-      <view class="form-tips">
-        <t-icon name="info-circle" size="28rpx" color="#ff6b35" />
-        <text class="tips-text">创建的模板需要审核通过后才会显示</text>
       </view>
     </view>
   </view>

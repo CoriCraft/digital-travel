@@ -2,6 +2,10 @@
 const app = getApp()
 const { checkImageSecurity, generateThumbnail } = require('../../utils/util.js')
 
+function getDB() {
+  return wx.cloud.database()
+}
+
 Page({
   /**
    * 页面的初始数据
@@ -34,7 +38,7 @@ Page({
    * 加载模板信息
    */
   loadTemplateInfo() {
-    const db = wx.cloud.database();
+    const db = getDB();
     db.collection('templates')
       .doc(this.data.templateId)
       .get()
@@ -190,7 +194,7 @@ Page({
       const userInfo = app.globalData.userInfo || {};
 
       // 创建照片记录（保存缩略图和原图两个URL）
-      const db = wx.cloud.database();
+      const db = getDB();
       const _ = db.command;
       const createResult = await db.collection('photos').add({
         data: {
