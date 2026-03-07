@@ -100,9 +100,9 @@
                 <view class="stats-info">
                   <t-icon name="image" size="22rpx" color="#999" />
                   <text class="stat-text">{{item.photoSetCount || 0}}</text>
-                  <t-icon name="star-filled" size="22rpx" color="#FFD700" />
+                  <t-icon name="star-filled" size="22rpx" color="{{item.isFavorited ? '#FFD700' : '#DADADA'}}" />
                   <text class="stat-text">{{item.favoriteCount || 0}}</text>
-                  <t-icon name="heart-filled" size="22rpx" color="#FF4444" />
+                  <t-icon name="heart-filled" size="22rpx" color="{{item.isLiked ? '#FF4444' : '#DADADA'}}" />
                   <text class="stat-text">{{item.likeCount || 0}}</text>
                 </view>
               </view>
@@ -131,9 +131,9 @@
                 <view class="stats-info">
                   <t-icon name="image" size="22rpx" color="#999" />
                   <text class="stat-text">{{item.photoSetCount || 0}}</text>
-                  <t-icon name="star-filled" size="22rpx" color="#FFD700" />
+                  <t-icon name="star-filled" size="22rpx" color="{{item.isFavorited ? '#FFD700' : '#DADADA'}}" />
                   <text class="stat-text">{{item.favoriteCount || 0}}</text>
-                  <t-icon name="heart-filled" size="22rpx" color="#FF4444" />
+                  <t-icon name="heart-filled" size="22rpx" color="{{item.isLiked ? '#FF4444' : '#DADADA'}}" />
                   <text class="stat-text">{{item.likeCount || 0}}</text>
                 </view>
               </view>
