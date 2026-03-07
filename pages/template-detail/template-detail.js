@@ -698,12 +698,6 @@ Page({
   /**
    * 照片收藏
    */
-    });
-  },
-
-  /**
-   * 照片收藏
-   */
   async onPhotoFavorite(e) {
     const { photoId } = e.currentTarget.dataset;
     const { photos, leftColumnPhotos, rightColumnPhotos, templateId } = this.data;
