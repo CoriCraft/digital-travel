@@ -318,42 +318,37 @@ Page({
     try {
       wx.showLoading({ title: '处理中...' })
 
-      const db = getDB()
       const userInfo = app.globalData.userInfo
       if (!userInfo || !userInfo.openid) {
+        wx.hideLoading()
         wx.showToast({ title: '请先登录', icon: 'none' })
         return
       }
 
-      // 删除收藏记录
-      await db.collection('user_favorites')
-        .where({
-          userId: userInfo.openid,
-          targetId: id,
-          targetType: 'template'
+      // 使用统一的 interaction 模块取消收藏
+      const result = await interaction.toggleFavorite(id, 'template', 'templates')
+
+      if (result.success) {
+        // 从列表中移除
+        const templates = this.data.templates
+        templates.splice(index, 1)
+        this.setData({ templates })
+
+        wx.hideLoading()
+        wx.showToast({
+          title: '已取消收藏',
+          icon: 'success'
         })
-        .remove()
 
-      // 更新模板的收藏数
-      await db.collection('templates').doc(id).update({
-        data: {
-          favoriteCount: db.command.inc(-1)
-        }
-      })
-
-      // 从列表中移除
-      const templates = this.data.templates
-      templates.splice(index, 1)
-      this.setData({ templates })
-
-      wx.hideLoading()
-      wx.showToast({
-        title: '已取消收藏',
-        icon: 'success'
-      })
-
-      // 清除缓存
-      wx.removeStorageSync(`favorite_status_template_${id}`)
+        // 清除相关缓存
+        wx.removeStorageSync(`template_cache_${id}`)
+      } else {
+        wx.hideLoading()
+        wx.showToast({
+          title: result.message || '操作失败',
+          icon: 'none'
+        })
+      }
     } catch (error) {
       console.error('取消收藏失败:', error)
       wx.hideLoading()
@@ -381,42 +376,34 @@ Page({
     try {
       wx.showLoading({ title: '处理中...' })
 
-      const db = getDB()
       const userInfo = app.globalData.userInfo
       if (!userInfo || !userInfo.openid) {
+        wx.hideLoading()
         wx.showToast({ title: '请先登录', icon: 'none' })
         return
       }
 
-      // 删除收藏记录
-      await db.collection('user_favorites')
-        .where({
-          userId: userInfo.openid,
-          targetId: id,
-          targetType: 'goods'
+      // 使用统一的 interaction 模块取消收藏
+      const result = await interaction.toggleFavorite(id, 'goods', 'goods')
+
+      if (result.success) {
+        // 从列表中移除
+        const goods = this.data.goods
+        goods.splice(index, 1)
+        this.setData({ goods })
+
+        wx.hideLoading()
+        wx.showToast({
+          title: '已取消收藏',
+          icon: 'success'
         })
-        .remove()
-
-      // 更新商品的收藏数
-      await db.collection('goods').doc(id).update({
-        data: {
-          favoriteCount: db.command.inc(-1)
-        }
-      })
-
-      // 从列表中移除
-      const goods = this.data.goods
-      goods.splice(index, 1)
-      this.setData({ goods })
-
-      wx.hideLoading()
-      wx.showToast({
-        title: '已取消收藏',
-        icon: 'success'
-      })
-
-      // 清除缓存
-      wx.removeStorageSync(`favorite_status_goods_${id}`)
+      } else {
+        wx.hideLoading()
+        wx.showToast({
+          title: result.message || '操作失败',
+          icon: 'none'
+        })
+      }
     } catch (error) {
       console.error('取消收藏失败:', error)
       wx.hideLoading()
@@ -444,42 +431,34 @@ Page({
     try {
       wx.showLoading({ title: '处理中...' })
 
-      const db = getDB()
       const userInfo = app.globalData.userInfo
       if (!userInfo || !userInfo.openid) {
+        wx.hideLoading()
         wx.showToast({ title: '请先登录', icon: 'none' })
         return
       }
 
-      // 删除收藏记录
-      await db.collection('user_favorites')
-        .where({
-          userId: userInfo.openid,
-          targetId: id,
-          targetType: 'location'
+      // 使用统一的 interaction 模块取消收藏
+      const result = await interaction.toggleFavorite(id, 'location', 'locations')
+
+      if (result.success) {
+        // 从列表中移除
+        const locations = this.data.locations
+        locations.splice(index, 1)
+        this.setData({ locations })
+
+        wx.hideLoading()
+        wx.showToast({
+          title: '已取消收藏',
+          icon: 'success'
         })
-        .remove()
-
-      // 更新地点的收藏数
-      await db.collection('locations').doc(id).update({
-        data: {
-          favoriteCount: db.command.inc(-1)
-        }
-      })
-
-      // 从列表中移除
-      const locations = this.data.locations
-      locations.splice(index, 1)
-      this.setData({ locations })
-
-      wx.hideLoading()
-      wx.showToast({
-        title: '已取消收藏',
-        icon: 'success'
-      })
-
-      // 清除缓存
-      wx.removeStorageSync(`favorite_status_location_${id}`)
+      } else {
+        wx.hideLoading()
+        wx.showToast({
+          title: result.message || '操作失败',
+          icon: 'none'
+        })
+      }
     } catch (error) {
       console.error('取消收藏失败:', error)
       wx.hideLoading()
@@ -507,42 +486,40 @@ Page({
     try {
       wx.showLoading({ title: '处理中...' })
 
-      const db = getDB()
       const userInfo = app.globalData.userInfo
       if (!userInfo || !userInfo.openid) {
+        wx.hideLoading()
         wx.showToast({ title: '请先登录', icon: 'none' })
         return
       }
 
-      // 删除收藏记录
-      await db.collection('user_favorites')
-        .where({
-          userId: userInfo.openid,
-          targetId: id,
-          targetType: 'photo'
+      // 使用统一的 interaction 模块取消收藏
+      const result = await interaction.toggleFavorite(id, 'photo', 'photos')
+
+      if (result.success) {
+        // 从列表中移除
+        const photos = this.data.photos
+        photos.splice(index, 1)
+        this.setData({ photos })
+
+        wx.hideLoading()
+        wx.showToast({
+          title: '已取消收藏',
+          icon: 'success'
         })
-        .remove()
 
-      // 更新照片的收藏数
-      await db.collection('photos').doc(id).update({
-        data: {
-          favoriteCount: db.command.inc(-1)
+        // 清除相关缓存
+        const photo = this.data.photos.find(p => p._id === id)
+        if (photo && photo.templateId) {
+          wx.removeStorageSync(`photos_cache_${photo.templateId}`)
         }
-      })
-
-      // 从列表中移除
-      const photos = this.data.photos
-      photos.splice(index, 1)
-      this.setData({ photos })
-
-      wx.hideLoading()
-      wx.showToast({
-        title: '已取消收藏',
-        icon: 'success'
-      })
-
-      // 清除缓存
-      wx.removeStorageSync(`favorite_status_photo_${id}`)
+      } else {
+        wx.hideLoading()
+        wx.showToast({
+          title: result.message || '操作失败',
+          icon: 'none'
+        })
+      }
     } catch (error) {
       console.error('取消收藏失败:', error)
       wx.hideLoading()

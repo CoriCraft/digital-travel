@@ -194,42 +194,37 @@ Page({
     try {
       wx.showLoading({ title: '处理中...' })
 
-      const db = getDB()
       const userInfo = app.globalData.userInfo
       if (!userInfo || !userInfo.openid) {
+        wx.hideLoading()
         wx.showToast({ title: '请先登录', icon: 'none' })
         return
       }
 
-      // 删除点赞记录
-      await db.collection('user_likes')
-        .where({
-          userId: userInfo.openid,
-          targetId: id,
-          targetType: 'template'
+      // 使用统一的 interaction 模块取消点赞
+      const result = await interaction.toggleLike(id, 'template', 'templates')
+
+      if (result.success) {
+        // 从列表中移除
+        const templates = this.data.templates
+        templates.splice(index, 1)
+        this.setData({ templates })
+
+        wx.hideLoading()
+        wx.showToast({
+          title: '已取消点赞',
+          icon: 'success'
         })
-        .remove()
 
-      // 更新模板的点赞数
-      await db.collection('templates').doc(id).update({
-        data: {
-          likeCount: db.command.inc(-1)
-        }
-      })
-
-      // 从列表中移除
-      const templates = this.data.templates
-      templates.splice(index, 1)
-      this.setData({ templates })
-
-      wx.hideLoading()
-      wx.showToast({
-        title: '已取消点赞',
-        icon: 'success'
-      })
-
-      // 清除缓存
-      wx.removeStorageSync(`like_status_template_${id}`)
+        // 清除相关缓存
+        wx.removeStorageSync(`template_cache_${id}`)
+      } else {
+        wx.hideLoading()
+        wx.showToast({
+          title: result.message || '操作失败',
+          icon: 'none'
+        })
+      }
     } catch (error) {
       console.error('取消点赞失败:', error)
       wx.hideLoading()
@@ -273,42 +268,40 @@ Page({
     try {
       wx.showLoading({ title: '处理中...' })
 
-      const db = getDB()
       const userInfo = app.globalData.userInfo
       if (!userInfo || !userInfo.openid) {
+        wx.hideLoading()
         wx.showToast({ title: '请先登录', icon: 'none' })
         return
       }
 
-      // 删除点赞记录
-      await db.collection('user_likes')
-        .where({
-          userId: userInfo.openid,
-          targetId: id,
-          targetType: 'photo'
+      // 使用统一的 interaction 模块取消点赞
+      const result = await interaction.toggleLike(id, 'photo', 'photos')
+
+      if (result.success) {
+        // 从列表中移除
+        const photos = this.data.photos
+        photos.splice(index, 1)
+        this.setData({ photos })
+
+        wx.hideLoading()
+        wx.showToast({
+          title: '已取消点赞',
+          icon: 'success'
         })
-        .remove()
 
-      // 更新照片的点赞数
-      await db.collection('photos').doc(id).update({
-        data: {
-          likeCount: db.command.inc(-1)
+        // 清除相关缓存
+        const photo = this.data.photos.find(p => p._id === id)
+        if (photo && photo.templateId) {
+          wx.removeStorageSync(`photos_cache_${photo.templateId}`)
         }
-      })
-
-      // 从列表中移除
-      const photos = this.data.photos
-      photos.splice(index, 1)
-      this.setData({ photos })
-
-      wx.hideLoading()
-      wx.showToast({
-        title: '已取消点赞',
-        icon: 'success'
-      })
-
-      // 清除缓存
-      wx.removeStorageSync(`like_status_photo_${id}`)
+      } else {
+        wx.hideLoading()
+        wx.showToast({
+          title: result.message || '操作失败',
+          icon: 'none'
+        })
+      }
     } catch (error) {
       console.error('取消点赞失败:', error)
       wx.hideLoading()
