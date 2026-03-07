@@ -55,8 +55,37 @@ Page({
       statusBarHeight
     });
 
+    // 检查照片的点赞和收藏状态
+    this.checkPhotoStatus(currentPhoto._id);
+
     // 增加当前照片的浏览量
     this.increasePhotoViewCount(currentPhoto._id);
+  },
+
+  /**
+   * 检查照片的点赞和收藏状态
+   */
+  async checkPhotoStatus(photoId) {
+    const { photos, currentIndex } = this.data;
+    const photo = photos.find(p => p._id === photoId);
+    if (!photo) return;
+
+    // 检查点赞状态
+    const isLiked = await interaction.checkLikeStatus(photoId, 'photo');
+    photo.isLiked = isLiked;
+
+    // 检查收藏状态
+    const isFavorited = await interaction.checkFavoriteStatus(photoId, 'photo');
+    photo.isFavorited = isFavorited;
+
+    // 更新数据
+    this.setData({
+      photos,
+      currentPhoto: photos[currentIndex]
+    });
+
+    // 更新缓存
+    wx.setStorageSync('previewPhotos', photos);
   },
 
   /**
@@ -75,6 +104,9 @@ Page({
       currentPhoto,
       isMyPhoto
     });
+
+    // 检查新照片的点赞和收藏状态
+    this.checkPhotoStatus(currentPhoto._id);
 
     // 增加新照片的浏览量
     this.increasePhotoViewCount(currentPhoto._id);

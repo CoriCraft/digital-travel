@@ -245,8 +245,13 @@ Page({
    */
   onPhotoTap(e) {
     const { id, index } = e.currentTarget.dataset
-    // 将照片列表存入缓存供预览页使用
-    wx.setStorageSync('previewPhotos', this.data.photos)
+    // 将照片列表存入缓存供预览页使用，并标记为已点赞
+    const photos = this.data.photos.map(p => ({
+      ...p,
+      isLiked: true  // 从点赞列表进入，标记为已点赞
+    }))
+    wx.setStorageSync('previewPhotos', photos)
+    wx.setStorageSync('previewPhotosTemplateId', '')
     wx.navigateTo({
       url: `/pages/photo-preview/photo-preview?currentIndex=${index}`
     })
