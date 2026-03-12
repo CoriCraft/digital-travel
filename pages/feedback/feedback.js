@@ -21,7 +21,8 @@ Page({
     images: [],
     contact: '',
     submitting: false,
-    historyList: []
+    historyList: [],
+    showSuccessPopup: false
   },
 
   onLoad(options) {
@@ -146,7 +147,7 @@ Page({
     this.setData({ submitting: true })
 
     try {
-      const userInfo = app.globalData.userInfo
+      const userInfo = await app.ensureUserInfo()
       const db = getDB()
 
       // 上传图片到云存储
@@ -184,23 +185,21 @@ Page({
       })
 
       wx.hideLoading()
-      wx.showToast({
-        title: '提交成功',
-        icon: 'success'
-      })
 
-      // 清空表单
+      // 清空表单并显示成功弹窗
       this.setData({
         content: '',
         images: [],
         contact: '',
-        submitting: false
+        submitting: false,
+        showSuccessPopup: true
       })
 
-      // 重新加载历史
+      // 重新加载历史并在2秒后自动关闭弹窗
       setTimeout(() => {
+        this.setData({ showSuccessPopup: false })
         this.loadHistory()
-      }, 1000)
+      }, 2000)
 
     } catch (err) {
       console.error('提交反馈失败:', err)
@@ -218,7 +217,7 @@ Page({
    */
   async loadHistory() {
     try {
-      const userInfo = app.globalData.userInfo
+      const userInfo = await app.ensureUserInfo()
       if (!userInfo || !userInfo.openid) {
         return
       }

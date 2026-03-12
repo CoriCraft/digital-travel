@@ -8,6 +8,8 @@ page {
 .container {
   height: 100%;
   width: 100%;
+  padding: 0; /* 覆盖全局的 padding: 200rpx 0 */
+  display: block; /* 覆盖全局的 flex 布局 */
 }
 
 /* 导航栏 */
@@ -61,6 +63,8 @@ page {
 .main-scroll {
   height: 100%;
   width: 100%;
+  padding-top: 32rpx;
+  box-sizing: border-box;
 }
 
 /* 区块 */
@@ -69,10 +73,13 @@ page {
 }
 
 .section-title {
-  font-size: 28rpx;
-  font-weight: 500;
-  color: #333;
-  padding: 24rpx 24rpx 16rpx;
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 32rpx;
+  line-height: 40rpx;
+  color: #3E3E3E;
+  padding: 24rpx 52rpx 16rpx;
 }
 
 .required {
@@ -84,73 +91,121 @@ page {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16rpx;
-  padding: 0 24rpx;
+  padding: 0 52rpx;
 }
 
 .type-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 12rpx;
-  padding: 24rpx 16rpx;
+  height: 154rpx;
+  box-sizing: border-box;
   background: #FFFFFF;
-  border-radius: 16rpx;
+  border-radius: 20rpx;
   border: 2rpx solid transparent;
-  transition: all 0.3s;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
 }
 
 .type-item.active {
-  border-color: #3ECE79;
-  background: rgba(62, 206, 121, 0.05);
+  background: rgba(80, 255, 98, 0.08);
+  border: 2rpx solid rgba(92, 197, 53, 0.51);
 }
 
 .type-text {
-  font-size: 24rpx;
+  font-size: 28rpx;
+  line-height: 40rpx;
   color: #666;
 }
 
 .type-item.active .type-text {
-  color: #3ECE79;
-  font-weight: 500;
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-weight: 700;
+  color: #34C759;
+}
+
+/* 自定义 SVG 图标（使用 mask 技术实现颜色切换） */
+.custom-icon {
+  width: 48rpx;
+  height: 48rpx;
+  background-color: #8B8B8B;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  transition: background-color 0.2s ease;
+}
+
+.type-item.active .custom-icon {
+  background-color: #34C759;
+}
+
+.icon-bug {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='9' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='12' y='16' width='0.01' height='0.01' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M12 12L12 8' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='9' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='12' y='16' width='0.01' height='0.01' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M12 12L12 8' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.icon-suggestion {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='9' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='12' y='16' width='0.01' height='0.01' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M10.5858 7.5856C10.9754 7.19597 11.4858 7.00071 11.9965 6.99982C12.5095 6.99892 13.0228 7.19418 13.4142 7.5856C13.8047 7.97613 14 8.48797 14 8.99982C14 9.5117 13.8047 10.0235 13.4142 10.414C13.0228 10.8054 12.5095 11.0007 11.9965 10.9998L12 11.9998' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='9' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='12' y='16' width='0.01' height='0.01' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M10.5858 7.5856C10.9754 7.19597 11.4858 7.00071 11.9965 6.99982C12.5095 6.99892 13.0228 7.19418 13.4142 7.5856C13.8047 7.97613 14 8.48797 14 8.99982C14 9.5117 13.8047 10.0235 13.4142 10.414C13.0228 10.8054 12.5095 11.0007 11.9965 10.9998L12 11.9998' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.icon-content {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='9' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 10L10 14' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M10 10L14 14' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='9' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 10L10 14' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M10 10L14 14' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.icon-other {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='11.999' r='9' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='12.01' y='11.999' width='0.01' height='0.01' transform='rotate(90 12.01 11.999)' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3Crect x='16.51' y='11.999' width='0.01' height='0.01' transform='rotate(90 16.51 11.999)' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3Crect x='7.51' y='11.999' width='0.01' height='0.01' transform='rotate(90 7.51 11.999)' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='11.999' r='9' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='12.01' y='11.999' width='0.01' height='0.01' transform='rotate(90 12.01 11.999)' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3Crect x='16.51' y='11.999' width='0.01' height='0.01' transform='rotate(90 16.51 11.999)' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3Crect x='7.51' y='11.999' width='0.01' height='0.01' transform='rotate(90 7.51 11.999)' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 /* 文本域 */
 .textarea-wrapper {
   background: #FFFFFF;
-  margin: 0 24rpx;
-  border-radius: 16rpx;
-  padding: 24rpx;
+  margin: 0 46rpx;
+  border-radius: 20rpx;
+  padding: 36rpx;
+  height: 364rpx;
+  box-sizing: border-box;
   position: relative;
 }
 
 .feedback-textarea {
   width: 100%;
-  min-height: 240rpx;
+  height: 240rpx;
+  font-weight: 100;
   font-size: 28rpx;
-  color: #333;
-  line-height: 1.6;
+  line-height: 40rpx;
+  color: #333333;
 }
 
 .char-count {
-  text-align: right;
-  font-size: 24rpx;
-  color: #999;
-  margin-top: 12rpx;
+  position: absolute;
+  right: 36rpx;
+  bottom: 28rpx;
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-weight: 500;
+  font-size: 30rpx;
+  line-height: 40rpx;
+  color: #8B8B8B;
 }
 
 /* 图片上传 */
 .image-upload {
   display: flex;
   gap: 16rpx;
-  padding: 0 24rpx;
+  padding: 0 46rpx;
   flex-wrap: wrap;
 }
 
 .image-item {
-  width: 200rpx;
-  height: 200rpx;
+  width: 246rpx;
+  height: 246rpx;
   position: relative;
-  border-radius: 12rpx;
+  border-radius: 20rpx;
   overflow: hidden;
 }
 
@@ -161,8 +216,8 @@ page {
 
 .image-delete {
   position: absolute;
-  top: 8rpx;
-  right: 8rpx;
+  top: 12rpx;
+  right: 12rpx;
   width: 48rpx;
   height: 48rpx;
   background: rgba(0, 0, 0, 0.5);
@@ -173,11 +228,12 @@ page {
 }
 
 .image-add {
-  width: 200rpx;
-  height: 200rpx;
+  width: 246rpx;
+  height: 246rpx;
+  box-sizing: border-box;
   background: #FFFFFF;
-  border: 2rpx dashed #DDDDDD;
-  border-radius: 12rpx;
+  border: 2rpx dashed #8B8B8B;
+  border-radius: 20rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -185,53 +241,85 @@ page {
   gap: 8rpx;
 }
 
+.add-icon {
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-weight: 500;
+  font-size: 80rpx;
+  line-height: 54rpx;
+  color: #8B8B8B;
+}
+
 .add-text {
-  font-size: 24rpx;
-  color: #999;
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-weight: 500;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  color: #8B8B8B;
 }
 
 .image-tip {
-  font-size: 24rpx;
-  color: #999;
-  padding: 12rpx 24rpx 0;
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-weight: 700;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  color: rgba(139, 139, 139, 0.5);
+  padding: 16rpx 46rpx 0;
 }
 
 /* 输入框 */
 .input-wrapper {
   background: #FFFFFF;
-  margin: 0 24rpx;
-  border-radius: 16rpx;
+  margin: 0 46rpx;
+  border-radius: 20rpx;
   padding: 0 24rpx;
+  height: 82rpx;
+  display: flex;
+  align-items: center;
 }
 
 .feedback-input {
   width: 100%;
-  height: 88rpx;
+  height: 100%;
+  font-family: 'Source Han Sans CN', sans-serif;
   font-size: 28rpx;
-  color: #333;
+  color: #333333;
 }
 
 .contact-tip {
-  font-size: 24rpx;
-  color: #999;
-  padding: 12rpx 24rpx 0;
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-weight: 700;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  color: rgba(139, 139, 139, 0.5);
+  padding: 16rpx 56rpx 0;
 }
 
 /* 提交按钮 */
 .submit-section {
-  padding: 40rpx 24rpx;
+  padding: 40rpx 46rpx;
 }
 
 .submit-btn {
-  width: 100%;
-  height: 88rpx;
-  background: linear-gradient(135deg, #3ECE79 0%, #2AB361 100%);
-  border-radius: 48rpx;
+  width: 100% !important;
+  height: 96rpx;
+  background: #A4E054;
+  border-radius: 16rpx;
   font-size: 32rpx;
-  font-weight: 600;
-  color: #FFFFFF;
+  font-weight: 500;
+  color: #333333;
   border: none;
-  box-shadow: 0 8rpx 24rpx rgba(62, 206, 121, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin: 0;
+  box-sizing: border-box !important;
+  line-height: 96rpx;
+}
+
+.submit-btn::after {
+  border: none;
 }
 
 .submit-btn[disabled] {
@@ -241,13 +329,14 @@ page {
 /* 历史反馈 */
 .history-list {
   background: #FFFFFF;
-  margin: 0 24rpx;
-  border-radius: 16rpx;
+  margin: 0 46rpx;
+  border-radius: 20rpx;
   padding: 0 24rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.02);
 }
 
 .history-item {
-  padding: 24rpx 0;
+  padding: 30rpx 0;
   border-bottom: 1rpx solid #F0F0F0;
 }
 
@@ -269,12 +358,16 @@ page {
 }
 
 .history-type-text {
-  font-size: 26rpx;
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-size: 28rpx;
+  line-height: 40rpx;
   color: #666;
 }
 
 .history-status {
+  font-family: 'Source Han Sans CN', sans-serif;
   font-size: 24rpx;
+  line-height: 40rpx;
   padding: 4rpx 12rpx;
   border-radius: 8rpx;
 }
@@ -295,9 +388,10 @@ page {
 }
 
 .history-content {
+  font-family: 'Source Han Sans CN', sans-serif;
   font-size: 28rpx;
-  color: #333;
-  line-height: 1.6;
+  line-height: 40rpx;
+  color: #333333;
   margin-bottom: 12rpx;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -307,6 +401,41 @@ page {
 }
 
 .history-time {
+  font-family: 'Source Han Sans CN', sans-serif;
   font-size: 24rpx;
-  color: #999;
+  line-height: 40rpx;
+  color: #8B8B8B;
+}
+
+/* 提交成功弹窗 */
+.success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(34, 34, 34, 0.7);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-icon {
+  width: 148rpx;
+  height: 148rpx;
+  background-image: url("data:image/svg+xml,%3Csvg width='74' height='74' viewBox='0 0 74 74' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='37' cy='37' r='37' fill='%2388DA3E'/%3E%3Cpath d='M49.9832 25.8936C49.5096 25.8936 49.0156 26.049 48.6549 26.4042L32.5469 42.303C32.0714 42.7711 31.5941 42.6842 31.2204 42.1329L25.6778 33.9559C25.1117 33.1215 23.9277 32.8884 23.0786 33.4453C22.2313 34.0021 21.9945 35.1658 22.5606 36.0001L28.1013 44.1771C29.77 46.6357 33.0205 46.9484 35.1461 44.8579L51.3114 29.0163C52.0311 28.3059 52.0311 27.1146 51.3114 26.4042C50.9507 26.049 50.4549 25.8936 49.9832 25.8936Z' fill='%23FAFAFA'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.success-text {
+  margin-top: 36rpx;
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-weight: 500;
+  font-size: 32rpx;
+  line-height: 40rpx;
+  color: #FFFFFF;
+  text-align: center;
 }

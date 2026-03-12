@@ -16,8 +16,11 @@
     <!-- 搜索框 -->
     <view class="search-section">
       <view class="search-box">
-        <t-icon name="search" size="32rpx" color="#999" />
-        <input class="search-input" placeholder="搜索帮助内容" bindinput="onSearchInput" value="{{searchKeyword}}" />
+        <view class="search-icon">
+          <t-icon name="search" size="36rpx" color="#999" />
+        </view>
+        <input class="search-input" placeholder="搜索帮助内容" bindinput="onSearchInput" bindconfirm="onSearch" value="{{searchKeyword}}" placeholder-class="search-placeholder" />
+        <view class="search-btn" bindtap="onSearch">搜索</view>
       </view>
     </view>
 
@@ -32,13 +35,17 @@
           data-id="{{item.id}}"
           bindtap="onQuestionTap"
         >
-          <view class="question-header">
-            <t-icon name="help-circle" size="36rpx" color="#3ECE79" />
+          <view class="item-icon">
+            <view class="custom-help-icon"></view>
+          </view>
+          <view class="item-content">
             <text class="question-title">{{item.title}}</text>
+            <text class="question-preview" wx:if="{{!item.expanded}}">{{item.preview}}</text>
+            <view class="question-answer" wx:if="{{item.expanded}}">{{item.answer}}</view>
+          </view>
+          <view class="item-arrow">
             <t-icon name="chevron-right" size="32rpx" color="#999" />
           </view>
-          <view class="question-preview" wx:if="{{!item.expanded}}">{{item.preview}}</view>
-          <view class="question-answer" wx:if="{{item.expanded}}">{{item.answer}}</view>
         </view>
       </view>
     </view>

@@ -236,6 +236,7 @@ Page({
           // 清除用户信息
           wx.removeStorageSync('userInfo')
           app.globalData.userInfo = null
+          app.globalData.userInfoPromise = null
 
           wx.showToast({
             title: '已退出登录',

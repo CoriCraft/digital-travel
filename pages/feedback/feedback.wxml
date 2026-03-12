@@ -11,7 +11,7 @@
   </view>
 
   <!-- 主内容 -->
-  <scroll-view scroll-y class="main-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+  <scroll-view scroll-y class="main-scroll" style="padding-top: calc({{statusBarHeight + navBarHeight}}px + 32rpx);">
 
     <!-- 反馈类型 -->
     <view class="section">
@@ -24,7 +24,7 @@
           data-value="{{item.value}}"
           bindtap="onTypeSelect"
         >
-          <t-icon name="{{item.icon}}" size="36rpx" color="{{selectedType === item.value ? '#3ECE79' : '#999'}}" />
+          <view class="custom-icon icon-{{item.value}}"></view>
           <text class="type-text">{{item.label}}</text>
         </view>
       </view>
@@ -37,6 +37,8 @@
         <textarea
           class="feedback-textarea"
           placeholder="请详细描述您遇到的问题或建议，我们会认真对待每一条反馈"
+          placeholder-style="color: #8B8B8B;"
+          style="font-weight: 400;"
           maxlength="500"
           value="{{content}}"
           bindinput="onContentInput"
@@ -56,15 +58,15 @@
         >
           <image class="upload-image" src="{{item}}" mode="aspectFill"></image>
           <view class="image-delete" data-index="{{index}}" catchtap="onDeleteImage">
-            <t-icon name="close" size="28rpx" color="#FFFFFF" />
+            <t-icon name="close" size="32rpx" color="#FFFFFF" />
           </view>
         </view>
         <view class="image-add" wx:if="{{images.length < 3}}" bindtap="onChooseImage">
-          <t-icon name="add" size="48rpx" color="#999" />
+          <text class="add-icon">+</text>
           <text class="add-text">添加图片</text>
         </view>
       </view>
-      <view class="image-tip">最多上传3张图片，每张不超过5MB</view>
+      <view class="image-tip">* 最多上传3张图片，每张不超过5MB</view>
     </view>
 
     <!-- 联系方式 -->
@@ -74,6 +76,7 @@
         <input
           class="feedback-input"
           placeholder="请输入您的手机号或微信号"
+          placeholder-style="color: #8B8B8B; font-family: 'Source Han Sans CN', sans-serif; font-weight: 500;"
           value="{{contact}}"
           bindinput="onContactInput"
         />
@@ -113,4 +116,10 @@
     </view>
 
   </scroll-view>
+
+  <!-- 提交成功弹窗 -->
+  <view class="success-overlay" wx:if="{{showSuccessPopup}}">
+    <view class="success-icon"></view>
+    <text class="success-text">感谢您的反馈！</text>
+  </view>
 </view>

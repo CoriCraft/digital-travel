@@ -8,6 +8,8 @@ page {
 .container {
   height: 100%;
   width: 100%;
+  padding: 0; /* 覆盖全局的 padding: 200rpx 0 */
+  display: block; /* 覆盖全局的 flex 布局 */
 }
 
 /* 导航栏 */
@@ -65,18 +67,25 @@ page {
 
 /* 搜索区域 */
 .search-section {
-  padding: 24rpx;
-  background: #FFFFFF;
-  margin-bottom: 20rpx;
+  padding: 64rpx 32rpx 24rpx 32rpx;
+  background: transparent;
 }
 
 .search-box {
+  height: 80rpx;
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  background: #F5F5F5;
-  border-radius: 48rpx;
-  padding: 16rpx 32rpx;
+  background: #FFFFFF;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  border-radius: 40rpx;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+
+.search-icon {
+  margin-right: 12rpx;
+  display: flex;
+  align-items: center;
 }
 
 .search-input {
@@ -85,26 +94,51 @@ page {
   color: #333;
 }
 
+.search-placeholder {
+  color: #999;
+}
+
+.search-btn {
+  width: 98rpx;
+  height: 54rpx;
+  background: linear-gradient(98.63deg, #7BDE3A 2.44%, #CFDF17 95.85%);
+  border-radius: 27rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 26rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
 /* 区块 */
 .section {
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
+  background: transparent;
 }
 
 .section-title {
   font-size: 32rpx;
   font-weight: 600;
   color: #333;
-  padding: 24rpx 24rpx 16rpx;
+  padding: 16rpx 32rpx 24rpx;
 }
 
 /* 问题列表 */
 .question-list {
   background: #FFFFFF;
+  border-radius: 20rpx;
+  margin: 0 32rpx;
   padding: 0 24rpx;
+  box-shadow: 4rpx 4rpx 10rpx rgba(0, 0, 0, 0.08);
 }
 
 .question-item {
-  padding: 24rpx 0;
+  display: flex;
+  align-items: center;
+  padding: 30rpx 0;
   border-bottom: 1rpx solid #F0F0F0;
 }
 
@@ -112,24 +146,42 @@ page {
   border-bottom: none;
 }
 
-.question-header {
+.item-icon {
+  margin-right: 20rpx;
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  flex-shrink: 0;
+}
+
+.custom-help-icon {
+  width: 48rpx;
+  height: 48rpx;
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0_459_493)'%3E%3Ccircle cx='12' cy='12' r='9' stroke='%2334C759' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='12' y='16' width='0.01' height='0.01' stroke='%2334C759' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M10.5858 7.5856C10.9754 7.19597 11.4858 7.00071 11.9965 6.99982C12.5095 6.99892 13.0228 7.19418 13.4142 7.5856C13.8047 7.97613 14 8.48797 14 8.99982C14 9.51166 13.8047 10.0235 13.4142 10.414C13.0228 10.8054 12.5095 11.0007 11.9965 10.9998L12 11.9998' stroke='%2334C759' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_459_493'%3E%3Crect width='24' height='24' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .question-title {
-  flex: 1;
   font-size: 28rpx;
   font-weight: 500;
   color: #333;
+  line-height: 40rpx;
+  margin-bottom: 6rpx;
 }
 
 .question-preview {
   font-size: 24rpx;
   color: #999;
-  margin-top: 12rpx;
-  padding-left: 48rpx;
+  line-height: 40rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -146,17 +198,27 @@ page {
   white-space: pre-line;
 }
 
+.item-arrow {
+  margin-left: 16rpx;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 /* 功能指南 */
 .guide-list {
   background: #FFFFFF;
+  border-radius: 24rpx;
+  margin: 0 32rpx;
   padding: 0 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.02);
 }
 
 .guide-item {
   display: flex;
   align-items: center;
   gap: 20rpx;
-  padding: 24rpx 0;
+  padding: 30rpx 0;
   border-bottom: 1rpx solid #F0F0F0;
 }
 
@@ -195,16 +257,17 @@ page {
 /* 联系我们 */
 .contact-card {
   background: #FFFFFF;
-  margin: 0 24rpx;
-  border-radius: 16rpx;
+  border-radius: 24rpx;
+  margin: 0 32rpx;
   padding: 0 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.02);
 }
 
 .contact-item {
   display: flex;
   align-items: center;
   gap: 20rpx;
-  padding: 24rpx 0;
+  padding: 30rpx 0;
 }
 
 .contact-icon {

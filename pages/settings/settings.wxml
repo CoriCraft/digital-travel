@@ -11,7 +11,7 @@
   </view>
 
   <!-- 主内容 -->
-  <scroll-view scroll-y class="main-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+  <scroll-view scroll-y class="main-scroll" style="padding-top: calc({{statusBarHeight + navBarHeight}}px + 32rpx);">
 
     <!-- 通知设置 -->
     <view class="section">

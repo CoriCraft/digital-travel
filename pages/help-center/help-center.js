@@ -116,8 +116,15 @@ Page({
    * 搜索输入
    */
   onSearchInput(e) {
-    const keyword = e.detail.value.trim().toLowerCase()
+    const keyword = e.detail.value.trim()
     this.setData({ searchKeyword: keyword })
+  },
+
+  /**
+   * 执行搜索
+   */
+  onSearch() {
+    const keyword = this.data.searchKeyword.trim().toLowerCase()
 
     if (keyword === '') {
       this.setData({ filteredQuestions: this.data.questions })
@@ -129,6 +136,13 @@ Page({
       q.answer.toLowerCase().includes(keyword)
     )
     this.setData({ filteredQuestions: filtered })
+
+    if (filtered.length === 0) {
+      wx.showToast({
+        title: '未找到相关内容',
+        icon: 'none'
+      })
+    }
   },
 
   /**
