@@ -19,7 +19,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24rpx;
+  padding: 0 32rpx;
 }
 
 /* 左侧区域 */
@@ -78,7 +78,7 @@
 
 /* 横向搜索栏 */
 .search-bar {
-  padding: 16rpx 24rpx 24rpx 24rpx;
+  padding: 16rpx 32rpx 24rpx 32rpx;
   background: transparent;
 }
 
@@ -128,24 +128,27 @@
   box-sizing: border-box;
   white-space: nowrap;
   margin-bottom: 24rpx;
-  padding: 0 24rpx;
 }
 
 .template-filter {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  justify-content: space-between;
+  padding: 0 32rpx;
 }
 
 .filter-tag {
-  padding: 12rpx 36rpx;
+  padding: 12rpx 0;
+  width: 160rpx;
+  text-align: center;
   font-size: 28rpx;
   color: #666;
   background-color: transparent;
-  border: 2rpx solid #9DA89D; /* 修改为设计稿的未选中边框颜色 */
-  border-radius: 34rpx;       /* 17px = 34rpx */
+  border: 2rpx solid #9DA89D;
+  border-radius: 34rpx;
   flex-shrink: 0;
   transition: all 0.3s;
+  box-sizing: border-box;
 }
 
 .filter-tag.active {
@@ -158,7 +161,7 @@
 
 /* 创作模板卡片 */
 .create-template-wrapper {
-  padding: 0 24rpx;
+  padding: 0 32rpx;
   margin-bottom: 32rpx;
 }
 
@@ -288,14 +291,14 @@
   color: #fff;
   font-size: 24rpx;
   font-weight: 600;
-  padding: 12rpx 24rpx;
+  padding: 12rpx 32rpx;
   border-radius: 30rpx;
   box-shadow: 0 4rpx 10rpx rgba(255, 140, 90, 0.3);
 }
 
 /* 创作画框按钮 */
 .create-canvas-btn {
-  margin: 0 24rpx 32rpx;
+  margin: 0 32rpx 32rpx;
   padding: 32rpx;
   background: linear-gradient(135deg, rgba(143, 241, 236, 0.3) 0%, rgba(130, 244, 95, 0.3) 100%);
   border-radius: 24rpx;
@@ -330,7 +333,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24rpx 24rpx;
+  padding: 24rpx 32rpx;
   background-color: transparent;
 }
 
@@ -359,14 +362,14 @@
 
 /* 模板列表 - 瀑布流容器 */
 .template-list {
-  padding: 0 24rpx 24rpx;
+  padding: 0 32rpx 24rpx;
   background-color: transparent;
 }
 
 .waterfall-container {
   display: flex;
   justify-content: space-between;
-  gap: 16rpx;
+  gap: 20rpx;
   margin-bottom: 24rpx;
 }
 
@@ -374,8 +377,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 24rpx; /* 增加一点卡片上下间距，给文件夹切角留空间 */
-  max-width: 48%; /* 限制列宽，让卡片变窄 */
+  gap: 24rpx;
 }
 
 /* 模板卡片：使用 Figma 的双层曲线背景 */
@@ -534,7 +536,7 @@
 
 /* 提示消息 */
 .template-tip {
-  margin: 0 24rpx 24rpx;
+  margin: 0 32rpx 24rpx;
   padding: 16rpx 0;
   background-color: transparent;
   border-radius: 0;

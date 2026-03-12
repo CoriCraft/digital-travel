@@ -1,12 +1,15 @@
 /* pages/upload-photoset/upload-photoset.wxss */
-.container {
-  min-height: 100vh;
-  position: relative;
-  z-index: 1;
-  padding-bottom: 160rpx;
+page {
+  background: linear-gradient(180deg, #E6FFEA 0%, #F8F8F8 40%, #F8F8F8 100%);
 }
 
-/* 自定义导航栏 */
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 导航栏样式优化 */
 .custom-nav {
   position: fixed;
   top: 0;
@@ -14,225 +17,249 @@
   right: 0;
   z-index: 100;
   background: transparent;
-  padding-top: var(--status-bar-height);
 }
 
 .nav-content {
-  height: var(--nav-bar-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32rpx;
+  padding: 0 20rpx;
 }
 
-.nav-left, .nav-right {
-  width: 80rpx;
-  color: #fff;
+.nav-left {
+  width: 100rpx;
+  display: flex;
+  align-items: center;
 }
 
 .nav-title {
-  font-size: 36rpx;
-  font-weight: 600;
-  color: #fff;
+  font-size: 34rpx;
+  font-weight: 500;
+  color: #333;
 }
 
-/* 页面内容 */
-.page-content {
-  padding-top: calc(var(--status-bar-height) + var(--nav-bar-height) + 32rpx);
-  padding-left: 32rpx;
-  padding-right: 32rpx;
+.nav-right {
+  width: 100rpx;
 }
 
 /* 模板信息提示 */
 .template-info {
   display: flex;
   align-items: center;
-  padding: 24rpx;
-  background-color: rgba(130, 244, 95, 0.1);
-  border-radius: 16rpx;
-  margin-bottom: 32rpx;
-}
-
-.info-icon {
-  margin-right: 12rpx;
+  justify-content: center;
+  margin-bottom: 40rpx;
 }
 
 .info-text {
   font-size: 28rpx;
-  color: #82F45F;
+  color: #999;
+  margin-left: 8rpx;
 }
 
-/* 表单区域 */
-.form-section {
-  background-color: #fff;
-  border-radius: 16rpx;
-  padding: 32rpx;
+/* 外层大白色卡片 (Rectangle 87) */
+.photo-card {
+  width: 620rpx;
+  margin: 0 auto;
+  background: #FFFFFF;
+  box-shadow: 1px 2px 12rpx rgba(0, 0, 0, 0.1);
+  border-radius: 26rpx;
+  padding: 40rpx 32rpx;
+  box-sizing: border-box;
 }
 
-.form-item {
+/* 标题样式 */
+.photo-header {
+  display: flex;
+  align-items: center;
   margin-bottom: 40rpx;
+}
+
+.photo-title {
+  font-family: 'Source Han Sans CN';
+  font-weight: 500;
+  font-size: 34rpx;
+  color: #000000;
+}
+
+.photo-required {
+  color: #FF5F57;
+  margin-left: 4rpx;
+  font-size: 34rpx;
+}
+
+/* 上传触发区域 */
+.upload-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 48rpx;
+}
+
+.upload-label {
+  font-family: 'Source Han Sans CN';
+  font-size: 32rpx;
+  color: #69A42D;
+  margin-top: 24rpx;
+}
+
+/* CSS 绘制相机图标 (高度还原 Figma 细节) */
+.camera-icon-group {
   position: relative;
+  width: 100rpx;
+  height: 86rpx;
 }
 
-.form-item:last-child {
-  margin-bottom: 0;
+.icon-camera-body {
+  position: absolute;
+  bottom: 0;
+  width: 83rpx;
+  height: 59rpx;
+  background: #85CD39;
+  border-radius: 5rpx;
+  right: 0;
 }
 
-.form-label {
+.icon-camera-lens {
+  position: absolute;
+  width: 31rpx;
+  height: 31rpx;
+  border: 5rpx solid #F2F2F2;
+  border-radius: 50%;
+  left: 43rpx;
+  top: 35rpx;
+  z-index: 2;
+}
+
+.icon-plus-v, .icon-plus-h {
+  position: absolute;
+  background: #84CD39;
+  z-index: 3;
+}
+.icon-plus-v { width: 6rpx; height: 34rpx; left: 19rpx; top: 0; }
+.icon-plus-h { width: 34rpx; height: 6rpx; left: 5rpx; top: 14rpx; }
+
+/* 浅绿色提示区域 (Rectangle 88) */
+.tips-box {
+  background: #F1FFED;
+  border-radius: 26rpx;
+  padding: 30rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tip-row {
   display: flex;
   align-items: center;
   margin-bottom: 16rpx;
 }
 
-.label-text {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #333;
+.tip-row:last-child {
+  margin-bottom: 0;
 }
 
-.required {
-  color: #ff4d4f;
-  margin-left: 4rpx;
-}
-
-.label-tip {
-  font-size: 24rpx;
-  color: #999;
-  margin-left: 8rpx;
-}
-
-.form-input {
-  width: 100%;
-  height: 88rpx;
-  padding: 0 24rpx;
-  background-color: #f5f5f5;
-  border-radius: 12rpx;
-  font-size: 28rpx;
-  color: #333;
-}
-
-.form-textarea {
-  width: 100%;
-  min-height: 200rpx;
-  padding: 24rpx;
-  background-color: #f5f5f5;
-  border-radius: 12rpx;
-  font-size: 28rpx;
-  color: #333;
-}
-
-.input-counter {
-  position: absolute;
-  right: 0;
-  bottom: -32rpx;
-  font-size: 24rpx;
-  color: #999;
-}
-
-/* 照片网格 */
-.photo-grid {
-  display: flex;
-  flex-wrap: wrap;
-  margin: -12rpx;
-}
-
-.photo-item {
+/* 绿色勾选图标 */
+.check-icon {
+  width: 32rpx;
+  height: 32rpx;
+  border: 4rpx solid #7FD73D;
+  border-radius: 50%;
+  margin-right: 20rpx;
   position: relative;
-  width: 200rpx;
-  height: 200rpx;
-  margin: 12rpx;
-  border-radius: 12rpx;
-  overflow: hidden;
 }
 
-.photo-preview {
+.check-icon::after {
+  content: '';
+  position: absolute;
+  width: 16rpx;
+  height: 8rpx;
+  border-left: 3rpx solid #7FD73D;
+  border-bottom: 3rpx solid #7FD73D;
+  transform: rotate(-45deg);
+  left: 6rpx;
+  top: 6rpx;
+}
+
+.tip-content {
+  font-family: 'Source Han Sans CN';
+  font-size: 28rpx;
+  line-height: 40rpx;
+  color: #757575;
+}
+
+/* 图片预览 */
+.photo-preview-wrapper {
+  position: relative;
+  width: 100%;
+  height: 400rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  margin-bottom: 40rpx;
+}
+
+.photo-preview-large {
   width: 100%;
   height: 100%;
 }
 
-.photo-delete {
+.photo-delete-btn {
   position: absolute;
-  top: 8rpx;
-  right: 8rpx;
-  width: 48rpx;
-  height: 48rpx;
-  background-color: rgba(0, 0, 0, 0.6);
+  top: 16rpx;
+  right: 16rpx;
+  background: rgba(0,0,0,0.5);
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 8rpx;
 }
 
-.photo-add {
-  width: 200rpx;
-  height: 200rpx;
-  margin: 12rpx;
-  background-color: #f5f5f5;
-  border: 2rpx dashed #ddd;
-  border-radius: 12rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.add-text {
-  font-size: 24rpx;
-  color: #999;
-  margin-top: 8rpx;
-}
-
-/* 上传提示 */
-.upload-tips {
-  margin-top: 48rpx;
-  padding: 24rpx;
-  background-color: #f9f9f9;
-  border-radius: 12rpx;
-}
-
-.tip-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 16rpx;
-}
-
-.tip-item:last-child {
-  margin-bottom: 0;
-}
-
-.tip-text {
-  font-size: 26rpx;
-  color: #666;
-  margin-left: 8rpx;
-}
-
-/* 底部提交按钮 */
-.submit-bar {
+/* 底部提交按钮区域容器 */
+.footer-safe-area {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 24rpx 32rpx;
-  background-color: #fff;
-  border-top: 1px solid #f0f0f0;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
+  background: transparent;
   z-index: 100;
 }
 
-.submit-btn {
-  width: 100%;
-  height: 88rpx;
-  background: linear-gradient(135deg, #82F45F 0%, #6FD84A 100%);
-  border-radius: 12rpx;
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #fff;
+/* 立即提交按钮主体 (Rectangle 21) */
+.action-submit-btn {
+  width: 680rpx;
+  height: 98rpx;
+  background: linear-gradient(90deg, #80D73D 0%, #C3ED44 100%);
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 4rpx 12rpx rgba(128, 215, 61, 0.2);
+}
+
+/* 立即提交文字样式 */
+.btn-text {
+  font-family: 'Source Han Sans CN';
+  font-weight: 500;
+  font-size: 36rpx;
+  color: #282828;
+  line-height: 40rpx;
+  text-align: center;
+}
+
+/* 按钮点击态与禁用态 */
+.action-submit-btn::after {
   border: none;
 }
 
-.submit-btn[disabled] {
+.action-submit-btn[disabled] {
   opacity: 0.6;
+  background: #E0E0E0 !important;
+  color: #999 !important;
 }
 
-.submit-btn::after {
-  border: none;
+.action-submit-btn:active {
+  opacity: 0.8;
+  transform: scale(0.98);
 }

@@ -5,10 +5,8 @@ Page({
   data: {
     statusBarHeight: 0,
     navBarHeight: 0,
-    notificationEnabled: true,
-    interactionEnabled: true,
     cacheSize: '0 MB',
-    version: '1.0.0'
+    version: '1.0.0' // 手动维护版本号，每次发布时更新
   },
 
   onLoad(options) {
@@ -17,8 +15,6 @@ Page({
       navBarHeight: app.globalData.navBarHeight
     })
 
-    // 加载设置
-    this.loadSettings()
     // 计算缓存大小
     this.calculateCacheSize()
   },
@@ -28,47 +24,6 @@ Page({
    */
   onBack() {
     wx.navigateBack()
-  },
-
-  /**
-   * 加载设置
-   */
-  loadSettings() {
-    const notificationEnabled = wx.getStorageSync('notificationEnabled')
-    const interactionEnabled = wx.getStorageSync('interactionEnabled')
-
-    this.setData({
-      notificationEnabled: notificationEnabled !== false,
-      interactionEnabled: interactionEnabled !== false
-    })
-  },
-
-  /**
-   * 系统通知开关
-   */
-  onNotificationChange(e) {
-    const enabled = e.detail.value
-    this.setData({ notificationEnabled: enabled })
-    wx.setStorageSync('notificationEnabled', enabled)
-
-    wx.showToast({
-      title: enabled ? '已开启系统通知' : '已关闭系统通知',
-      icon: 'success'
-    })
-  },
-
-  /**
-   * 互动消息开关
-   */
-  onInteractionChange(e) {
-    const enabled = e.detail.value
-    this.setData({ interactionEnabled: enabled })
-    wx.setStorageSync('interactionEnabled', enabled)
-
-    wx.showToast({
-      title: enabled ? '已开启互动消息' : '已关闭互动消息',
-      icon: 'success'
-    })
   },
 
   /**
@@ -123,17 +78,19 @@ Page({
           wx.showLoading({ title: '清除中...' })
 
           // 保留重要数据
-          const userInfo = wx.getStorageSync('userInfo')
-          const notificationEnabled = wx.getStorageSync('notificationEnabled')
-          const interactionEnabled = wx.getStorageSync('interactionEnabled')
+          const userProfile = wx.getStorageSync('userProfile')
+          const firstLoginTime = wx.getStorageSync('firstLoginTime')
 
           // 清除所有缓存
           wx.clearStorage({
             success: () => {
               // 恢复重要数据
-              wx.setStorageSync('userInfo', userInfo)
-              wx.setStorageSync('notificationEnabled', notificationEnabled)
-              wx.setStorageSync('interactionEnabled', interactionEnabled)
+              if (userProfile) {
+                wx.setStorageSync('userProfile', userProfile)
+              }
+              if (firstLoginTime) {
+                wx.setStorageSync('firstLoginTime', firstLoginTime)
+              }
 
               wx.hideLoading()
               wx.showToast({
@@ -172,13 +129,13 @@ Page({
    * 检查更新
    */
   onCheckUpdate() {
-    wx.showLoading({ title: '检查中...' })
-
-    // 检查小程序更新
     const updateManager = wx.getUpdateManager()
+
+    wx.showLoading({ title: '检查中...' })
 
     updateManager.onCheckForUpdate(res => {
       wx.hideLoading()
+
       if (res.hasUpdate) {
         wx.showModal({
           title: '发现新版本',
@@ -186,26 +143,8 @@ Page({
           success: modalRes => {
             if (modalRes.confirm) {
               wx.showLoading({ title: '下载中...' })
-              updateManager.onUpdateReady(() => {
-                wx.hideLoading()
-                wx.showModal({
-                  title: '更新提示',
-                  content: '新版本已准备好，是否重启应用？',
-                  success: restartRes => {
-                    if (restartRes.confirm) {
-                      updateManager.applyUpdate()
-                    }
-                  }
-                })
-              })
-
-              updateManager.onUpdateFailed(() => {
-                wx.hideLoading()
-                wx.showToast({
-                  title: '更新失败',
-                  icon: 'none'
-                })
-              })
+            } else {
+              wx.hideLoading()
             }
           }
         })
@@ -217,8 +156,25 @@ Page({
       }
     })
 
-    updateManager.onCheckForUpdate(() => {
+    updateManager.onUpdateReady(() => {
       wx.hideLoading()
+      wx.showModal({
+        title: '更新提示',
+        content: '新版本已准备好，是否重启应用？',
+        success: res => {
+          if (res.confirm) {
+            updateManager.applyUpdate()
+          }
+        }
+      })
+    })
+
+    updateManager.onUpdateFailed(() => {
+      wx.hideLoading()
+      wx.showToast({
+        title: '更新失败',
+        icon: 'none'
+      })
     })
   },
 

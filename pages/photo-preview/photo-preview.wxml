@@ -10,7 +10,7 @@
   <!-- 顶部工具栏 -->
   <view class="top-toolbar" wx:if="{{showToolbar}}" style="--status-bar-height: {{statusBarHeight}}px;">
     <view class="toolbar-left" bindtap="onBack">
-      <view class="back-icon back-icon-white"></view>
+      <view class="back-icon"></view>
     </view>
     <view class="toolbar-center">
       <text class="photo-index">{{currentIndex + 1}} / {{photos.length}}</text>
@@ -28,19 +28,19 @@
   <view class="bottom-toolbar" wx:if="{{showToolbar}}">
     <view class="toolbar-actions">
       <view class="action-item" bindtap="onLike">
-        <t-icon name="{{currentPhoto.isLiked ? 'heart-filled' : 'heart'}}" size="56rpx" color="{{currentPhoto.isLiked ? '#FF4444' : '#fff'}}" />
+        <t-icon name="{{currentPhoto.isLiked ? 'heart-filled' : 'heart'}}" size="56rpx" color="{{currentPhoto.isLiked ? '#FF4444' : '#999'}}" />
         <text class="action-text">{{currentPhoto.likeCount || 0}}</text>
       </view>
       <view class="action-item" bindtap="onFavorite">
-        <t-icon name="{{currentPhoto.isFavorited ? 'star-filled' : 'star'}}" size="56rpx" color="{{currentPhoto.isFavorited ? '#FFD700' : '#fff'}}" />
+        <t-icon name="{{currentPhoto.isFavorited ? 'star-filled' : 'star'}}" size="56rpx" color="{{currentPhoto.isFavorited ? '#FFD700' : '#999'}}" />
         <text class="action-text">{{currentPhoto.favoriteCount || 0}}</text>
       </view>
       <view class="action-item" wx:if="{{!isMyPhoto}}" bindtap="onReport">
-        <t-icon name="error-circle" size="56rpx" color="#fff" />
+        <t-icon name="error-circle" size="56rpx" color="#999" />
         <text class="action-text">举报</text>
       </view>
       <view class="action-item" wx:if="{{isMyPhoto}}" bindtap="onDelete">
-        <t-icon name="delete" size="56rpx" color="#fff" />
+        <t-icon name="delete" size="56rpx" color="#999" />
         <text class="action-text">删除</text>
       </view>
     </view>

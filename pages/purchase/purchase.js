@@ -288,36 +288,46 @@ Page({
   buildWaterfall(goodsList) {
     console.log('buildWaterfall 接收到的商品数量：', goodsList.length);
 
-    let {
-      leftList,
-      rightList,
-      leftHeight,
-      rightHeight,
-    } = this.data
+    // 创建新的空数组，不使用 data 中的旧数据
+    const leftList = [];
+    const rightList = [];
+    let leftHeight = 0;
+    let rightHeight = 0;
 
-    console.log('当前左右列表长度：', leftList.length, rightList.length);
+    console.log('[瀑布流] 开始分配商品');
 
-    goodsList.forEach((item) => {
+    goodsList.forEach((item, index) => {
       // 根据图片比例预估高度（核心）
       const cardWidth = 340 // rpx，与你 swiper 一致
 
-      // 如果缺少图片尺寸信息，使用默认比例 3:4
+      // 使用真实图片尺寸信息（已通过 wx.getImageInfo 获取）
       const imgWidth = item.imgWidth || 3
       const imgHeight = item.imgHeight || 4
 
       const calculatedImgHeight = (cardWidth * imgHeight) / imgWidth
       const cardHeight = calculatedImgHeight + 160 // 图片 + 文本区域估算
 
+      console.log(`[瀑布流] 商品${index} 宽高比: ${imgWidth}x${imgHeight}, 计算高度:${cardHeight.toFixed(0)}`);
+
       if (leftHeight <= rightHeight) {
         leftList.push(item)
         leftHeight += cardHeight
+        console.log(`[瀑布流] 商品${index} -> 左列, 高度:${cardHeight.toFixed(0)}, 左列总高:${leftHeight.toFixed(0)}`);
       } else {
         rightList.push(item)
         rightHeight += cardHeight
+        console.log(`[瀑布流] 商品${index} -> 右列, 高度:${cardHeight.toFixed(0)}, 右列总高:${rightHeight.toFixed(0)}`);
       }
     })
 
-    console.log('构建后左右列表长度：', leftList.length, rightList.length);
+    console.log('[瀑布流] 分配完成:', {
+      totalGoods: goodsList.length,
+      leftCount: leftList.length,
+      rightCount: rightList.length,
+      leftHeight: leftHeight.toFixed(0),
+      rightHeight: rightHeight.toFixed(0),
+      diff: Math.abs(leftHeight - rightHeight).toFixed(0)
+    });
 
     this.setData({
       leftList,
@@ -443,10 +453,9 @@ Page({
 
       console.log('商品总数：', total);
 
-      // SVG图片直接使用coverImage，无需转换
+      // 标记轮播商品为热门
       data.forEach(item => {
         item.img = item.coverImage;
-        // 标记轮播商品为热门
         if (this.bannerGoodsIds && this.bannerGoodsIds.includes(item._id)) {
           item.isHot = true;
         }
@@ -516,7 +525,7 @@ Page({
         .where(query)
         .count();
 
-      // SVG图片直接使用coverImage，无需转换
+      // 设置商品图片
       data.forEach(item => {
         item.img = item.coverImage;
       });

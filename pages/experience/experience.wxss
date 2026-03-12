@@ -1,6 +1,5 @@
 /* pages/experience/experience.wxss */
 
-/* --- 导航栏 --- */
 .nav-bar {
   position: fixed;
   top: 0;
@@ -14,7 +13,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24rpx;
+  padding: 0 32rpx;
   height: 100%;
 }
 
@@ -37,10 +36,52 @@
   color: #333;
 }
 
-/* 搜索框容器 */
+/* éŽ¼æ»…å‚¨å¦—å——î†é£?*/
 .search-bar-wrapper {
+  padding: 16rpx 32rpx 24rpx 32rpx;
+  background: transparent;
+}
+
+.custom-search-bar {
+  height: 80rpx;
+  background: #FFFFFF;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
   padding: 0 24rpx;
-  margin-bottom: 20rpx;
+  box-sizing: border-box;
+}
+
+.search-icon {
+  margin-right: 12rpx;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.search-placeholder {
+  color: #999;
+}
+
+.search-btn {
+  width: 98rpx;
+  height: 54rpx;
+  background: linear-gradient(98.63deg, #7BDE3A 2.44%, #CFDF17 95.85%);
+  border-radius: 27rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 26rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-left: 16rpx;
 }
 
 .page-container {
@@ -51,28 +92,28 @@
   z-index: 1;
 }
 
-/* --- 网格布局 (高度精确控制) --- */
+/* --- ç¼ƒæˆžç‰¸ç”¯å†¨çœ¬ (æ¥‚æ¨ºå®³ç»®å‰§â€˜éŽºÑƒåŸ—) --- */
 .grid-section {
   display: flex;
-  padding: 0 24rpx;
+  padding: 0 32rpx;
   gap: 20rpx;
   margin-bottom: 30rpx;
-  min-height: 500rpx; /* 确保有足够高度 */
-  overflow: hidden; /* 防止子元素溢出 */
+  overflow: hidden;
 }
 
 .grid-col {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20rpx;
-  min-width: 0; /* 关键：允许flex子元素收缩 */
-  max-width: 50%; /* 限制最大宽度 */
+  min-width: 0;
+}
+
+.left-col {
+  flex: 1.35;
 }
 
 .right-col {
-  /* 调试：添加背景色看看是否存在 */
-  /* background: rgba(255, 0, 0, 0.1); */
+  flex: 1;
 }
 
 .bento-card {
@@ -84,25 +125,84 @@
   box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.03);
 }
 
-/* 左侧：休闲玩乐 (300rpx) */
+/* å®¸ï¸¿æ™¶é”›æ°«ç´¤é—‚èŒ¬å¸ºæ¶”?(300rpx) */
 .card-leisure {
-  background: linear-gradient(135deg, #FFE180 0%, #7FD73D 100%);
-  height: 300rpx;
+  position: relative;
+  height: auto;
+  background-color: transparent;
+  padding: 0 !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+/* 透明占位层，比 box 稍大，用于容纳超出的 HOT 标签 */
+.leisure-overflow-container {
+  position: absolute;
+  top: -50rpx;
+  left: -20rpx;
+  right: -20rpx;
+  bottom: -20rpx;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.leisure-overflow-container .card-tag-hot {
+  pointer-events: auto;
+}
+
+/* 异形 SVG 背景 - 使用 image 标签 */
+.leisure-bg-svg {
+  position: absolute;
+  top: -5%;
+  left: 0;
+  width: 100%;
+  height: 110%;
+  z-index: 1;
+}
+
+/* 叠加的半透明高光层 (Rectangle 92) */
+.card-leisure::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(282.98deg, rgba(196, 237, 68, 0.4) 6.29%, rgba(124, 214, 61, 0.4) 102.49%);
+  border-radius: 24rpx;
+  z-index: 1;
+  pointer-events: none; /* 防止遮挡点击事件 */
+}
+
+/* 新增：内容包裹层，重写原有布局属性 */
+.leisure-content {
+  position: relative;
+  z-index: 2; /* 提高层级，确保内容显示在高光层之上 */
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 20rpx;
+  box-sizing: border-box;
 }
 
 .card-tag-hot {
   position: absolute;
-  top: 0;
-  left: 90rpx;
-  background: linear-gradient(239deg, #FCAE41 0%, #FF8100 100%);
+  top: 56rpx;
+  left: 240rpx;
+  width: 96rpx;
+  height: 40rpx;
+  background: linear-gradient(272.68deg, #FCAE41 3.55%, #FF8100 96.45%);
+  border-radius: 26rpx;
+  transform: rotate(11.04deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #fff;
-  font-size: 18rpx;
-  padding: 4rpx 10rpx;
-  border-radius: 0 0 10rpx 10rpx;
+  font-size: 22rpx;
+  font-weight: 900;
+  font-style: italic;
   z-index: 10;
-  font-weight: bold;
 }
 
 .card-header {
@@ -125,75 +225,96 @@
   flex: 1;
   display: flex;
   gap: 12rpx;
-  min-height: 0; /* 防止flex子元素溢出 */
+  min-height: 0; /* é˜²æ­¢flexå­å…ƒç´ æº¢å‡º */
 }
 
 .img-placeholder {
   background: rgba(255,255,255,0.6);
   border-radius: 12rpx;
   width: 50%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
-  flex-shrink: 0; /* 防止收缩 */
+  flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .img-placeholder image {
   width: 100%;
   height: 100%;
-  display: block; /* 防止图片底部空隙 */
+  display: block;
+  object-fit: cover;
 }
 
-/* 左侧：景点游玩 (180rpx) -> 左列总高 500rpx */
+/* å®¸ï¸¿æ™¶é”›æ°­æ«™éè§„çˆ¶éœ?(180rpx) -> å®¸ï¹€åžªéŽ¬å©šç® 500rpx */
 .card-scenic {
-  background: linear-gradient(180deg, #B9EED3 0%, #DCF7BC 100%);
-  height: 180rpx;
+  background: linear-gradient(270deg, #ABEFA4 0%, #B6E286 100%);
+  box-shadow: 2rpx 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  border-radius: 26rpx;
+  height: 162rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.scenic-left {
   display: flex;
   flex-direction: column;
   justify-content: center;
-}
-
-.scenic-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16rpx;
+  gap: 12rpx;
 }
 
 .action-pill {
-  background: linear-gradient(270deg, #FFCB49 0%, #FF8707 100%);
+  background: linear-gradient(270deg, #FFC131 0%, #FF9C00 100%);
   color: #fff;
   font-size: 20rpx;
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 30rpx;
   font-weight: 700;
+  display: inline-block;
+  text-align: center;
 }
 
 .scenic-imgs {
   display: flex;
-  gap: 12rpx;
+  flex-direction: row;
+  align-items: center;
+}
+
+.img-wrapper {
+  width: 70rpx;
   height: 80rpx;
-  min-height: 0;
+  border-radius: 16rpx;
+  overflow: hidden;
+  position: relative;
+  z-index: 3;
+}
+
+/* 利用负边距实现图片互相覆盖的效果 */
+.overlap-img {
+  margin-left: -15rpx;
+  z-index: 2;
+  box-shadow: -2rpx 0 6rpx rgba(0,0,0,0.1);
+}
+
+.overlap-img:last-child {
+  z-index: 1;
 }
 
 .img-mini {
-  flex: 1;
-  background: rgba(255,255,255,0.6);
-  border-radius: 8rpx;
-  height: 100%;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.img-mini image {
   width: 100%;
   height: 100%;
+  background: rgba(255,255,255,0.6);
   display: block;
+  object-fit: cover;
 }
 
-/* 右侧：酒店民宿 (320rpx) */
+/* é™å……æ™¶é”›æ°¶åŽ­æ´æ¥çš¯ç€¹?(320rpx) */
 .card-hotel {
   background: linear-gradient(180deg, #ABF0A5 0%, #B7E387 100%);
-  height: 320rpx;
+  height: auto;
   display: flex;
   flex-direction: column;
 }
@@ -207,29 +328,31 @@
   margin-top: 16rpx;
   display: flex;
   gap: 12rpx;
-  height: 100%;
-  min-height: 0;
+  flex: 1;
 }
 
 .img-tall {
   flex: 1;
   background: rgba(255,255,255,0.6);
   border-radius: 12rpx;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .img-tall image {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: cover;
 }
 
-/* 右侧：特色农家菜 (160rpx) -> 右列总高 500rpx */
+/* é™å……æ™¶é”›æ°±å£’é‘¹æ’å•˜ç€¹æƒ°å½ (160rpx) -> é™å†²åžªéŽ¬å©šç® 500rpx */
 .card-food {
   background: linear-gradient(135deg, #FFE180 0%, #7FD73D 100%);
-  height: 160rpx;
+  height: auto;
   display: flex;
   flex-direction: column;
 }
@@ -246,16 +369,17 @@
   flex: 1;
   display: flex;
   gap: 12rpx;
-  min-height: 0;
 }
 
 .img-food {
   flex: 1;
   background: #f0f0f0;
   border-radius: 12rpx;
+  height: auto;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   flex-shrink: 0;
-  height: 100%;
+  align-self: flex-start;
 }
 
 .img-food image {
@@ -265,9 +389,9 @@
   object-fit: cover;
 }
 
-/* --- Tab 栏 --- */
+/* --- Tab é?--- */
 .tab-section {
-  padding: 0 24rpx;
+  padding: 0 32rpx;
   margin-bottom: 24rpx;
   display: flex;
   justify-content: space-between;
@@ -279,6 +403,8 @@
   color: #666;
   position: relative;
   font-weight: 500;
+  min-width: 56rpx;
+  text-align: center;
 }
 
 .tab-item.active {
@@ -300,9 +426,9 @@
   box-shadow: 0 4rpx 4rpx rgba(121, 198, 53, 0.2);
 }
 
-/* --- 推荐卡片 (核心操作区) --- */
+/* --- éŽºã„¨å´˜é—ï¼„å¢– (éç¨¿ç¸¾éŽ¿å¶„ç¶”é–? --- */
 .feed-list {
-  padding: 0 24rpx;
+  padding: 0 32rpx;
 }
 
 .feed-card {
@@ -323,7 +449,7 @@
   margin: 0;
 }
 
-/* 距离标签 */
+/* ç’ºæ¿ˆîž‡éå›©î„· */
 .distance-badge {
   position: absolute;
   top: 20rpx;
@@ -338,7 +464,7 @@
   z-index: 10;
 }
 
-/* TOP 标签 */
+/* TOP éå›©î„· */
 .top-badge {
   position: absolute;
   top: 20rpx;
@@ -353,7 +479,7 @@
   box-shadow: 0 4rpx 12rpx rgba(255, 87, 19, 0.3);
 }
 
-/* 热门标签 */
+/* é‘î…¢æ£¬éå›©î„· */
 .hot-badge {
   position: absolute;
   top: 20rpx;
@@ -373,7 +499,7 @@
   height: 100%;
 }
 
-/* 加载状态 */
+/* é”çŠºæµ‡é˜èˆµâ‚¬?*/
 .loading-more,
 .no-more,
 .empty-tip {
@@ -384,7 +510,7 @@
 }
 
 .feed-info {
-  padding: 32rpx 28rpx 28rpx 28rpx;
+  padding: 32rpx 32rpx 28rpx 32rpx;
 }
 
 .info-top {
@@ -409,7 +535,7 @@
   text-overflow: ellipsis;
 }
 
-/* 定位行 */
+/* ç€¹æ°«ç¶…ç›?*/
 .feed-loc {
   display: flex;
   align-items: center;
@@ -427,7 +553,7 @@
   color: #7C7C7C;
 }
 
-/* 底部操作区 */
+/* æ´æ›¢å„´éŽ¿å¶„ç¶”é–?*/
 .bottom-action-area {
   margin-top: 20rpx;
   display: flex;
@@ -435,7 +561,7 @@
   gap: 16rpx;
 }
 
-/* 全宽导航按钮 */
+/* éã„¥î†”ç€µè‰°åŸ…éŽ¸å¤æŒ³ */
 .btn-nav-full {
   flex: 1;
   height: 72rpx;
@@ -450,34 +576,34 @@
   box-shadow: 0 4rpx 12rpx rgba(46, 68, 34, 0.08);
 }
 
-/* 关键：悬浮帮助按钮 (全局固定定位) */
+/* éæŠ½æ•­é”›æ°­å“å¨´î†¼åºœé”â•‚å¯œé–½?(éã„¥çœ¬é¥å“„ç•¾ç€¹æ°«ç¶…) */
 .float-help-bubble {
-  position: fixed; /* 固定定位 */
-  right: 24rpx;    /* 距离右侧边距 */
-  bottom: 180rpx;  /* 距离底部的高度 (避开tabbar) */
+  position: fixed; /* é¥å“„ç•¾ç€¹æ°«ç¶… */
+  right: 24rpx;    /* ç’ºæ¿ˆîž‡é™å……æ™¶æˆç¡…çª› */
+  bottom: 180rpx;  /* ç’ºæ¿ˆîž‡æ´æ›¢å„´é¨å‹¯ç®æ´?(é–¬åž®ç´‘tabbar) */
 
   width: 96rpx;
   height: 96rpx;
   background: #ffffff;
 
-  /* 超椭圆/大圆角设计 */
+  /* ç“’å‘®ãé¦?æ¾¶Ñƒæ¸¾ç‘™æŽ•î†•ç’?*/
   border-radius: 36rpx;
 
-  /* 弥散阴影：颜色淡，扩散半径大 */
+  /* å¯®ãƒ¦æšŽé—ƒæ‘å¥–é”›æ°¶î–é‘¹å‰è´°é”›å±¾å¢¿éï½…å´å¯°å‹«ã‡ */
   box-shadow: 0 8rpx 24rpx rgba(142, 217, 77, 0.25);
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 999; /* 确保在最上层 */
+  z-index: 999; /* çº­î†»ç¹šé¦ã„¦æ¸¶æ¶“å©‚çœ° */
 }
 
-/* 新增代码：控制 SVG 图标的大小 */
+/* é‚æ¿î–ƒæµ ï½‡çˆœé”›æ°­å¸¶é’?SVG é¥ç‚¬çˆ£é¨å‹«ã‡ç?*/
 .help-icon-svg {
   width: 44rpx;
   height: 44rpx;
-  margin-bottom: 2rpx; /* 稍微拉开一点文字距离 */
+  margin-bottom: 2rpx; /* ç»‹å¶…äº•éŽ·å¤Šç´‘æ¶“â‚¬éè§„æžƒç€›æ¥„çª›ç»‚?*/
 }
 
 .help-text {

@@ -95,7 +95,7 @@ Page({
       wx.showLoading({ title: '提交中...', mask: true });
 
       const db = getDB()
-      const userInfo = app.globalData.userInfo;
+      const userInfo = await app.ensureUserInfo();
 
       if (this.data.type === 'goods') {
         // 创建商品评论

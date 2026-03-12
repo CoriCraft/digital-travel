@@ -13,24 +13,6 @@
   <!-- 主内容 -->
   <scroll-view scroll-y class="main-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;" refresher-enabled="{{true}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
 
-    <!-- 数据统计卡片 -->
-    <view class="stats-card">
-      <view class="stat-item">
-        <text class="stat-num">{{totalViews}}</text>
-        <text class="stat-label">总浏览</text>
-      </view>
-      <view class="stat-divider"></view>
-      <view class="stat-item">
-        <text class="stat-num">{{totalLikes}}</text>
-        <text class="stat-label">总点赞</text>
-      </view>
-      <view class="stat-divider"></view>
-      <view class="stat-item">
-        <text class="stat-num">{{totalFavorites}}</text>
-        <text class="stat-label">总收藏</text>
-      </view>
-    </view>
-
     <!-- 我的照片 -->
     <view class="content-section">
       <view wx:if="{{photos.length === 0}}" class="empty">
@@ -39,17 +21,38 @@
         <text class="empty-tip">快去上传你的精彩照片吧</text>
       </view>
 
-      <view wx:else class="photo-waterfall">
+      <view wx:else class="waterfall-container">
         <!-- 左列 -->
         <view class="waterfall-column">
-          <view
-            wx:for="{{leftColumnPhotos}}"
-            wx:key="_id"
-            class="photo-card"
-            data-index="{{item.originalIndex}}"
-            bindtap="onPhotoTap"
-          >
-            <image class="photo-image" src="{{item.thumbnailUrl || item.photoUrl}}" mode="widthFix" lazy-load="{{true}}" />
+          <view class="photo-card" wx:for="{{leftColumnPhotos}}" wx:key="_id">
+            <image
+              class="photo-image"
+              src="{{item.thumbnailUrl || item.photoUrl}}"
+              mode="widthFix"
+              lazy-load="{{true}}"
+              data-index="{{item.originalIndex}}"
+              bindtap="onPhotoTap"
+            />
+            <view class="photo-info">
+              <view class="author-info">
+                <image class="author-avatar" src="{{userAvatar || defaultAvatar}}" mode="aspectFill" />
+                <text class="author-name">{{userName || '我'}}</text>
+              </view>
+              <view class="photo-stats">
+                <view class="stat-item">
+                  <t-icon name="browse" size="32rpx" color="#d3d3d3" />
+                  <text class="stat-num">{{item.viewCount || 0}}</text>
+                </view>
+                <view class="stat-item" data-photo-id="{{item._id}}" catchtap="onPhotoFavorite">
+                  <t-icon name="star-filled" size="32rpx" color="{{item.isFavorited ? '#FFD700' : '#DADADA'}}" />
+                  <text class="stat-num">{{item.favoriteCount || 0}}</text>
+                </view>
+                <view class="stat-item" data-photo-id="{{item._id}}" catchtap="onPhotoLike">
+                  <t-icon name="heart-filled" size="32rpx" color="{{item.isLiked ? '#FF4444' : '#DADADA'}}" />
+                  <text class="stat-num">{{item.likeCount || 0}}</text>
+                </view>
+              </view>
+            </view>
             <view class="photo-actions" catchtap="onDeletePhoto" data-id="{{item._id}}" data-index="{{item.originalIndex}}">
               <view class="action-btn delete">
                 <t-icon name="delete" size="32rpx" color="#FF4444" />
@@ -60,14 +63,35 @@
 
         <!-- 右列 -->
         <view class="waterfall-column">
-          <view
-            wx:for="{{rightColumnPhotos}}"
-            wx:key="_id"
-            class="photo-card"
-            data-index="{{item.originalIndex}}"
-            bindtap="onPhotoTap"
-          >
-            <image class="photo-image" src="{{item.thumbnailUrl || item.photoUrl}}" mode="widthFix" lazy-load="{{true}}" />
+          <view class="photo-card" wx:for="{{rightColumnPhotos}}" wx:key="_id">
+            <image
+              class="photo-image"
+              src="{{item.thumbnailUrl || item.photoUrl}}"
+              mode="widthFix"
+              lazy-load="{{true}}"
+              data-index="{{item.originalIndex}}"
+              bindtap="onPhotoTap"
+            />
+            <view class="photo-info">
+              <view class="author-info">
+                <image class="author-avatar" src="{{userAvatar || defaultAvatar}}" mode="aspectFill" />
+                <text class="author-name">{{userName || '我'}}</text>
+              </view>
+              <view class="photo-stats">
+                <view class="stat-item">
+                  <t-icon name="browse" size="32rpx" color="#d3d3d3" />
+                  <text class="stat-num">{{item.viewCount || 0}}</text>
+                </view>
+                <view class="stat-item" data-photo-id="{{item._id}}" catchtap="onPhotoFavorite">
+                  <t-icon name="star-filled" size="32rpx" color="{{item.isFavorited ? '#FFD700' : '#DADADA'}}" />
+                  <text class="stat-num">{{item.favoriteCount || 0}}</text>
+                </view>
+                <view class="stat-item" data-photo-id="{{item._id}}" catchtap="onPhotoLike">
+                  <t-icon name="heart-filled" size="32rpx" color="{{item.isLiked ? '#FF4444' : '#DADADA'}}" />
+                  <text class="stat-num">{{item.likeCount || 0}}</text>
+                </view>
+              </view>
+            </view>
             <view class="photo-actions" catchtap="onDeletePhoto" data-id="{{item._id}}" data-index="{{item.originalIndex}}">
               <view class="action-btn delete">
                 <t-icon name="delete" size="32rpx" color="#FF4444" />

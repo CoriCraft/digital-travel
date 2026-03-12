@@ -1,6 +1,8 @@
 .container {
   min-height: 100vh;
   width: 100%;
+  padding: 0; /* 覆盖全局的 padding: 200rpx 0 */
+  display: block; /* 覆盖全局的 flex 布局 */
   background: linear-gradient(135deg, rgba(143, 241, 236, 0.3) 0%, rgba(130, 244, 95, 0.3) 100%);
 }
 
@@ -103,8 +105,8 @@
 
 .tab-badge {
   position: absolute;
-  top: 8rpx;
-  right: 20rpx;
+  top: 4rpx;
+  right: 2rpx;
   min-width: 32rpx;
   height: 32rpx;
   line-height: 32rpx;

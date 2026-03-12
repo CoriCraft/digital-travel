@@ -3,7 +3,6 @@
     "t-icon": "tdesign-miniprogram/icon/icon",
     "t-swiper": "tdesign-miniprogram/swiper/swiper",
     "t-swiper-nav": "tdesign-miniprogram/swiper-nav/swiper-nav",
-    "t-input": "tdesign-miniprogram/input/input",
-    "search-bar": "/components/search-bar/search-bar"
+    "t-input": "tdesign-miniprogram/input/input"
   }
 }

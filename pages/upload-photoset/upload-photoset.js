@@ -166,6 +166,15 @@ Page({
     this.setData({ uploading: true });
 
     try {
+      // 0. 获取图片信息（宽高）
+      wx.showLoading({ title: '读取图片信息...' });
+      const imageInfo = await wx.getImageInfo({ src: photo });
+      console.log('[照片上传] 图片信息:', {
+        width: imageInfo.width,
+        height: imageInfo.height,
+        path: imageInfo.path
+      });
+
       // 1. 生成缩略图
       wx.showLoading({ title: '生成缩略图...' });
       console.log('[照片上传] 开始生成缩略图，原图路径:', photo);
@@ -191,7 +200,7 @@ Page({
       console.log('[照片上传] 原图上传成功，fileID:', originalResult.fileID);
 
       // 获取用户信息
-      const userInfo = app.globalData.userInfo || {};
+      const userInfo = await app.ensureUserInfo();
 
       // 创建照片记录（保存缩略图和原图两个URL）
       const db = getDB();
@@ -201,6 +210,8 @@ Page({
           templateId,
           thumbnailUrl: thumbnailResult.fileID,  // 缩略图URL
           photoUrl: originalResult.fileID,        // 原图URL
+          width: imageInfo.width,                 // 图片宽度
+          height: imageInfo.height,               // 图片高度
           userId: userInfo.openid || '',
           userName: userInfo.nickName || '匿名用户',
           userAvatar: userInfo.avatarUrl || '',

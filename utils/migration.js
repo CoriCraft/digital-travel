@@ -29,12 +29,12 @@ function needMigration() {
 /**
  * 获取用户openid
  */
-function getUserOpenId() {
+async function getUserOpenId() {
   const app = getApp()
-  if (!app || !app.globalData) {
+  if (!app || !app.globalData || !app.ensureUserInfo) {
     return null
   }
-  const userInfo = app.globalData.userInfo
+  const userInfo = await app.ensureUserInfo()
   if (!userInfo || !userInfo.openid) {
     return null
   }
@@ -52,7 +52,7 @@ async function migrateSingleType(oldKey, config) {
       return { success: true, count: 0 }
     }
 
-    const openid = getUserOpenId()
+    const openid = await getUserOpenId()
     if (!openid) {
       console.error('[迁移] 用户未登录，无法迁移')
       return { success: false, message: '用户未登录' }
@@ -130,7 +130,7 @@ async function performMigration() {
     console.log('[迁移] 开始数据迁移...')
 
     // 检查用户是否登录
-    const openid = getUserOpenId()
+    const openid = await getUserOpenId()
     if (!openid) {
       console.log('[迁移] 用户未登录，延迟迁移')
       return { success: false, message: '用户未登录，将在登录后自动迁移' }

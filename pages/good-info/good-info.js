@@ -32,7 +32,7 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad(options) {
+  async onLoad(options) {
     const { id } = options;
     this.setData({
       statusBarHeight: app.globalData.statusBarHeight,
@@ -40,6 +40,7 @@ Page({
       goodsId: id
     });
 
+    await app.ensureUserInfo();
     this.loadGoodsDetail();
     this.checkFavoriteStatus();
     this.loadReviews();
@@ -354,10 +355,10 @@ Page({
   /**
    * 长按评论 - 自己的可删除,别人的可举报
    */
-  onReviewReport(e) {
+  async onReviewReport(e) {
     const { id, type, content, userid } = e.currentTarget.dataset;
-    const app = getApp();
-    const currentUserId = app.globalData.userInfo?.openid;
+    const userInfo = await app.ensureUserInfo();
+    const currentUserId = userInfo?.openid;
 
     // 判断是否是自己的评论
     const isMyReview = userid === currentUserId;
@@ -471,7 +472,7 @@ Page({
     try {
       wx.showLoading({ title: '提交中...' });
 
-      const app = getApp();
+      const userInfo = await app.ensureUserInfo();
       const db = getDB();
       await db.collection('reports').add({
         data: {
@@ -479,8 +480,8 @@ Page({
           targetType,
           targetName,
           reason,
-          reporterOpenId: app.globalData.userInfo?.openid || '',
-          reporterName: app.globalData.userInfo?.nickName || '匿名用户',
+          reporterOpenId: userInfo?.openid || '',
+          reporterName: userInfo?.nickName || '匿名用户',
           status: 'pending',
           createTime: new Date(),
         }

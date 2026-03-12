@@ -1,0 +1,78 @@
+以下是修改代码的部分：
+
+WXSS 修改
+原有代码：
+
+CSS
+.section {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #999;
+  padding: 24rpx 24rpx 16rpx;
+}
+
+/* 设置卡片 */
+修改后代码：
+
+CSS
+.section {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20px;
+  color: #8B8B8B;
+  padding: 24rpx 24rpx 16rpx;
+}
+
+/* 设置卡片 */
+(注：WXML 保持你最开始的样子不变即可，不需要任何修改)
+
+这样“隐私设置”、“缓存管理”等所有区块的标题就都会统一应用你设计稿里的这个文字样式了。
+
+你需要我把其他部分（比如卡片内部的列表项文字）也按照设计稿的样式做同样的替换吗？
+原有代码：
+
+CSS
+/* 区块 */
+.section {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #999;
+  padding: 24rpx 24rpx 16rpx;
+}
+
+/* 设置卡片 */
+.setting-card {
+修改后代码：
+
+CSS
+/* 区块 */
+.section {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20px;
+  color: #8B8B8B;
+  padding: 24rpx 24rpx 16rpx;
+}
+
+/* 设置卡片 */
+.setting-card {

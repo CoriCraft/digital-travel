@@ -1,7 +1,6 @@
 {
   "usingComponents": {
-    "t-icon": "tdesign-miniprogram/icon/icon",
-    "search-bar": "/components/search-bar/search-bar"
+    "t-icon": "tdesign-miniprogram/icon/icon"
   },
   "enablePullDownRefresh": true,
   "backgroundTextStyle": "dark",

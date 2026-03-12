@@ -15,6 +15,7 @@ page {
   position: relative;
   display: flex;
   flex-direction: column;
+  padding: 0; /* 覆盖全局的 padding: 200rpx 0 */
 }
 
 /* --- 导航栏 --- */
@@ -61,34 +62,34 @@ page {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding-bottom: 20rpx;
+  padding-bottom: 40rpx; /* 增加底部留白 */
   align-items: stretch; /* 关键：强制子元素拉伸填满横向空间 */
 }
 
 /* --- 1. 用户卡片 --- */
 .user-card-wrap {
-  width: 100%; /* 强制宽度 */
-  box-sizing: border-box; /* 包含 padding */
+  width: 100%;
+  box-sizing: border-box;
   padding: 0 32rpx;
-  margin-top: 10rpx; 
-  margin-bottom: 20rpx;
+  margin-top: 32rpx; /* 缩小顶部间距 */
+  margin-bottom: 16rpx; /* 缩小底部间距 */
   position: relative;
   z-index: 1;
 }
 
 .user-card {
-  width: 100%; /* 强制宽度 */
+  width: 100%;
   box-sizing: border-box;
   background: #FFFFFF;
-  border-radius: 24rpx;
-  padding: 30rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.02);
+  border-radius: 20rpx; /* 对应 figma 的 10px */
+  padding: 46rpx 36rpx 36rpx 36rpx; /* 调整内边距让视觉与原图比例一致 */
+  box-shadow: 4rpx 4rpx 10rpx rgba(0, 0, 0, 0.08); /* 对应 figma: 2px 2px 5px */
 }
 
 .user-header {
   display: flex;
   align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 36rpx; /* 加大与分割线的间距 */
 }
 
 .avatar-btn {
@@ -97,7 +98,7 @@ page {
   border: none;
   background: transparent;
   line-height: 1;
-  margin-right: 24rpx;
+  margin-right: 32rpx; /* 头像与文字的间距 */
   flex-shrink: 0;
 }
 
@@ -106,23 +107,32 @@ page {
 }
 
 .avatar {
-  width: 100rpx;
-  height: 100rpx;
+  width: 152rpx; /* 对应 figma 的 76px */
+  height: 152rpx;
   border-radius: 50%;
   background: #f0f0f0;
   display: block;
 }
 
-.user-meta { display: flex; flex-direction: column; }
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
 .nickname-row {
   display: flex;
   align-items: center;
   gap: 8rpx;
-  margin-bottom: 4rpx;
+  margin-bottom: 12rpx; /* 调整昵称与手机号间距 */
 }
 
-.nickname { font-size: 34rpx; font-weight: bold; color: #333; }
+.nickname {
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-size: 36rpx; /* 对应 figma 的 18px */
+  font-weight: 500;
+  color: #000000;
+}
 
 .icon-edit {
   width: 28rpx;
@@ -131,40 +141,76 @@ page {
   background-size: cover;
 }
 
-.user-id { font-size: 24rpx; color: #999; }
-
-.card-divider {
-  height: 2rpx;
-  background: #59B370;
-  margin-bottom: 20rpx;
+.user-id {
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-size: 28rpx; /* 对应 figma 的 14px */
+  font-weight: 400;
+  color: #737373;
 }
 
-.stats-row { display: flex; align-items: center; }
-.stat-box { flex: 1; display: flex; flex-direction: column; align-items: center; }
-.stat-num { font-size: 36rpx; font-weight: bold; color: #333; }
-.stat-label { font-size: 22rpx; color: #999; margin-top: 4rpx; }
-.stat-vertical-line { width: 2rpx; height: 60rpx; background: #59B370; }
+.card-divider {
+  height: 2rpx; /* 对应 figma 的 1px */
+  background: #59B370;
+  margin-bottom: 30rpx;
+}
+
+.stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stat-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-num {
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-size: 36rpx; /* 对应 figma 的 18px */
+  font-weight: 500;
+  color: #000000;
+  line-height: 40rpx;
+}
+
+.stat-label {
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-size: 20rpx; /* 对应 figma 的 10px */
+  font-weight: 400;
+  color: #737373;
+  margin-top: 8rpx;
+  line-height: 40rpx;
+}
+
+.stat-vertical-line {
+  width: 2rpx; /* 对应 figma 的 1px */
+  height: 90rpx; /* 对应 figma 旋转后的 45px */
+  background: #59B370;
+}
 
 /* --- 2. 菜单卡片 --- */
 .menu-section {
-  width: 100%; /* 强制宽度 */
+  width: 100%;
   box-sizing: border-box;
   padding: 0 32rpx;
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
-  margin-bottom: 48rpx;
+  gap: 16rpx; /* 缩小卡片之间的间距 */
+  margin-bottom: 32rpx; /* 缩小底部间距 */
 }
 
 .menu-card {
-  width: 100%; /* 强制宽度 */
+  width: 100%;
   box-sizing: border-box;
+  height: 134rpx; /* 对应 Figma 的 67px 高度 */
   background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 24rpx 30rpx; 
+  border-radius: 20rpx; /* 对应 Figma 的 10px */
+  padding: 0 36rpx; /* 左右内边距对齐用户卡片 */
   display: flex;
   align-items: center;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.01);
+  box-shadow: 4rpx 4rpx 10rpx rgba(0, 0, 0, 0.08); /* 对应 Figma: 2px 2px 5px 8% */
 }
 
 .icon-box {
@@ -174,11 +220,14 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 20rpx;
+  margin-right: 24rpx;
   flex-shrink: 0;
+  position: relative; /* 为红点做定位准备 */
 }
 
-.bg-pale-green { background-color: rgba(143, 241, 236, 0.15); }
+.bg-pale-green {
+  background-color: rgba(78, 206, 109, 0.12);
+}
 
 .icon-img {
   width: 40rpx;
@@ -189,45 +238,102 @@ page {
 }
 
 /* 图标数据 */
-.icon-truck { background-image: url("data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 80 80' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60.1 27.2H54.4V14.5C54.4 11.2 51.7 8.5 48.4 8.5H6.1C2.8 8.5 0.1 11.2 0.1 14.5V54.4C0.1 57.7 2.8 60.4 6.1 60.4H8.4C9.5 66.8 15.1 71.7 21.8 71.7C28.5 71.7 34.1 66.8 35.2 60.4H44.8C45.9 66.8 51.5 71.7 58.2 71.7C64.9 71.7 70.5 66.8 71.6 60.4H74C77.3 60.4 80 57.7 80 54.4V42.3C80 34 73.3 27.2 65.1 27.2H60.1ZM21.8 64.6C18.6 64.6 16 62 16 58.8C16 55.6 18.6 53 21.8 53C25 53 27.6 55.6 27.6 58.8C27.6 62 25 64.6 21.8 64.6ZM58.2 64.6C55 64.6 52.4 62 52.4 58.8C52.4 55.6 55 53 58.2 53C61.4 53 64 55.6 64 58.8C64 62 61.4 64.6 58.2 64.6ZM71.2 46.5H60.1V34.2H65C68.4 34.2 71.2 37 71.2 40.4V46.5Z' fill='%233Ece79'/%3E%3C/svg%3E"); }
-.icon-photo { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233Ece79'%3E%3Cpath d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/%3E%3C/svg%3E"); }
-.icon-heart { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233Ece79'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E"); }
-.icon-thumb { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233Ece79'%3E%3Cpath d='M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z'/%3E%3C/svg%3E"); }
+.icon-truck { background-image: url("data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 80 80' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60.1 27.2H54.4V14.5C54.4 11.2 51.7 8.5 48.4 8.5H6.1C2.8 8.5 0.1 11.2 0.1 14.5V54.4C0.1 57.7 2.8 60.4 6.1 60.4H8.4C9.5 66.8 15.1 71.7 21.8 71.7C28.5 71.7 34.1 66.8 35.2 60.4H44.8C45.9 66.8 51.5 71.7 58.2 71.7C64.9 71.7 70.5 66.8 71.6 60.4H74C77.3 60.4 80 57.7 80 54.4V42.3C80 34 73.3 27.2 65.1 27.2H60.1ZM21.8 64.6C18.6 64.6 16 62 16 58.8C16 55.6 18.6 53 21.8 53C25 53 27.6 55.6 27.6 58.8C27.6 62 25 64.6 21.8 64.6ZM58.2 64.6C55 64.6 52.4 62 52.4 58.8C52.4 55.6 55 53 58.2 53C61.4 53 64 55.6 64 58.8C64 62 61.4 64.6 58.2 64.6ZM71.2 46.5H60.1V34.2H65C68.4 34.2 71.2 37 71.2 40.4V46.5Z' fill='%234ECE6D'/%3E%3C/svg%3E"); }
+.icon-photo { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234ECE6D'%3E%3Cpath d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/%3E%3C/svg%3E"); }
+.icon-heart { background-image: url("data:image/svg+xml,%3Csvg width='26' height='25' viewBox='0 0 26 25' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.8951 17.7452L7.70612 20.4722L8.69951 14.6949L4.5 10.6006L10.3006 9.75913L12.8951 4.5L15.4935 9.75913L21.2941 10.6006L17.0946 14.6949L18.088 20.4722L12.8951 17.7452Z' stroke='%234ECE6D' stroke-width='9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.icon-thumb {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234ECE6D'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
+}
 .icon-arrow { width: 28rpx; height: 28rpx; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23D0D0D0'%3E%3Cpath d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z'/%3E%3C/svg%3E"); background-size: cover; }
 
-.menu-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-.menu-title { font-size: 28rpx; font-weight: 600; color: #333; }
-.menu-desc { font-size: 22rpx; color: #999; margin-top: 2rpx; }
+.menu-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
+.menu-title {
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-size: 28rpx; /* 对应 Figma 的 14px */
+  font-weight: 500;
+  color: #000000;
+  line-height: 40rpx;
+}
+
+.menu-desc {
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-size: 20rpx; /* 对应 Figma 的 10px */
+  font-weight: 400;
+  color: #7F7F7F; /* 对应 Figma 的 #7F7F7F */
+  margin-top: 4rpx;
+  line-height: 28rpx;
+}
+
+/* 专门用于『我的喜欢』副标题加粗 */
+.menu-desc-bold {
+  font-weight: 700;
+}
+
+.icon-arrow {
+  width: 48rpx; /* 对应 Figma 的 24px */
+  height: 48rpx;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000000'%3E%3Cpath d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z'/%3E%3C/svg%3E");
+  background-size: cover;
+}
 /* --- 3. 底部列表区 --- */
 .list-section {
-  width: 100%; /* 强制宽度 */
+  width: 100%;
   box-sizing: border-box;
   padding: 0 32rpx;
-  flex: 1; 
+  margin-bottom: 0; /* 移除底部边距，由主内容区统一控制 */
 }
 
 .list-card {
-  width: 100%; /* 强制宽度 */
+  width: 100%;
   box-sizing: border-box;
   background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 0 30rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.01);
+  border-radius: 20rpx; /* 对应 Figma: 10px */
+  padding: 0 36rpx; /* 左右内边距对齐上面的卡片 */
+  box-shadow: 4rpx 4rpx 10rpx rgba(0, 0, 0, 0.08); /* 对应 Figma: 2px 2px 5px 8% */
 }
 
 .list-row {
   display: flex;
   align-items: center;
-  height: 90rpx; 
-  border-bottom: 1rpx solid #F8F8F8;
+  height: 120rpx; /* 对应 Figma 180px总高 / 3 = 60px */
+  /* 对应的分割线，使用浅灰过渡更柔和 */
+  border-bottom: 2rpx solid #EFEFEF;
 }
 
-.list-row.no-border { border-bottom: none; }
+.list-row.no-border {
+  border-bottom: none;
+}
 
-.list-icon { width: 36rpx; height: 36rpx; margin-right: 20rpx; background-size: cover; }
-.list-name { flex: 1; font-size: 28rpx; color: #333; }
-.icon-arrow-small { width: 24rpx; height: 24rpx; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23DDDDDD'%3E%3Cpath d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z'/%3E%3C/svg%3E"); background-size: cover; }
+.list-icon {
+  width: 40rpx; /* 对应 Figma 中 20px 左右的宽高 */
+  height: 40rpx;
+  margin-right: 24rpx;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.list-name {
+  flex: 1;
+  font-family: 'Source Han Sans CN', sans-serif;
+  font-size: 24rpx; /* 对应 Figma: 12px */
+  font-weight: 400;
+  color: #434343; /* 对应 Figma: #434343 */
+}
+
+.icon-arrow-small {
+  width: 34rpx; /* 对应 Figma: 17px */
+  height: 34rpx;
+  /* 颜色变更为纯黑以对齐设计图 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000000'%3E%3Cpath d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z'/%3E%3C/svg%3E");
+  background-size: cover;
+}
 
 .icon-message { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233ECE79'%3E%3Cpath d='M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z'/%3E%3C/svg%3E"); }
 .icon-help { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232A343D'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/%3E%3C/svg%3E"); }

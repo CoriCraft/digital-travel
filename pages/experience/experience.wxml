@@ -8,49 +8,61 @@
       </view>
       <view class="nav-title">线下体验</view>
       <view class="nav-right">
-        <!-- 右侧图标已移除 -->
+        <!-- 右侧占位 -->
       </view>
     </view>
   </view>
 
   <!-- 搜索框 -->
   <view class="search-bar-wrapper">
-    <search-bar
-      placeholder="搜索地点、美食、景点..."
-      value="{{searchKeyword}}"
-      bind:input="onSearchInput"
-      bind:search="onSearch"
-    />
+    <view class="custom-search-bar">
+      <view class="search-icon">
+        <t-icon name="search" size="36rpx" color="#999" />
+      </view>
+      <input class="search-input" placeholder="方山风景区" placeholder-class="search-placeholder" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
+      <view class="search-btn" bindtap="onSearch">搜索</view>
+    </view>
   </view>
 
   <view class="grid-section">
     <view class="grid-col left-col">
       <view class="bento-card card-leisure" bindtap="onBentoCardTap" data-type="leisure">
-        <view class="card-tag-hot">HOT</view>
-        <view class="card-header">
-          <text class="card-title">休闲玩乐</text>
-          <text class="card-sub">精品推荐/吃喝玩乐</text>
+        <view class="leisure-overflow-container">
+          <view class="card-tag-hot">HOT</view>
         </view>
-        <view class="leisure-imgs">
-          <image wx:if="{{leisureLocations[0]}}" class="img-placeholder left" src="{{leisureLocations[0].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{leisureLocations[0]._id}}" />
-          <view wx:else class="img-placeholder left"></view>
-          <image wx:if="{{leisureLocations[1]}}" class="img-placeholder right" src="{{leisureLocations[1].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{leisureLocations[1]._id}}" />
-          <view wx:else class="img-placeholder right"></view>
+        <image class="leisure-bg-svg" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQ1IiBoZWlnaHQ9IjE3NCIgdmlld0JveD0iMCAwIDI0NSAxNzQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGZpbHRlcj0idXJsKCNmaWx0ZXIwX2RfNDYzXzU3MSkiPgo8cGF0aCBkPSJNNzMuMDczOSA4SDIyQzE0LjgyMDMgOCA5IDEzLjgyMDMgOSAyMVYxNDlDOSAxNTYuMTggMTQuODIwMyAxNjIgMjIgMTYySDIyMUMyMjguMTggMTYyIDIzNCAxNTYuMTggMjM0IDE0OVY0Ny44NzI1QzIzNCA0MC42OTI4IDIyOC4xOCAzNC44NzI1IDIyMSAzNC44NzI1SDE0Ni4yNzVDMTQyLjE5MSAzNC44NzI1IDEzOC4zNDUgMzIuOTUzNyAxMzUuODg5IDI5LjY5MTJMMTIzLjQ2IDEzLjE4MTJDMTIxLjAwNCA5LjkxODggMTE3LjE1OCA4IDExMy4wNzQgOFoiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl80NjNfNTcxKSIvPgo8L2c+CjxkZWZzPgo8ZmlsdGVyIGlkPSJmaWx0ZXIwX2RfNDYzXzU3MSIgeD0iMCIgeT0iMCIgd2lkdGg9IjI0NSIgaGVpZ2h0PSIxNzQiIGZpbHRlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJzUkdCIj4KPGZlRmxvb2QgZmxvb2Qtb3BhY2l0eT0iMCIgcmVzdWx0PSJCYWNrZ3JvdW5kSW1hZ2VGaXgiLz4KPGZlQ29sb3JNYXRyaXggaW49IlNvdXJjZUFscGhhIiB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMTI3IDAiIHJlc3VsdD0iaGFyZEFscGhhIi8+CjxmZU9mZnNldCBkeD0iMSIgZHk9IjIiLz4KPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNSIvPgo8ZmVDb21wb3NpdGUgaW4yPSJoYXJkQWxwaGEiIG9wZXJhdG9yPSJvdXQiLz4KPGZlQ29sb3JNYXRyaXggdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAuMSAwIi8+CjxmZUJsZW5kIG1vZGU9Im5vcm1hbCIgaW4yPSJCYWNrZ3JvdW5kSW1hZ2VGaXgiIHJlc3VsdD0iZWZmZWN0MV9kcm9wU2hhZG93XzQ2M181NzEiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJlZmZlY3QxX2Ryb3BTaGFkb3dfNDYzXzU3MSIgcmVzdWx0PSJzaGFwZSIvPgo8L2ZpbHRlcj4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyXzQ2M181NzEiIHgxPSIyMTUuOTc3IiB5MT0iMTUyLjc0MyIgeDI9Ijg2LjY5NzIiIHkyPSItMjQuMDYxOCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjRkZFMTgwIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzdGRDczRCIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPg==" mode="aspectFill" />
+        <view class="leisure-content">
+          <view class="card-header">
+            <text class="card-title">休闲玩乐</text>
+            <text class="card-sub">精品推荐/吃喝玩乐</text>
+          </view>
+          <view class="leisure-imgs">
+            <image wx:if="{{leisureLocations[0]}}" class="img-placeholder left" src="{{leisureLocations[0].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{leisureLocations[0]._id}}" />
+            <view wx:else class="img-placeholder left"></view>
+            <image wx:if="{{leisureLocations[1]}}" class="img-placeholder right" src="{{leisureLocations[1].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{leisureLocations[1]._id}}" />
+            <view wx:else class="img-placeholder right"></view>
+          </view>
         </view>
       </view>
 
       <view class="bento-card card-scenic" bindtap="onBentoCardTap" data-type="scenic">
-        <view class="scenic-header">
+        <view class="scenic-left">
           <text class="card-title">景点游玩</text>
-          <view class="action-pill">马上看看 ></view>
+          <view class="action-pill">马上看看 〉</view>
         </view>
         <view class="scenic-imgs">
-          <image wx:if="{{scenicLocations[0]}}" class="img-mini" src="{{scenicLocations[0].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{scenicLocations[0]._id}}" />
-          <view wx:else class="img-mini"></view>
-          <image wx:if="{{scenicLocations[1]}}" class="img-mini" src="{{scenicLocations[1].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{scenicLocations[1]._id}}" />
-          <view wx:else class="img-mini"></view>
-          <image wx:if="{{scenicLocations[2]}}" class="img-mini" src="{{scenicLocations[2].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{scenicLocations[2]._id}}" />
-          <view wx:else class="img-mini"></view>
+          <view class="img-wrapper">
+            <image wx:if="{{scenicLocations[0]}}" class="img-mini" src="{{scenicLocations[0].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{scenicLocations[0]._id}}" />
+            <view wx:else class="img-mini"></view>
+          </view>
+          <view class="img-wrapper overlap-img">
+            <image wx:if="{{scenicLocations[1]}}" class="img-mini" src="{{scenicLocations[1].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{scenicLocations[1]._id}}" />
+            <view wx:else class="img-mini"></view>
+          </view>
+          <view class="img-wrapper overlap-img">
+            <image wx:if="{{scenicLocations[2]}}" class="img-mini" src="{{scenicLocations[2].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{scenicLocations[2]._id}}" />
+            <view wx:else class="img-mini"></view>
+          </view>
         </view>
       </view>
     </view>
@@ -58,8 +70,8 @@
     <view class="grid-col right-col">
       <view class="bento-card card-hotel" bindtap="onBentoCardTap" data-type="hotel">
         <view class="card-header">
-          <text class="card-title">酒店民宿</text>
-          <text class="card-sub-blue">精品民宿/舒适酒店</text>
+          <text class="card-title">酒店住宿</text>
+          <text class="card-sub-blue">精选住宿/舒适出行</text>
         </view>
         <view class="hotel-imgs">
           <image wx:if="{{hotelLocations[0]}}" class="img-tall" src="{{hotelLocations[0].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{hotelLocations[0]._id}}" />
@@ -70,14 +82,13 @@
       </view>
 
       <view class="bento-card card-food" bindtap="onBentoCardTap" data-type="food">
-          <text class="food-title">特色农家菜</text>
-          <view class="food-imgs">
-            <image wx:if="{{foodLocations[0]}}" class="img-food" src="{{foodLocations[0].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{foodLocations[0]._id}}" />
-            <view wx:else class="img-food"></view>
-            <image wx:if="{{foodLocations[1]}}" class="img-food" src="{{foodLocations[1].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{foodLocations[1]._id}}" />
-            <view wx:else class="img-food"></view>
-
-          </view>
+        <text class="food-title">美食推荐</text>
+        <view class="food-imgs">
+          <image wx:if="{{foodLocations[0]}}" class="img-food" src="{{foodLocations[0].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{foodLocations[0]._id}}" />
+          <view wx:else class="img-food"></view>
+          <image wx:if="{{foodLocations[1]}}" class="img-food" src="{{foodLocations[1].coverImage}}" mode="aspectFill" catchtap="onBentoImageTap" data-id="{{foodLocations[1]._id}}" />
+          <view wx:else class="img-food"></view>
+        </view>
       </view>
     </view>
   </view>
@@ -85,7 +96,7 @@
   <view class="tab-section">
     <view class="tab-item {{currentCategory === 0 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="0">推荐</view>
     <view class="tab-item {{currentCategory === 1 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="1">附近</view>
-    <view class="tab-item {{currentCategory === 2 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="2">住宿</view>
+    <view class="tab-item {{currentCategory === 2 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="2">酒店</view>
     <view class="tab-item {{currentCategory === 3 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="3">美食</view>
     <view class="tab-item {{currentCategory === 4 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="4">景点</view>
     <view class="tab-item {{currentCategory === 5 ? 'active' : ''}}" bindtap="onCategoryChange" data-value="5">玩乐</view>
@@ -95,9 +106,7 @@
     <view class="feed-card" wx:for="{{feedList}}" wx:key="_id" bindtap="onViewDetail" data-id="{{item._id}}">
       <view class="feed-img-box">
         <image wx:if="{{item.coverImage}}" class="feed-img" src="{{item.coverImage}}" mode="aspectFill" style="width: 100%; height: 100%;" lazy-load="{{true}}" />
-        <!-- 热门标签 -->
-        <view wx:if="{{item.isHot}}" class="hot-badge">🔥 热门</view>
-        <!-- 距离标签 -->
+        <view wx:if="{{item.isHot}}" class="hot-badge">热门</view>
         <view wx:if="{{item.distanceText}}" class="distance-badge">{{item.distanceText}}</view>
       </view>
 
@@ -123,14 +132,13 @@
     </view>
 
     <view class="empty-tip" wx:if="{{!loading && feedList.length === 0}}">
-      <text>暂无数据</text>
+      <text>暂无内容</text>
     </view>
   </view>
 
-  <!-- 全局悬浮帮助按钮 -->
   <view class="float-help-bubble" bindtap="onHelpTap">
     <image class="help-icon-svg" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8IS0tIOawlOaXoTIgLS0+CiAgPHBhdGggZD0iTTIwIDM2QzguOTU0MyAzNiAzIDI5LjI4NDMgMyAyMEMzIDEwLjcxNTcgOC45NTQzIDQgMjAgNEMzMS4wNDU3IDQgMzcgMTAuNzE1NyAzNyAyMEMzNyAyMy4wOTIxIDM2LjEyMjYgMjYuMDIzNCAzNC41NTA4IDI4LjYyNjlMMzcgMzZMMjkuNjI2OSAzMy41NTA4QzI3LjAyMzQgMzUuMTIyNiAyNC4wOTIxIDM2IDIwIDM2WiIgc3Ryb2tlPSIjOEVDOTREIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPCEtLSDljYzljacgLS0+CiAgPHBhdGggZD0iTTIwIDE0VjI2IiBzdHJva2U9IiM4RUM5NEQiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNMTQgMjBIMjYiIHN0cm9rZT0iIzhFQzk0RCIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4=" />
-    <text class="help-text">帮助</text>
+    <text class="help-text">指引</text>
   </view>
 
 </view>

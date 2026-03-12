@@ -103,6 +103,16 @@
   letter-spacing: 2rpx;
 }
 
+.template-description {
+  margin-bottom: 16rpx;
+}
+
+.description-text {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 40rpx;
+}
+
 .template-stats {
   display: flex;
   align-items: center;

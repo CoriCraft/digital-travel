@@ -8,6 +8,8 @@ page {
 .container {
   height: 100%;
   width: 100%;
+  padding: 0; /* 覆盖全局的 padding: 200rpx 0 */
+  display: block; /* 覆盖全局的 flex 布局 */
 }
 
 /* 导航栏 */
@@ -171,7 +173,7 @@ page {
 
 /* 内容区域 */
 .content-section {
-  padding: 0 24rpx 40rpx;
+  padding: 48rpx 0 40rpx; /* 只保留上下留白，左右由 waterfall-container 控制 */
 }
 
 /* 空状态 */
@@ -331,9 +333,11 @@ page {
 }
 
 /* 照片瀑布流 */
-.photo-waterfall {
+.waterfall-container {
   display: flex;
+  justify-content: space-between;
   gap: 16rpx;
+  padding: 0 16rpx; /* 与模板详情页保持一致 */
 }
 
 .waterfall-column {
@@ -344,16 +348,72 @@ page {
 }
 
 .photo-card {
-  background: #FFFFFF;
-  border-radius: 16rpx;
+  background-color: #fff;
+  border-radius: 12rpx;
   overflow: hidden;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
   position: relative;
+  display: block; /* 明确设置为 block，避免继承 flex 布局 */
 }
 
 .photo-image {
   width: 100%;
   display: block;
+  background-color: #f5f5f5;
+  min-height: 200rpx;
+}
+
+.photo-info {
+  padding: 16rpx 16rpx 24rpx;
+  display: block; /* 明确设置为 block，避免继承 flex 布局 */
+  background: #FDFEF6;
+  box-shadow: 4rpx 4rpx 6rpx rgba(0, 0, 0, 0.07);
+  border-radius: 0 0 12rpx 12rpx; /* 只有底部圆角，与卡片衔接 */
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.author-avatar {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+}
+
+.author-name {
+  font-size: 24rpx;
+  color: #666;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.photo-stats {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.photo-stats .stat-item {
+  display: flex !important;
+  flex-direction: row !important; /* 强制横向排列 */
+  align-items: center;
+  gap: 6rpx;
+  transition: background-color 0.2s;
+}
+
+.photo-stats .stat-item:active {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.stat-num {
+  font-size: 28rpx;
+  color: #b3b3b3;
 }
 
 .photo-actions {
@@ -362,4 +422,5 @@ page {
   right: 12rpx;
   display: flex;
   gap: 12rpx;
+  z-index: 10;
 }

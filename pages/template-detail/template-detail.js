@@ -33,7 +33,7 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad(options) {
+  async onLoad(options) {
     const { id } = options;
     this.setData({
       templateId: id,
@@ -42,6 +42,7 @@ Page({
       menuButtonRight: app.globalData.menuButtonRight
     });
 
+    await app.ensureUserInfo();
     this.loadTemplateDetail();
     this.loadPhotos(); // 独立加载照片列表
     this.checkFavoriteStatus();
@@ -114,9 +115,9 @@ Page({
   /**
    * 检查是否是创建者
    */
-  checkIsCreator(template) {
-    const userInfo = app.globalData.userInfo || {};
-    const currentOpenId = userInfo.openid || '';
+  async checkIsCreator(template) {
+    const userInfo = await app.ensureUserInfo();
+    const currentOpenId = userInfo?.openid || '';
     const creatorId = template.creatorId || '';
 
     const isCreator = currentOpenId && creatorId && currentOpenId === creatorId;
@@ -175,21 +176,38 @@ Page({
     // 如果有缓存且未过期，使用缓存数据
     if (cachedData && cachedData.timestamp && (now - cachedData.timestamp < cacheExpire)) {
       console.log('使用缓存的照片数据');
-      const allPhotos = cachedData.data;
 
-      // 检查每张照片的点赞状态
-      this.checkPhotosLikeStatus(allPhotos);
+      // 批量获取所有照片的真实宽高
+      Promise.all(
+        cachedData.data.map(async (photo) => {
+          try {
+            const imageUrl = photo.thumbnailUrl || photo.photoUrl;
+            const imageInfo = await wx.getImageInfo({ src: imageUrl });
+            return {
+              ...photo,
+              width: imageInfo.width,
+              height: imageInfo.height
+            };
+          } catch (err) {
+            console.error('获取图片信息失败:', photo._id, err);
+            return photo;
+          }
+        })
+      ).then(allPhotos => {
+        // 检查每张照片的点赞状态
+        this.checkPhotosLikeStatus(allPhotos);
 
-      // 获取图片临时链接（用于预览）
-      this.getTempFileURLs(allPhotos);
+        // 获取图片临时链接（用于预览）
+        this.getTempFileURLs(allPhotos);
 
-      // 设置照片数据
-      this.setData({
-        photos: allPhotos,
-        loading: false
-      }, () => {
-        // 数据设置完成后进行排序
-        this.sortPhotos();
+        // 设置照片数据
+        this.setData({
+          photos: allPhotos,
+          loading: false
+        }, () => {
+          // 数据设置完成后进行排序
+          this.sortPhotos();
+        });
       });
       return;
     }
@@ -208,10 +226,28 @@ Page({
       })
       .orderBy('createTime', 'desc')
       .get()
-      .then(res => {
+      .then(async res => {
         console.log('[模板详情] 照片列表加载成功，数量:', res.data.length);
 
-        const allPhotos = res.data;
+        // 批量获取所有照片的真实宽高
+        const allPhotos = await Promise.all(
+          res.data.map(async (photo) => {
+            try {
+              // 优先使用缩略图获取宽高（更快）
+              const imageUrl = photo.thumbnailUrl || photo.photoUrl;
+              const imageInfo = await wx.getImageInfo({ src: imageUrl });
+              return {
+                ...photo,
+                width: imageInfo.width,
+                height: imageInfo.height
+              };
+            } catch (err) {
+              console.error('获取图片信息失败:', photo._id, err);
+              // 如果获取失败，返回原照片对象（会使用哈希估算）
+              return photo;
+            }
+          })
+        );
 
         // 打印每张照片的URL信息
         allPhotos.forEach((photo, index) => {
@@ -219,7 +255,9 @@ Page({
             _id: photo._id,
             hasThumbnail: !!photo.thumbnailUrl,
             thumbnailUrl: photo.thumbnailUrl,
-            photoUrl: photo.photoUrl
+            photoUrl: photo.photoUrl,
+            width: photo.width,
+            height: photo.height
           });
         });
 
@@ -408,25 +446,38 @@ Page({
 
   /**
    * 智能瀑布流分列
-   * 使用图片 ID 哈希值来生成稳定的高度估算
+   * 优先使用真实宽高，否则使用图片 ID 哈希值来生成稳定的高度估算
    */
   buildWaterfall(photos) {
-    let {
-      leftColumnPhotos,
-      rightColumnPhotos,
-      leftHeight,
-      rightHeight
-    } = this.data;
+    // 创建新的空数组，不使用 data 中的旧数据
+    const leftColumnPhotos = [];
+    const rightColumnPhotos = [];
+    let leftHeight = 0;
+    let rightHeight = 0;
+
+    console.log('[瀑布流] 开始分配，照片总数:', photos.length);
 
     photos.forEach((photo, index) => {
-      // 使用照片 ID 的哈希值生成稳定的高度
-      const hash = this.simpleHash(photo._id);
-      const heightVariation = (hash % 300) - 150; // -150 到 +150 的变化
-      const baseHeight = 450; // 基础高度
-      const cardHeight = baseHeight + heightVariation + 120; // 图片 + 底部信息栏
-
       // 添加 originalIndex 用于点击跳转
       const photoWithIndex = { ...photo, originalIndex: index };
+
+      // 计算实际高度：优先使用图片的真实宽高比
+      let cardHeight;
+      if (photo.width && photo.height) {
+        // 如果有宽高信息，使用真实宽高比计算
+        // 假设列宽为 343rpx（750rpx - 24*2 - 16）/ 2
+        const columnWidth = 343;
+        const imageHeight = (photo.height / photo.width) * columnWidth;
+        cardHeight = imageHeight + 120; // 图片高度 + 底部信息栏
+        console.log(`[瀑布流] 照片${index} 使用真实宽高比: ${photo.width}x${photo.height}, 计算高度:${cardHeight.toFixed(0)}`);
+      } else {
+        // 如果没有宽高信息，使用哈希值估算
+        const hash = this.simpleHash(photo._id);
+        const heightVariation = (hash % 300) - 150;
+        const baseHeight = 450;
+        cardHeight = baseHeight + heightVariation + 120;
+        console.log(`[瀑布流] 照片${index} 使用哈希估算, 高度:${cardHeight}`);
+      }
 
       // 打印每张照片在列表中使用的URL
       const displayUrl = photo.thumbnailUrl || photo.photoUrl;
@@ -435,25 +486,29 @@ Page({
         useThumbnail: !!photo.thumbnailUrl,
         displayUrl: displayUrl,
         estimatedHeight: cardHeight,
-        hash: hash
+        leftHeight,
+        rightHeight
       });
 
       // 分配到较短的列
       if (leftHeight <= rightHeight) {
         leftColumnPhotos.push(photoWithIndex);
         leftHeight += cardHeight;
+        console.log(`[瀑布流] 照片${index} -> 左列, 高度:${cardHeight.toFixed(0)}, 左列总高:${leftHeight.toFixed(0)}`);
       } else {
         rightColumnPhotos.push(photoWithIndex);
         rightHeight += cardHeight;
+        console.log(`[瀑布流] 照片${index} -> 右列, 高度:${cardHeight.toFixed(0)}, 右列总高:${rightHeight.toFixed(0)}`);
       }
     });
 
     console.log('[瀑布流] 分配完成:', {
+      totalPhotos: photos.length,
       leftCount: leftColumnPhotos.length,
       rightCount: rightColumnPhotos.length,
-      leftHeight,
-      rightHeight,
-      diff: Math.abs(leftHeight - rightHeight)
+      leftHeight: leftHeight.toFixed(0),
+      rightHeight: rightHeight.toFixed(0),
+      diff: Math.abs(leftHeight - rightHeight).toFixed(0)
     });
 
     this.setData({
@@ -628,21 +683,41 @@ Page({
   /**
    * 检查照片点赞状态
    */
-  async checkPhotosLikeStatus(photos) {
+  async checkPhotosLikeStatus(photos, forceRefresh = false) {
     if (!photos || photos.length === 0) return;
 
     // 批量检查点赞状态
     const likeTargets = photos.map(p => ({ targetId: p._id, targetType: 'photo' }));
-    const likeResults = await interaction.batchCheckStatus(likeTargets, 'like');
+    const likeResults = await interaction.batchCheckStatus(likeTargets, 'like', forceRefresh);
 
     // 批量检查收藏状态
     const favoriteTargets = photos.map(p => ({ targetId: p._id, targetType: 'photo' }));
-    const favoriteResults = await interaction.batchCheckStatus(favoriteTargets, 'favorite');
+    const favoriteResults = await interaction.batchCheckStatus(favoriteTargets, 'favorite', forceRefresh);
 
     // 更新照片状态
     photos.forEach(photo => {
       photo.isLiked = likeResults[photo._id] || false;
       photo.isFavorited = favoriteResults[photo._id] || false;
+    });
+
+    // 更新瀑布流列的状态
+    const { leftColumnPhotos, rightColumnPhotos } = this.data;
+
+    leftColumnPhotos.forEach(photo => {
+      photo.isLiked = likeResults[photo._id] || false;
+      photo.isFavorited = favoriteResults[photo._id] || false;
+    });
+
+    rightColumnPhotos.forEach(photo => {
+      photo.isLiked = likeResults[photo._id] || false;
+      photo.isFavorited = favoriteResults[photo._id] || false;
+    });
+
+    // 更新页面数据
+    this.setData({
+      photos,
+      leftColumnPhotos,
+      rightColumnPhotos
     });
   },
 
@@ -798,6 +873,7 @@ Page({
     try {
       wx.showLoading({ title: '提交中...' });
 
+      const userInfo = await app.ensureUserInfo();
       const db = getDB();
       await db.collection('reports').add({
         data: {
@@ -805,8 +881,8 @@ Page({
           targetType,
           targetName,
           reason,
-          reporterOpenId: app.globalData.userInfo?.openid || '',
-          reporterName: app.globalData.userInfo?.nickName || '匿名用户',
+          reporterOpenId: userInfo?.openid || '',
+          reporterName: userInfo?.nickName || '匿名用户',
           status: 'pending',
           createTime: new Date(),
         }
@@ -835,7 +911,19 @@ Page({
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow() {},
+  onShow() {
+    // 从照片预览页返回时，强制刷新照片状态
+    if (this.data.photos.length > 0) {
+      console.log('[onShow] 强制刷新照片状态');
+      this.checkPhotosLikeStatus(this.data.photos, true);
+    }
+
+    // 刷新模板自身的收藏和点赞状态
+    if (this.data.templateId) {
+      this.checkFavoriteStatus();
+      this.checkLikeStatus();
+    }
+  },
 
   /**
    * 生命周期函数--监听页面隐藏
@@ -913,7 +1001,7 @@ Page({
 
     try {
       const db = getDB();
-      const userInfo = app.globalData.userInfo || {};
+      const userInfo = await app.ensureUserInfo();
       const currentOpenId = userInfo.openid || '';
 
       // 1. 检查是否有其他用户上传的照片

@@ -1,19 +1,16 @@
 // pages/my/my.js
-const app = getApp()
-const { checkImageSecurity, checkOperationLimit, recordOperationTime, getRemainingTime } = require('../../utils/util.js')
+const app = getApp();
+const { checkImageSecurity, checkOperationLimit, recordOperationTime, getRemainingTime } = require('../../utils/util.js');
 
 function getDB() {
-  return wx.cloud.database()
+  return wx.cloud.database();
 }
 
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
     statusBarHeight: 0,
     navBarHeight: 0,
+    contentPaddingTop: 0,
     userAvatar: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="50" fill="%23E8F5E9"/%3E%3Cpath d="M50 45c8.284 0 15-6.716 15-15s-6.716-15-15-15-15 6.716-15 15 6.716 15 15 15zm0 5c-13.807 0-25 11.193-25 25v10h50V75c0-13.807-11.193-25-25-25z" fill="%233ECE79"/%3E%3C/svg%3E',
     userName: '微信用户',
     userPhone: '',
@@ -22,344 +19,253 @@ Page({
     unreadCount: 0
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {
-    this.setData({
-      statusBarHeight: app.globalData.statusBarHeight,
-      navBarHeight: app.globalData.navBarHeight
-    })
+  onLoad() {
+    const sbHeight = Number(app.globalData.statusBarHeight) || 0;
+    const nbHeight = Number(app.globalData.navBarHeight) || 0;
 
-    // 加载用户信息
-    this.loadUserInfo()
+    this.setData({
+      statusBarHeight: sbHeight,
+      navBarHeight: nbHeight,
+      contentPaddingTop: sbHeight + nbHeight
+    });
+
+    this.loadUserInfo();
   },
 
-  /**
-   * 加载用户信息
-   */
-  loadUserInfo() {
-    const userInfo = app.globalData.userInfo
+  async loadUserInfo() {
+    const userInfo = await app.ensureUserInfo();
     if (userInfo) {
       this.setData({
         userName: userInfo.nickName || '微信用户',
         userAvatar: userInfo.avatarUrl || this.data.userAvatar
-      })
+      });
     }
 
-    // 加载统计数据
-    this.loadStatistics()
+    await this.loadStatistics();
 
-    // 延迟加载未读消息数量，避免阻塞页面渲染
     setTimeout(() => {
-      this.loadUnreadCount()
-    }, 500)
+      this.loadUnreadCount();
+    }, 500);
   },
 
-  /**
-   * 加载统计数据
-   */
-  loadStatistics() {
-    const userInfo = app.globalData.userInfo
+  async loadStatistics() {
+    const userInfo = await app.ensureUserInfo();
     if (!userInfo || !userInfo.openid) {
-      console.log('用户信息未加载，跳过统计')
-      return
+      console.log('用户信息未准备好，跳过统计加载');
+      return;
     }
 
-    const db = getDB()
+    const db = getDB();
 
-    // 统计打卡拍摄点数量
     db.collection('check_ins')
       .where({
         userId: userInfo.openid
       })
       .count()
       .then(res => {
-        this.setData({ checkInCount: res.total })
+        this.setData({ checkInCount: res.total });
       })
       .catch(err => {
-        console.error('统计打卡失败:', err)
-      })
+        console.error('加载打卡统计失败:', err);
+      });
 
-    // 计算注册天数（基于本地首次登录时间）
-    let firstLogin = wx.getStorageSync('firstLoginTime')
+    let firstLogin = wx.getStorageSync('firstLoginTime');
     if (!firstLogin) {
-      firstLogin = Date.now()
-      wx.setStorageSync('firstLoginTime', firstLogin)
+      firstLogin = Date.now();
+      wx.setStorageSync('firstLoginTime', firstLogin);
     }
-    const days = Math.max(1, Math.ceil((Date.now() - firstLogin) / (1000 * 60 * 60 * 24)))
-    this.setData({ registerDays: days })
+
+    const days = Math.max(1, Math.ceil((Date.now() - firstLogin) / (1000 * 60 * 60 * 24)));
+    this.setData({ registerDays: days });
   },
 
-  /**
-   * 选择头像
-   */
   async onChooseAvatar(e) {
-    const { avatarUrl } = e.detail
-    console.log('选择头像:', avatarUrl)
+    const { avatarUrl } = e.detail;
 
-    // 检查更换频率（24小时内只能更换一次）
-    const canChange = checkOperationLimit('lastAvatarChangeTime', 1440)
+    const canChange = checkOperationLimit('lastAvatarChangeTime', 1440);
     if (!canChange) {
-      const remaining = getRemainingTime('lastAvatarChangeTime', 1440)
+      const remaining = getRemainingTime('lastAvatarChangeTime', 1440);
       wx.showModal({
-        title: '操作限制',
-        content: `为了防止频繁更换头像，24小时内只能更换一次。距离下次可更换还需 ${remaining}`,
+        title: '暂时不能修改',
+        content: `24 小时内仅可修改一次头像，请 ${remaining} 后再试。`,
         showCancel: false
-      })
-      return
+      });
+      return;
     }
 
-    wx.showLoading({ title: '审核中...' })
+    wx.showLoading({ title: '检测中...' });
 
     try {
-      // 图片内容安全审核
-      const checkResult = await checkImageSecurity(avatarUrl)
-
+      const checkResult = await checkImageSecurity(avatarUrl);
       if (!checkResult.success) {
-        wx.hideLoading()
+        wx.hideLoading();
         wx.showModal({
-          title: '审核失败',
+          title: '头像检测失败',
           content: checkResult.errMsg,
           showCancel: false
-        })
-        return
+        });
+        return;
       }
 
-      // 审核通过，上传头像到云存储
-      wx.showLoading({ title: '上传中...' })
+      wx.showLoading({ title: '上传中...' });
 
-      const cloudPath = `avatars/${app.globalData.userInfo.openid}_${Date.now()}.jpg`
+      const userInfo = await app.ensureUserInfo();
+      const cloudPath = `avatars/${userInfo.openid}_${Date.now()}.jpg`;
       const uploadRes = await wx.cloud.uploadFile({
-        cloudPath: cloudPath,
+        cloudPath,
         filePath: avatarUrl
-      })
+      });
 
-      console.log('头像上传成功:', uploadRes.fileID)
-
-      // 更新本地显示
       this.setData({
-        userAvatar: avatarUrl
-      })
+        userAvatar: uploadRes.fileID
+      });
 
-      // 更新全局用户信息
-      app.updateUserProfile(this.data.userName, uploadRes.fileID)
+      await app.updateUserProfile(this.data.userName, uploadRes.fileID);
+      recordOperationTime('lastAvatarChangeTime');
 
-      // 记录更换时间
-      recordOperationTime('lastAvatarChangeTime')
-
-      wx.hideLoading()
+      wx.hideLoading();
       wx.showToast({
         title: '头像更新成功',
         icon: 'success'
-      })
+      });
     } catch (err) {
-      console.error('头像上传失败:', err)
-      wx.hideLoading()
+      console.error('头像上传失败:', err);
+      wx.hideLoading();
       wx.showToast({
         title: '头像上传失败',
         icon: 'none'
-      })
+      });
     }
   },
 
-  /**
-   * 修改昵称
-   */
   onEditNickname() {
     wx.showModal({
       title: '修改昵称',
       editable: true,
-      placeholderText: '请输入昵称',
+      placeholderText: '请输入新的昵称',
       content: this.data.userName,
-      success: res => {
-        if (res.confirm && res.content) {
-          const newName = res.content.trim()
-          if (newName) {
-            this.setData({
-              userName: newName
-            })
+      success: async res => {
+        if (!res.confirm || !res.content) {
+          return;
+        }
 
-            // 更新全局用户信息
-            app.updateUserProfile(newName, app.globalData.userInfo.avatarUrl)
+        const newName = res.content.trim();
+        if (!newName) {
+          return;
+        }
 
-            wx.showToast({
-              title: '昵称更新成功',
-              icon: 'success'
-            })
-          }
+        try {
+          const userInfo = await app.ensureUserInfo();
+          await app.updateUserProfile(newName, userInfo?.avatarUrl || '');
+          this.setData({
+            userName: newName
+          });
+
+          wx.showToast({
+            title: '昵称更新成功',
+            icon: 'success'
+          });
+        } catch (err) {
+          console.error('更新昵称失败:', err);
+          wx.showToast({
+            title: '昵称更新失败',
+            icon: 'none'
+          });
         }
       }
-    })
+    });
   },
 
-  /**
-   * 导航到作品页面
-   */
   navigateToProducts() {
     wx.navigateTo({
       url: '/pages/my-works/my-works'
-    })
+    });
   },
 
-  /**
-   * 导航到收藏页面
-   */
   navigateToCollect() {
     wx.navigateTo({
       url: '/pages/my-favorites/my-favorites'
-    })
+    });
   },
 
-  /**
-   * 导航到喜欢页面
-   */
   navigateToLikes() {
     wx.navigateTo({
       url: '/pages/my-likes/my-likes'
-    })
+    });
   },
 
-  /**
-   * 加载未读消息数量
-   */
   async loadUnreadCount() {
     try {
-      // 检查用户信息是否已加载
-      const userInfo = app.globalData.userInfo
+      const userInfo = await app.ensureUserInfo();
       if (!userInfo || !userInfo.openid) {
-        console.log('用户信息未加载，跳过加载未读消息数量')
-        return
+        console.log('用户信息未准备好，跳过未读消息统计');
+        return;
       }
 
-      // 设置超时保护
-      const timeoutPromise = new Promise((resolve) => {
+      const timeoutPromise = new Promise(resolve => {
         setTimeout(() => {
-          resolve({ timeout: true })
-        }, 5000) // 5秒超时
-      })
+          resolve({ timeout: true });
+        }, 5000);
+      });
 
       const callFunctionPromise = wx.cloud.callFunction({
         name: 'getUnreadCount'
-      })
+      });
 
-      const res = await Promise.race([callFunctionPromise, timeoutPromise])
-
+      const res = await Promise.race([callFunctionPromise, timeoutPromise]);
       if (res.timeout) {
-        console.log('获取未读消息数量超时，使用默认值')
-        return
+        console.log('加载未读消息超时，忽略本次请求');
+        return;
       }
 
       if (res.result && res.result.success) {
         this.setData({
           unreadCount: res.result.count
-        })
+        });
       }
     } catch (err) {
-      console.error('加载未读消息数量失败:', err)
-      // 失败时不影响页面显示，静默处理
+      console.error('加载未读消息失败:', err);
     }
   },
 
-  /**
-   * 导航到消息中心
-   */
   navigateToMessages() {
     wx.navigateTo({
       url: '/pages/messages/messages'
-    })
+    });
   },
 
-  /**
-   * 导航到帮助中心
-   */
   navigateToHelp() {
     wx.navigateTo({
       url: '/pages/help-center/help-center'
-    })
+    });
   },
 
-  /**
-   * 导航到服务改进
-   */
   navigateToService() {
     wx.navigateTo({
       url: '/pages/feedback/feedback'
-    })
+    });
   },
 
-  /**
-   * 导航到设置
-   */
   navigateToSettings() {
     wx.navigateTo({
       url: '/pages/settings/settings'
-    })
+    });
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow() {
     if (typeof this.getTabBar === 'function') {
       const tabBar = this.getTabBar();
       tabBar.setData({
-        value: 'my',
+        value: 'my'
       });
     }
 
-    // 每次显示页面时重新加载用户信息
-    this.loadUserInfo()
+    this.loadUserInfo();
   },
 
-  /**
-   * 返回首页
-   */
   goHome() {
     wx.switchTab({
       url: '/pages/template/template'
     });
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
   }
-})
+});

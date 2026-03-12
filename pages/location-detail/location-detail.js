@@ -26,12 +26,14 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad(options) {
+  async onLoad(options) {
     this.setData({
       statusBarHeight: app.globalData.statusBarHeight,
       navBarHeight: app.globalData.navBarHeight,
       locationId: options.id
     });
+
+    await app.ensureUserInfo();
 
     if (options.id) {
       this.loadLocationDetail(options.id);
@@ -133,7 +135,7 @@ Page({
   async checkCheckInStatus(locationId) {
     try {
       const db = getDB()
-      const userInfo = app.globalData.userInfo;
+      const userInfo = await app.ensureUserInfo();
       if (!userInfo || !userInfo.openid) {
         return;
       }
@@ -166,7 +168,7 @@ Page({
   async onCheckIn() {
     try {
       // 检查用户是否登录
-      const userInfo = app.globalData.userInfo;
+      const userInfo = await app.ensureUserInfo();
       if (!userInfo || !userInfo.openid) {
         wx.showModal({
           title: '提示',
@@ -406,8 +408,8 @@ Page({
   /**
    * 写评价
    */
-  onWriteReview() {
-    const userInfo = app.globalData.userInfo;
+  async onWriteReview() {
+    const userInfo = await app.ensureUserInfo();
     if (!userInfo || !userInfo.openid) {
       wx.showModal({
         title: '提示',
@@ -448,9 +450,10 @@ Page({
   /**
    * 长按评论 - 自己的可删除,别人的可举报
    */
-  onReviewReport(e) {
+  async onReviewReport(e) {
     const { id, type, content, userid } = e.currentTarget.dataset;
-    const currentUserId = app.globalData.userInfo?.openid;
+    const userInfo = await app.ensureUserInfo();
+    const currentUserId = userInfo?.openid;
 
     // 判断是否是自己的评论
     const isMyReview = userid === currentUserId;
@@ -564,6 +567,7 @@ Page({
     try {
       wx.showLoading({ title: '提交中...' });
 
+      const userInfo = await app.ensureUserInfo();
       const db = getDB();
       await db.collection('reports').add({
         data: {
@@ -571,8 +575,8 @@ Page({
           targetType,
           targetName,
           reason,
-          reporterOpenId: app.globalData.userInfo?.openid || '',
-          reporterName: app.globalData.userInfo?.nickName || '匿名用户',
+          reporterOpenId: userInfo?.openid || '',
+          reporterName: userInfo?.nickName || '匿名用户',
           status: 'pending',
           createTime: new Date(),
         }

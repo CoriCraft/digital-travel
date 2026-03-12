@@ -27,6 +27,9 @@
         <text class="template-name">{{template.name}}</text>
         <view class="official-badge" wx:if="{{template.isOfficial}}">官方</view>
       </view>
+      <view class="template-description" wx:if="{{template.description}}">
+        <text class="description-text">{{template.description}}</text>
+      </view>
       <view class="template-stats">
         <view class="stat-item">
           <t-icon name="star-filled" size="32rpx" color="{{isFavorite ? '#FFD700' : '#DADADA'}}" />

@@ -85,12 +85,12 @@ function updateCacheItem(type, targetType, targetId, isAdd) {
 /**
  * 获取用户openid
  */
-function getUserOpenId() {
+async function getUserOpenId() {
   const app = getApp()
-  if (!app || !app.globalData) {
+  if (!app || !app.globalData || !app.ensureUserInfo) {
     return null
   }
-  const userInfo = app.globalData.userInfo
+  const userInfo = await app.ensureUserInfo()
   if (!userInfo || !userInfo.openid) {
     return null
   }
@@ -112,7 +112,7 @@ async function checkFavoriteStatus(targetId, targetType) {
     }
 
     // 缓存未命中，查询云端
-    const openid = getUserOpenId()
+    const openid = await getUserOpenId()
     if (!openid) {
       return false
     }
@@ -152,7 +152,7 @@ async function checkLikeStatus(targetId, targetType) {
     }
 
     // 缓存未命中，查询云端
-    const openid = getUserOpenId()
+    const openid = await getUserOpenId()
     if (!openid) {
       return false
     }
@@ -196,7 +196,7 @@ async function toggleFavorite(targetId, targetType, collectionName) {
   }, 300)
 
   try {
-    const openid = getUserOpenId()
+    const openid = await getUserOpenId()
     if (!openid) {
       wx.showModal({
         title: '提示',
@@ -286,7 +286,7 @@ async function toggleLike(targetId, targetType, collectionName) {
   }, 300)
 
   try {
-    const openid = getUserOpenId()
+    const openid = await getUserOpenId()
     if (!openid) {
       wx.showModal({
         title: '提示',
@@ -358,14 +358,29 @@ async function toggleLike(targetId, targetType, collectionName) {
 }
 
 /**
+ * 清除缓存
+ * @param {string} type - 类型: favorites/likes
+ * @param {string} targetType - 资源类型
+ */
+function clearCache(type, targetType) {
+  try {
+    const key = getCacheKey(type, targetType)
+    wx.removeStorageSync(key)
+  } catch (error) {
+    console.error('清除缓存失败:', error)
+  }
+}
+
+/**
  * 批量检查状态
  * @param {Array} targets - 目标资源列表 [{id, type}]
  * @param {string} actionType - 操作类型: favorite/like
+ * @param {boolean} forceRefresh - 是否强制刷新（忽略缓存）
  * @returns {Promise<Object>} - {targetId: boolean}
  */
-async function batchCheckStatus(targets, actionType) {
+async function batchCheckStatus(targets, actionType, forceRefresh = false) {
   try {
-    const openid = getUserOpenId()
+    const openid = await getUserOpenId()
     if (!openid || !targets || targets.length === 0) {
       return {}
     }
@@ -373,10 +388,10 @@ async function batchCheckStatus(targets, actionType) {
     // 按类型分组
     const grouped = {}
     targets.forEach(target => {
-      if (!grouped[target.type]) {
-        grouped[target.type] = []
+      if (!grouped[target.targetType]) {
+        grouped[target.targetType] = []
       }
-      grouped[target.type].push(target.id)
+      grouped[target.targetType].push(target.targetId)
     })
 
     const result = {}
@@ -387,16 +402,21 @@ async function batchCheckStatus(targets, actionType) {
     for (let targetType in grouped) {
       const ids = grouped[targetType]
 
+      // 如果强制刷新，清除缓存
+      if (forceRefresh) {
+        clearCache(actionType === 'favorite' ? 'favorites' : 'likes', targetType)
+      }
+
       // 先尝试从缓存读取
       const cache = getCache(actionType === 'favorite' ? 'favorites' : 'likes', targetType)
-      if (cache) {
+      if (cache && !forceRefresh) {
         ids.forEach(id => {
           result[id] = cache.includes(id)
         })
         continue
       }
 
-      // 缓存未命中，查询云端
+      // 缓存未命中或强制刷新，查询云端
       const { data } = await db.collection(collectionName)
         .where({
           userId: openid,
@@ -407,6 +427,19 @@ async function batchCheckStatus(targets, actionType) {
         .get()
 
       const checkedIds = data.map(item => item.targetId)
+
+      // 更新缓存
+      const allIds = await db.collection(collectionName)
+        .where({
+          userId: openid,
+          targetType: targetType
+        })
+        .field({ targetId: true })
+        .get()
+
+      const cacheIds = allIds.data.map(item => item.targetId)
+      setCache(actionType === 'favorite' ? 'favorites' : 'likes', targetType, cacheIds)
+
       ids.forEach(id => {
         result[id] = checkedIds.includes(id)
       })
@@ -424,5 +457,6 @@ module.exports = {
   checkLikeStatus,
   toggleFavorite,
   toggleLike,
-  batchCheckStatus
+  batchCheckStatus,
+  clearCache
 }

@@ -18,7 +18,7 @@ Page({
     statusBarHeight: 0
   },
 
-  onLoad(options) {
+  async onLoad(options) {
     const { currentIndex } = options;
 
     // 获取状态栏高度
@@ -43,7 +43,8 @@ Page({
     const currentPhoto = photos[index];
 
     // 判断是否是自己的照片
-    const currentUserId = app.globalData.userInfo?.openid || '';
+    const userInfo = await app.ensureUserInfo();
+    const currentUserId = userInfo?.openid || '';
     const isMyPhoto = currentPhoto.userId === currentUserId;
 
     this.setData({
@@ -91,12 +92,13 @@ Page({
   /**
    * 轮播切换
    */
-  onSwiperChange(e) {
+  async onSwiperChange(e) {
     const index = e.detail.current;
     const currentPhoto = this.data.photos[index];
 
     // 判断是否是自己的照片
-    const currentUserId = app.globalData.userInfo?.openid || '';
+    const userInfo = await app.ensureUserInfo();
+    const currentUserId = userInfo?.openid || '';
     const isMyPhoto = currentPhoto.userId === currentUserId;
 
     this.setData({
@@ -302,7 +304,8 @@ Page({
       const _ = db.command;
 
       // 调试信息
-      const currentUserId = app.globalData.userInfo?.openid || '';
+      const userInfo = await app.ensureUserInfo();
+      const currentUserId = userInfo?.openid || '';
       const { currentPhoto, templateId } = this.data;
       console.log('当前用户 openid:', currentUserId);
       console.log('照片 userId:', currentPhoto.userId);
@@ -387,7 +390,8 @@ Page({
         // 还有照片，显示下一张或上一张
         const newIndex = currentIndex >= photos.length ? photos.length - 1 : currentIndex;
         const currentPhoto = photos[newIndex];
-        const currentUserId = app.globalData.userInfo?.openid || '';
+        const userInfo = await app.ensureUserInfo();
+        const currentUserId = userInfo?.openid || '';
         const isMyPhoto = currentPhoto.userId === currentUserId;
 
         this.setData({
@@ -418,7 +422,8 @@ Page({
       wx.showLoading({ title: '删除中...' });
 
       const db = getDB();
-      const currentUserId = app.globalData.userInfo?.openid || '';
+      const userInfo = await app.ensureUserInfo();
+      const currentUserId = userInfo?.openid || '';
       const { templateId } = this.data;
 
       // 1. 删除照片记录
@@ -533,6 +538,7 @@ Page({
     try {
       wx.showLoading({ title: '提交中...' });
 
+      const userInfo = await app.ensureUserInfo();
       const db = getDB();
       await db.collection('reports').add({
         data: {
@@ -540,8 +546,8 @@ Page({
           targetType,
           targetName,
           reason,
-          reporterOpenId: app.globalData.userInfo?.openid || '',
-          reporterName: app.globalData.userInfo?.nickName || '匿名用户',
+          reporterOpenId: userInfo?.openid || '',
+          reporterName: userInfo?.nickName || '匿名用户',
           status: 'pending',
           createTime: new Date(),
         }

@@ -24,18 +24,23 @@
         image-props="{{ { mode: 'aspectFill' } }}"
         t-class="banner-swiper"
         t-class-image="banner-image"
+        t-class-navigation="custom-navigation"
+        t-class-nav-item="custom-nav-item"
         bindchange="onSwiperChange"
         bindclick="onBannerClick"
       />
     </view>
 
     <!-- 搜索框 -->
-    <search-bar
-      placeholder="猜你喜欢..."
-      value="{{searchKeyword}}"
-      bind:input="onSearchInput"
-      bind:search="onSearch"
-    />
+    <view class="search-bar-wrapper">
+      <view class="custom-search-bar">
+        <view class="search-icon">
+          <t-icon name="search" size="36rpx" color="#999" />
+        </view>
+        <input class="search-input" placeholder="猜你喜欢..." placeholder-class="search-placeholder" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
+        <view class="search-btn" bindtap="onSearch">搜索</view>
+      </view>
+    </view>
 
     <view class="tabs-section">
       <view class="tabs-row">

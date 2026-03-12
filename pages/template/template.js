@@ -70,14 +70,17 @@ Page({
       });
     }
 
-    // 检查是否需��刷新列表
+    // 检查是否需要刷新列表
     const needRefresh = wx.getStorageSync('template_list_need_refresh');
     if (needRefresh) {
-      console.log('检测到需要刷新��板列表');
+      console.log('检测到需要刷新模板列表');
       wx.removeStorageSync('template_list_need_refresh');
       this.loadTemplates();
+    } else if (this.data.templates.length > 0) {
+      // 如果已有模板数据，强制刷新状态（忽略缓存）
+      console.log('[onShow] 强制刷新模板状态');
+      this.batchCheckTemplateStatus(this.data.templates, true);
     }
-
 
     // 检查位置信息是否过期，自动弹出位置选择
     this.checkLocationExpired();
@@ -477,7 +480,10 @@ Page({
         // 智能瀑布流分列
         if (loadMore) {
           // 加载更多：在现有基础上继续分配
-          this.buildWaterfall(templatesWithHot);
+          this.buildWaterfall(templatesWithHot, () => {
+            // 瀑布流构建完成后检查状态
+            this.batchCheckTemplateStatus(newTemplates);
+          });
         } else {
           // 首次加载：重置后分配
           this.setData({
@@ -486,7 +492,10 @@ Page({
             leftHeight: 0,
             rightHeight: 0
           }, () => {
-            this.buildWaterfall(newTemplates);
+            this.buildWaterfall(newTemplates, () => {
+              // 瀑布流构建完成后检查状态
+              this.batchCheckTemplateStatus(newTemplates);
+            });
           });
         }
 
@@ -498,9 +507,6 @@ Page({
         });
 
         wx.hideLoading();
-
-        // 批量检查模板的收藏和点赞状态
-        this.batchCheckTemplateStatus(templatesWithHot);
 
         // 如果是加载更多且没有更多数据，提示用户
         if (loadMore && !hasMore) {
@@ -623,7 +629,7 @@ Page({
    * 智能瀑布流分列
    * 根据图片比例预估卡片高度，动态分配到较短的列
    */
-  buildWaterfall(templates) {
+  buildWaterfall(templates, callback) {
     let {
       leftColumnTemplates,
       rightColumnTemplates,
@@ -653,7 +659,7 @@ Page({
       rightColumnTemplates,
       leftHeight,
       rightHeight
-    });
+    }, callback);
   },
 
   /**
@@ -721,8 +727,14 @@ Page({
   /**
    * 批量检查模板的收藏和点赞状态
    */
-  async batchCheckTemplateStatus(templates) {
-    if (!templates || templates.length === 0) return;
+  async batchCheckTemplateStatus(templates, forceRefresh = false) {
+    if (!templates || templates.length === 0) {
+      console.log('[状态检查] 模板列表为空，跳过检查');
+      return;
+    }
+
+    console.log('[状态检查] 开始检查模板状态，数量:', templates.length, '强制刷新:', forceRefresh);
+    console.log('[状态检查] 当前瀑布流列状态 - 左列:', this.data.leftColumnTemplates.length, '右列:', this.data.rightColumnTemplates.length);
 
     try {
       // 准备批量查询的目标列表
@@ -732,15 +744,18 @@ Page({
       }));
 
       // 批量检查收藏状态
-      const favoriteResults = await interaction.batchCheckStatus(targets, 'favorite');
+      const favoriteResults = await interaction.batchCheckStatus(targets, 'favorite', forceRefresh);
+      console.log('[状态检查] 收藏状态结果:', favoriteResults);
 
       // 批量检查点赞状态
-      const likeResults = await interaction.batchCheckStatus(targets, 'like');
+      const likeResults = await interaction.batchCheckStatus(targets, 'like', forceRefresh);
+      console.log('[状态检查] 点赞状态结果:', likeResults);
 
       // 更新模板列表中的状态
       const updatedTemplates = this.data.templates.map(template => {
         const isFavorited = favoriteResults[template._id] || false;
         const isLiked = likeResults[template._id] || false;
+        console.log(`[状态检查] 模板 ${template.name} (${template._id}): 收藏=${isFavorited}, 点赞=${isLiked}`);
         return {
           ...template,
           isFavorited,
@@ -775,9 +790,9 @@ Page({
         rightColumnTemplates: updatedRightColumn
       });
 
-      console.log('批量状态检查完成');
+      console.log('[状态检查] 批量状态检查完成，已更新页面数据');
     } catch (error) {
-      console.error('批量检查状态失败:', error);
+      console.error('[状态检查] 批量检查状态失败:', error);
     }
   },
 
@@ -885,6 +900,7 @@ Page({
     try {
       wx.showLoading({ title: '提交中...' });
 
+      const userInfo = await app.ensureUserInfo();
       const db = getDB();
       await db.collection('reports').add({
         data: {
@@ -892,8 +908,8 @@ Page({
           targetType,
           targetName,
           reason,
-          reporterOpenId: app.globalData.userInfo?.openid || '',
-          reporterName: app.globalData.userInfo?.nickName || '匿名用户',
+          reporterOpenId: userInfo?.openid || '',
+          reporterName: userInfo?.nickName || '匿名用户',
           status: 'pending',
           createTime: new Date(),
         }

@@ -14,23 +14,17 @@
   <scroll-view scroll-y class="main-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;" refresher-enabled="{{true}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
 
     <!-- 标签切换 -->
-    <view class="tabs">
+    <view class="tabs-container">
       <view
-        class="tab-item {{currentTab === 0 ? 'active' : ''}}"
+        class="tab-item {{currentTab === 0 ? 'active' : 'inactive'}}"
         data-index="{{0}}"
         bindtap="onTabChange"
-      >
-        <text class="tab-text">模板</text>
-        <view class="tab-badge" wx:if="{{templates.length > 0}}">{{templates.length}}</view>
-      </view>
+      >模板</view>
       <view
-        class="tab-item {{currentTab === 1 ? 'active' : ''}}"
+        class="tab-item {{currentTab === 1 ? 'active' : 'inactive'}}"
         data-index="{{1}}"
         bindtap="onTabChange"
-      >
-        <text class="tab-text">照片</text>
-        <view class="tab-badge" wx:if="{{photos.length > 0}}">{{photos.length}}</view>
-      </view>
+      >照片</view>
     </view>
 
     <!-- 喜欢的模板 -->
@@ -42,29 +36,36 @@
       </view>
 
       <view wx:else class="template-grid">
-        <view
-          wx:for="{{templates}}"
-          wx:key="_id"
-          class="template-card"
-          data-id="{{item._id}}"
-          bindtap="onTemplateTap"
-        >
-          <image class="template-cover" src="{{item.cover}}" mode="aspectFill"></image>
-          <view class="template-info">
-            <text class="template-name">{{item.name}}</text>
-            <view class="template-meta">
-              <view class="meta-item">
-                <t-icon name="image" size="28rpx" color="#999" />
-                <text class="meta-text">{{item.photoSetCount || 0}}</text>
+        <view wx:for="{{templates}}" wx:key="_id" class="template-card" data-id="{{item._id}}" bindtap="onTemplateTap">
+          <view class="template-cover-wrapper">
+            <image class="template-cover" src="{{item.cover}}" mode="widthFix"></image>
+          </view>
+
+          <view class="template-info-box">
+            <text class="template-title">{{item.name}}</text>
+
+            <view class="like-star" catchtap="onUnlikeTemplate" data-id="{{item._id}}" data-index="{{index}}">
+              <t-icon name="thumb-up-filled" size="36rpx" color="#FF6B35" />
+              <text class="like-count">{{item.likeCount || 0}}</text>
+            </view>
+
+            <view class="template-bottom-row">
+              <view class="author-group">
+                <image class="author-avatar" src="{{item.creatorAvatar || defaultAvatar}}" mode="aspectFill"></image>
+                <text class="author-name">{{item.creatorName || '未知'}}</text>
               </view>
-              <view class="meta-item">
-                <t-icon name="heart-filled" size="28rpx" color="#FF4444" />
-                <text class="meta-text">{{item.likeCount || 0}}</text>
+
+              <view class="stats-group">
+                <view class="stat-item">
+                  <t-icon name="image" size="28rpx" color="#4D4D4D" />
+                  <text class="stat-num">{{item.photoSetCount || 0}}</text>
+                </view>
+                <view class="stat-item">
+                  <t-icon name="star-filled" size="28rpx" color="{{item.isFavorited ? '#FFD700' : '#DADADA'}}" />
+                  <text class="stat-num">{{item.favoriteCount || 0}}</text>
+                </view>
               </view>
             </view>
-          </view>
-          <view class="like-btn" catchtap="onUnlikeTemplate" data-id="{{item._id}}" data-index="{{index}}">
-            <t-icon name="thumb-up-filled" size="40rpx" color="#FF6B35" />
           </view>
         </view>
       </view>
