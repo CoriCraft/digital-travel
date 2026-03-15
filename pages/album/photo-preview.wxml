@@ -1,0 +1,36 @@
+<view class="preview-container">
+  <!-- 照片轮播 -->
+  <swiper
+    class="photo-swiper"
+    current="{{currentIndex}}"
+    bindchange="onSwiperChange"
+    bindtap="toggleToolbar"
+  >
+    <swiper-item wx:for="{{photos}}" wx:key="index">
+      <image
+        src="{{item.url}}"
+        mode="aspectFit"
+        class="preview-image"
+      />
+    </swiper-item>
+  </swiper>
+
+  <!-- 顶部工具栏 -->
+  <view class="top-toolbar" wx:if="{{showToolbar}}" style="padding-top: {{statusBarHeight}}px;">
+    <view class="toolbar-left" bindtap="onBack">
+      <image src="/static/icons/arrow-left.svg" class="back-icon-white" />
+    </view>
+    <view class="toolbar-center">
+      <text class="photo-counter">{{currentIndex + 1}} / {{photos.length}}</text>
+    </view>
+    <view class="toolbar-right"></view>
+  </view>
+
+  <!-- 底部工具栏 -->
+  <view class="bottom-toolbar" wx:if="{{showToolbar}}">
+    <view class="toolbar-btn" bindtap="onDownload">
+      <image src="/static/icons/download.svg" class="toolbar-icon" />
+      <text class="toolbar-text">下载</text>
+    </view>
+  </view>
+</view>

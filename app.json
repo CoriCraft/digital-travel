@@ -55,6 +55,7 @@
     "pages/purchase/purchase",
     "pages/album/album",
     "pages/album/detail",
+    "pages/album/photo-preview",
     "pages/my/my",
     "pages/good-info/good-info"
   ],

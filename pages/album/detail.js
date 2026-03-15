@@ -156,11 +156,14 @@ Page({
    */
   viewPhoto(e) {
     const index = e.currentTarget.dataset.index;
-    const urls = this.data.photos.map(photo => photo.url);
+    const photos = this.data.photos;
 
-    wx.previewImage({
-      current: urls[index],
-      urls: urls
+    // 将照片列表存入缓存
+    wx.setStorageSync('albumPreviewPhotos', photos);
+
+    // 跳转到照片预览页面
+    wx.navigateTo({
+      url: `/pages/album/photo-preview?index=${index}`
     });
   },
 
