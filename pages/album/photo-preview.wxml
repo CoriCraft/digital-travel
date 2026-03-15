@@ -3,8 +3,6 @@
   <view class="top-toolbar" style="padding-top: {{statusBarHeight}}px;">
     <view class="toolbar-left" bindtap="onBack">
       <image src="/static/icons/arrow-left.svg" class="back-icon-white" />
-    </view>
-    <view class="toolbar-center">
       <text class="photo-counter">{{currentIndex + 1}} / {{photos.length}}</text>
     </view>
   </view>
