@@ -40,6 +40,11 @@
   align-items: center;
 }
 
+.back-icon {
+  width: 30px;
+  height: 35px;
+}
+
 .nav-title {
   font-size: 34rpx;
   font-weight: 600;

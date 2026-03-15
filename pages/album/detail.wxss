@@ -30,8 +30,8 @@
 }
 
 .nav-left image {
-  width: 48rpx;
-  height: 48rpx;
+  width: 30px;
+  height: 35px;
   padding: 12rpx;
   background: rgba(0,0,0,0.3);
   border-radius: 50%;
