@@ -1,10 +1,20 @@
 <view class="preview-container">
+  <!-- 顶部工具栏 -->
+  <view class="top-toolbar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="toolbar-left" bindtap="onBack">
+      <image src="/static/icons/arrow-left.svg" class="back-icon-white" />
+    </view>
+    <view class="toolbar-center">
+      <text class="photo-counter">{{currentIndex + 1}} / {{photos.length}}</text>
+    </view>
+    <view class="toolbar-right"></view>
+  </view>
+
   <!-- 照片轮播 -->
   <swiper
     class="photo-swiper"
     current="{{currentIndex}}"
     bindchange="onSwiperChange"
-    bindtap="toggleToolbar"
   >
     <swiper-item wx:for="{{photos}}" wx:key="index">
       <image
@@ -15,22 +25,36 @@
     </swiper-item>
   </swiper>
 
-  <!-- 顶部工具栏 -->
-  <view class="top-toolbar" wx:if="{{showToolbar}}" style="padding-top: {{statusBarHeight}}px;">
-    <view class="toolbar-left" bindtap="onBack">
-      <image src="/static/icons/arrow-left.svg" class="back-icon-white" />
+  <!-- 操作区 -->
+  <view class="action-bar">
+    <view class="action-item" bindtap="onDownload">
+      <image src="/static/icons/download.svg" class="action-icon" />
+      <text class="action-text">下载</text>
     </view>
-    <view class="toolbar-center">
-      <text class="photo-counter">{{currentIndex + 1}} / {{photos.length}}</text>
+
+    <view class="action-item" bindtap="onShare">
+      <image src="/static/icons/share.svg" class="action-icon" />
+      <text class="action-text">分享</text>
     </view>
-    <view class="toolbar-right"></view>
+
+    <view class="action-item" bindtap="onDelete">
+      <image src="/static/icons/delete.svg" class="action-icon" />
+      <text class="action-text">删除</text>
+    </view>
   </view>
 
-  <!-- 底部工具栏 -->
-  <view class="bottom-toolbar" wx:if="{{showToolbar}}">
-    <view class="toolbar-btn" bindtap="onDownload">
-      <image src="/static/icons/download.svg" class="toolbar-icon" />
-      <text class="toolbar-text">下载</text>
+  <!-- 缩略图 -->
+  <scroll-view class="thumb-scroll" scroll-x="true" show-scrollbar="false">
+    <view class="thumb-list">
+      <view
+        class="thumb-item {{currentIndex === index ? 'active' : ''}}"
+        wx:for="{{photos}}"
+        wx:key="index"
+        data-index="{{index}}"
+        bindtap="onClickThumb"
+      >
+        <image src="{{item.url}}" mode="aspectFill" class="thumb-image" />
+      </view>
     </view>
-  </view>
+  </scroll-view>
 </view>

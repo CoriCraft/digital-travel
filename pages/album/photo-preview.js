@@ -100,6 +100,36 @@ Page({
     });
   },
 
+  /**
+   * 点击缩略图
+   */
+  onClickThumb(e) {
+    const index = e.currentTarget.dataset.index;
+    this.setData({
+      currentIndex: index
+    });
+  },
+
+  /**
+   * 分享
+   */
+  onShare() {
+    wx.showToast({
+      title: '分享功能开发中',
+      icon: 'none'
+    });
+  },
+
+  /**
+   * 删除
+   */
+  onDelete() {
+    wx.showToast({
+      title: '删除功能开发中',
+      icon: 'none'
+    });
+  },
+
   onUnload() {
     // 清理缓存
     wx.removeStorageSync('albumPreviewPhotos');
