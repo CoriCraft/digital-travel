@@ -54,6 +54,7 @@
     "pages/write-review/write-review",
     "pages/purchase/purchase",
     "pages/album/album",
+    "pages/album/detail",
     "pages/my/my",
     "pages/good-info/good-info"
   ],

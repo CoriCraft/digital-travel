@@ -1,0 +1,43 @@
+<view class="album-detail-page">
+  <!-- 自定义导航栏 -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="goBack">
+        <image src="/static/icons/arrow-left.svg" class="icon icon-lg" />
+      </view>
+      <view class="nav-title">相册详情</view>
+      <view class="nav-right"></view>
+    </view>
+  </view>
+
+  <!-- 内容区域 -->
+  <scroll-view scroll-y class="detail-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+    <view class="album-info" wx:if="{{album}}">
+      <text class="album-title">{{album.title}}</text>
+      <view class="album-meta">
+        <text class="meta-item">{{album.date}}</text>
+        <text class="meta-divider">·</text>
+        <text class="meta-item">{{album.location}}</text>
+        <text class="meta-divider">·</text>
+        <text class="meta-item">{{photos.length}}张照片</text>
+      </view>
+    </view>
+
+    <!-- 照片网格 -->
+    <view class="photo-grid" wx:if="{{photos.length > 0}}">
+      <view class="photo-item" wx:for="{{photos}}" wx:key="index" bindtap="viewPhoto" data-index="{{index}}">
+        <image src="{{item.url}}" mode="widthFix" class="photo-img" />
+        <view class="photo-actions">
+          <view class="action-btn" catchtap="downloadPhoto" data-index="{{index}}">
+            <image src="/static/icons/download.svg" class="icon icon-sm" />
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:else>
+      <text class="empty-text">暂无照片</text>
+    </view>
+  </scroll-view>
+</view>

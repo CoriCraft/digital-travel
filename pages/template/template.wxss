@@ -551,3 +551,95 @@
   font-size: 26rpx;
   color: #999;
 }
+
+/* 电子相册弹窗 */
+.album-dialog-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.album-dialog {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 60rpx 48rpx 48rpx;
+  width: 560rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.album-dialog-icon {
+  font-size: 80rpx;
+  margin-bottom: 24rpx;
+}
+
+.album-dialog-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 16rpx;
+}
+
+.album-dialog-desc {
+  font-size: 26rpx;
+  color: #999;
+  margin-bottom: 48rpx;
+}
+
+.album-dialog-btns {
+  display: flex;
+  gap: 24rpx;
+  width: 100%;
+}
+
+.album-dialog-btn-cancel {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  border: 2rpx solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  color: #666;
+}
+
+.album-dialog-btn-confirm {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  color: #fff;
+}
+
+.album-dialog-photos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8rpx;
+  width: 100%;
+  margin-bottom: 24rpx;
+}
+
+.album-dialog-photo {
+  width: 100%;
+  height: 220rpx;
+  border-radius: 12rpx;
+}
+
+.album-dialog-loading {
+  font-size: 26rpx;
+  color: #999;
+  margin-bottom: 24rpx;
+}

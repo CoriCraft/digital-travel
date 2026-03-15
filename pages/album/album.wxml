@@ -12,7 +12,7 @@
   </view>
 
   <scroll-view scroll-y class="album-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
-    <view class="album-list">
+    <view class="album-list" wx:if="{{albumList.length > 0}}">
       <view class="album-card" wx:for="{{albumList}}" wx:key="id" bindtap="viewAlbum" data-id="{{item.id}}">
         <view class="card-stack-bg"></view>
         <view class="card-main">
@@ -21,15 +21,20 @@
           </view>
           <view class="card-footer">
             <view class="card-info">
-              <text class="card-meta">{{item.location}} · {{item.date}}</text>
+              <text class="card-title">{{item.title}}</text>
+              <text class="card-meta">{{item.date}}</text>
             </view>
             <view class="card-right">
-              <text class="photo-count">{{item.views}}张</text>
+              <text class="photo-count">{{item.photoCount}}张</text>
               <image src="/static/icons/arrow-right.svg" class="arrow-icon"></image>
             </view>
           </view>
         </view>
       </view>
+    </view>
+    <view class="empty-state" wx:else>
+      <text class="empty-text">暂无相册</text>
+      <text class="empty-hint">扫描旅拍机二维码保存相册</text>
     </view>
   </scroll-view>
 

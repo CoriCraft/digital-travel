@@ -35,13 +35,19 @@ Page({
     currentPage: 0, // 当前页码
     hasMore: true, // 是否还有更多数据
     featuredTemplate: null, // 创作模板展示的固定模板（热度第一名）
+    // 电子相册弹窗
+    albumDialogVisible: false,
+    albumOrderId: '',
+    albumPhotos: [],
+    albumLoading: false,
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad(options) {
-    console.log(app.globalData);
+    console.log('onLoad options:', JSON.stringify(options))
+    console.log('options.scene:', options.scene)
     this.setData({
       statusBarHeight: app.globalData.statusBarHeight,
       navBarHeight: app.globalData.navBarHeight
@@ -52,6 +58,32 @@ Page({
     this.loadFeaturedTemplate();
     // 加载模板列表
     this.loadTemplates();
+    // 处理扫码进入：解析 scene 参数
+    if (options.scene) {
+      console.log('检测到 scene 参数')
+      const scene = decodeURIComponent(options.scene)
+      console.log('解码后的 scene:', scene)
+      const match = scene.match(/orderId=([^&]+)/)
+      console.log('正则匹配结果:', match)
+      if (match) {
+        const orderId = match[1]
+        console.log('提取到 orderId:', orderId)
+        this.setData({ albumOrderId: orderId, albumDialogVisible: true, albumLoading: true })
+        wx.cloud.callFunction({
+          name: 'getAlbumPhotos',
+          data: { orderId }
+        }).then(res => {
+          console.log('云函数返回:', res)
+          const photos = res.result?.data?.photos || []
+          this.setData({ albumPhotos: photos, albumLoading: false })
+        }).catch(err => {
+          console.error('云函数调用失败:', err)
+          this.setData({ albumLoading: false })
+        })
+      }
+    } else {
+      console.log('未检测到 scene 参数')
+    }
   },
 
   /**
@@ -891,6 +923,103 @@ Page({
         await this.submitReport(targetId, targetType, targetName, reason);
       }
     });
+  },
+
+  /**
+   * 关闭电子相册弹窗
+   */
+  onAlbumDialogClose() {
+    this.setData({ albumDialogVisible: false })
+  },
+
+  /**
+   * 保存相册到用户相册
+   */
+  async onSaveAlbum() {
+    const { albumOrderId, albumPhotos } = this.data
+
+    if (!albumPhotos || albumPhotos.length === 0) {
+      wx.showToast({ title: '没有照片可保存', icon: 'none' })
+      return
+    }
+
+    wx.showLoading({ title: '保存中...' })
+
+    try {
+      const db = wx.cloud.database()
+
+      // 1. 下载并上传照片到云存储
+      const uploadedPhotos = []
+      for (let i = 0; i < albumPhotos.length; i++) {
+        const photo = albumPhotos[i]
+        const photoUrl = photo.url || photo
+
+        try {
+          // 提取原始文件扩展名
+          const urlMatch = photoUrl.match(/\.([^./?#]+)(?:[?#]|$)/)
+          const ext = urlMatch ? urlMatch[1] : 'jpg'
+
+          // 下载照片
+          const downloadRes = await wx.cloud.downloadFile({ fileID: photoUrl })
+
+          // 上传到用户云存储，保留原始扩展名
+          const uploadRes = await wx.cloud.uploadFile({
+            cloudPath: `user_albums/${albumOrderId}/${Date.now()}_${i}.${ext}`,
+            filePath: downloadRes.tempFilePath
+          })
+
+          uploadedPhotos.push({
+            fileID: uploadRes.fileID,
+            originalUrl: photoUrl,
+            uploadTime: new Date()
+          })
+        } catch (err) {
+          console.error(`照片 ${i} 处理失败:`, err)
+        }
+      }
+
+      if (uploadedPhotos.length === 0) {
+        throw new Error('照片上传失败')
+      }
+
+      // 2. 写入 user_albums 集合
+      await db.collection('user_albums').add({
+        data: {
+          orderId: albumOrderId,
+          title: `电子相册 ${albumOrderId}`,
+          photos: uploadedPhotos,
+          coverPhoto: uploadedPhotos[0].fileID,
+          totalCount: uploadedPhotos.length,
+          createTime: new Date()
+        }
+      })
+
+      wx.hideLoading()
+      wx.showToast({ title: '保存成功', icon: 'success' })
+
+      this.setData({ albumDialogVisible: false })
+
+      // 跳转到电子相册页面
+      setTimeout(() => {
+        wx.switchTab({ url: '/pages/album/album' })
+      }, 1500)
+
+    } catch (err) {
+      wx.hideLoading()
+      console.error('保存相册失败:', err)
+      wx.showToast({ title: err.message || '保存失败', icon: 'none' })
+    }
+  },
+
+  /**
+   * 跳转到电子相册页面
+   */
+  onGoToAlbum() {
+    const { albumOrderId } = this.data
+    this.setData({ albumDialogVisible: false })
+    wx.navigateTo({
+      url: `/pages/album/album?orderId=${albumOrderId}`
+    })
   },
 
   /**
