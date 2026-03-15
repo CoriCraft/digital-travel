@@ -57,7 +57,7 @@
 .album-info {
   background: rgba(255,255,255,0.95);
   padding: 40rpx 32rpx;
-  margin: 0 32rpx 20rpx;
+  margin: 80rpx 32rpx 20rpx;
   border-radius: 16rpx;
   backdrop-filter: blur(10rpx);
 }
