@@ -19,8 +19,9 @@
     <swiper-item wx:for="{{photos}}" wx:key="index">
       <image
         src="{{item.url}}"
-        mode="aspectFit"
+        mode="widthFix"
         class="preview-image"
+        style="width: 750rpx;"
       />
     </swiper-item>
   </swiper>

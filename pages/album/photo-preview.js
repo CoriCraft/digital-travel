@@ -32,6 +32,46 @@ Page({
       currentIndex: parseInt(index) || 0,
       statusBarHeight: systemInfo.statusBarHeight
     });
+
+    // 获取所有照片的尺寸
+    this.loadPhotoSizes(photos);
+  },
+
+  /**
+   * 加载照片尺寸
+   */
+  loadPhotoSizes(photos) {
+    const promises = photos.map(photo => {
+      return new Promise((resolve) => {
+        wx.getImageInfo({
+          src: photo.url,
+          success: (res) => {
+            resolve({
+              width: res.width,
+              height: res.height
+            });
+          },
+          fail: () => {
+            resolve({
+              width: 750,
+              height: 1000
+            });
+          }
+        });
+      });
+    });
+
+    Promise.all(promises).then(sizes => {
+      const photosWithSize = photos.map((photo, index) => ({
+        ...photo,
+        width: sizes[index].width,
+        height: sizes[index].height
+      }));
+
+      this.setData({
+        photos: photosWithSize
+      });
+    });
   },
 
   /**
