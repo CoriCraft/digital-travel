@@ -55,35 +55,35 @@
 
 /* 相册信息 */
 .album-info {
-  background: transparent;
+  background: rgba(255,255,255,0.95);
   padding: 40rpx 32rpx;
-  margin-bottom: 20rpx;
+  margin: 0 32rpx 20rpx;
+  border-radius: 16rpx;
+  backdrop-filter: blur(10rpx);
 }
 
 .album-title {
   display: block;
   font-size: 40rpx;
   font-weight: 600;
-  color: #fff;
+  color: #333;
   margin-bottom: 16rpx;
-  text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.3);
 }
 
 .album-meta {
   display: flex;
   align-items: center;
   font-size: 28rpx;
-  color: rgba(255,255,255,0.9);
-  text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.3);
+  color: #666;
 }
 
 .meta-item {
-  color: rgba(255,255,255,0.9);
+  color: #666;
 }
 
 .meta-divider {
   margin: 0 12rpx;
-  color: rgba(255,255,255,0.6);
+  color: #999;
 }
 
 /* 照片网格 */
