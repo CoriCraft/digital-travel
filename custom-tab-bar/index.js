@@ -22,7 +22,7 @@ Component({
       },
       {
         value: 'album',
-        label: '电子相册',
+        label: '旅拍相册',
         icon: '/static/tab-album.png',
         url: '/pages/album/album',
       },

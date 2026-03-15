@@ -24,7 +24,7 @@
         "pagePath": "pages/purchase/purchase"
       },
       {
-        "text": "电子相册",
+        "text": "旅拍相册",
         "iconPath": "/static/images/default-avatar.png",
         "pagePath": "pages/album/album"
       },

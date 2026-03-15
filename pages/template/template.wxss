@@ -552,7 +552,7 @@
   color: #999;
 }
 
-/* 电子相册弹窗 */
+/* 旅拍相册弹窗 */
 .album-dialog-mask {
   position: fixed;
   top: 0;

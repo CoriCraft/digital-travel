@@ -35,7 +35,7 @@ Page({
     currentPage: 0, // 当前页码
     hasMore: true, // 是否还有更多数据
     featuredTemplate: null, // 创作模板展示的固定模板（热度第一名）
-    // 电子相册弹窗
+    // 旅拍相册弹窗
     albumDialogVisible: false,
     albumOrderId: '',
     albumPhotos: [],
@@ -926,7 +926,7 @@ Page({
   },
 
   /**
-   * 关闭电子相册弹窗
+   * 关闭旅拍相册弹窗
    */
   onAlbumDialogClose() {
     this.setData({ albumDialogVisible: false })
@@ -986,7 +986,7 @@ Page({
       await db.collection('user_albums').add({
         data: {
           orderId: albumOrderId,
-          title: `电子相册 ${albumOrderId}`,
+          title: `旅拍相册 ${albumOrderId}`,
           photos: uploadedPhotos,
           coverPhoto: uploadedPhotos[0].fileID,
           totalCount: uploadedPhotos.length,
@@ -999,7 +999,7 @@ Page({
 
       this.setData({ albumDialogVisible: false })
 
-      // 跳转到电子相册页面
+      // 跳转到旅拍相册页面
       setTimeout(() => {
         wx.switchTab({ url: '/pages/album/album' })
       }, 1500)
@@ -1012,7 +1012,7 @@ Page({
   },
 
   /**
-   * 跳转到电子相册页面
+   * 跳转到旅拍相册页面
    */
   onGoToAlbum() {
     const { albumOrderId } = this.data

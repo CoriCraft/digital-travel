@@ -4,7 +4,7 @@
       <view class="nav-left" bindtap="goHome">
         <t-icon name="home" size="48rpx" color="#333" />
       </view>
-      <view class="nav-title">电子相册</view>
+      <view class="nav-title">旅拍相册</view>
       <view class="nav-right">
         <!-- 右侧图标已移除 -->
       </view>

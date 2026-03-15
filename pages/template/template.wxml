@@ -169,10 +169,10 @@
 
 </view>
 
-<!-- 电子相册弹窗 -->
+<!-- 旅拍相册弹窗 -->
 <view class="album-dialog-mask" wx:if="{{albumDialogVisible}}" bindtap="onAlbumDialogClose">
   <view class="album-dialog" catchtap="">
-    <view class="album-dialog-title">您有一份电子相册</view>
+    <view class="album-dialog-title">您有一份旅拍相册</view>
     <view class="album-dialog-photos" wx:if="{{!albumLoading && albumPhotos.length > 0}}">
       <image
         wx:for="{{albumPhotos}}"
@@ -187,7 +187,7 @@
     <view class="album-dialog-desc">共 {{albumPhotos.length}} 张照片</view>
     <view class="album-dialog-btns">
       <view class="album-dialog-btn-cancel" bindtap="onAlbumDialogClose">稍后查看</view>
-      <view class="album-dialog-btn-confirm" bindtap="onSaveAlbum">保存到电子相册</view>
+      <view class="album-dialog-btn-confirm" bindtap="onSaveAlbum">保存到旅拍相册</view>
     </view>
   </view>
 </view>

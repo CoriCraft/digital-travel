@@ -8,7 +8,7 @@
   margin-bottom: -6rpx;
 }
 
-/* 电子相册和我的图标向上调整 */
+/* 旅拍相册和我的图标向上调整 */
 .icon-adjust-up {
   margin-top: -12rpx;
 }
