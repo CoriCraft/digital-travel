@@ -7,7 +7,6 @@
     <view class="toolbar-center">
       <text class="photo-counter">{{currentIndex + 1}} / {{photos.length}}</text>
     </view>
-    <view class="toolbar-right"></view>
   </view>
 
   <!-- 照片轮播 -->
