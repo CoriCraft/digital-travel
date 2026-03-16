@@ -133,14 +133,7 @@ App({
         return;
       }
 
-      if (storedUserInfo.nickName || storedUserInfo.avatarUrl) {
-        await this.updateUserProfile(
-          storedUserInfo.nickName || '微信用户',
-          storedUserInfo.avatarUrl || ''
-        );
-        return;
-      }
-
+      // 新用户首次进入，跳转到用户信息填写页面
       console.log('新用户首次进入，需要完善用户信息');
       wx.reLaunch({
         url: '/pages/user-info/user-info'

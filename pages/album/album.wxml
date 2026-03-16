@@ -22,7 +22,10 @@
           <view class="card-footer">
             <view class="card-info">
               <text class="card-title">{{item.title}}</text>
-              <text class="card-meta">{{item.date}}</text>
+              <view class="card-meta-row">
+                <text class="card-meta">{{item.date}}</text>
+                <text class="card-location" wx:if="{{item.locationName}}">· {{item.locationName}}</text>
+              </view>
             </view>
             <view class="card-right">
               <text class="photo-count">{{item.photoCount}}张</text>

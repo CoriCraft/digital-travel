@@ -2,19 +2,35 @@
 .preview-container {
   width: 100%;
   min-height: 100vh;
-  position: relative;
   box-sizing: border-box;
 }
 
-/* 照片轮播 */
-.photo-swiper {
+/* 照片展示区 */
+.photo-area {
   width: 100%;
-  height: auto;
+  overflow: hidden;
+}
+
+.photo-slider {
+  display: flex;
+  width: 300%;
+  margin-left: -100%;
+}
+
+.photo-slider.slide-animate {
+  transition: transform 0.3s ease-out;
+}
+
+.photo-slide {
+  width: 33.333%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 .preview-image {
   width: 100%;
-  height: auto;
   display: block;
 }
 
@@ -24,7 +40,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 88rpx;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -39,10 +55,9 @@
   align-items: center;
 }
 
-.back-icon-white {
+.back-icon {
   width: 30px;
   height: 35px;
-  filter: brightness(0) invert(1);
 }
 
 .toolbar-center {
@@ -53,7 +68,7 @@
 
 .photo-counter {
   font-size: 32rpx;
-  color: #fff;
+  color: #222;
   font-weight: 500;
 }
 
@@ -70,17 +85,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 140rpx;
 }
 
 .action-icon {
-  width: 44rpx;
-  height: 44rpx;
+  width: 48rpx;
+  height: 48rpx;
   margin-right: 10rpx;
+  display: block;
+}
+
+.action-icon-download {
+  width: 36rpx;
+  height: 38rpx;
 }
 
 .action-text {
-  font-size: 34rpx;
-  color: #222;
+  font-size: 32rpx;
+  color: #292929;
   line-height: 1;
 }
 
@@ -107,6 +129,7 @@
   border: 2rpx solid transparent;
   box-sizing: border-box;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .thumb-item.active {

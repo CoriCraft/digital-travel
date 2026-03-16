@@ -29,6 +29,10 @@
   align-items: center;
 }
 
+.nav-right {
+  justify-content: flex-end;
+}
+
 .nav-left image {
   width: 30px;
   height: 35px;
@@ -58,12 +62,33 @@
   backdrop-filter: blur(10rpx);
 }
 
+.album-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
 .album-title {
   display: block;
   font-size: 40rpx;
   font-weight: 600;
   color: #333;
-  margin-bottom: 16rpx;
+  flex: 1;
+}
+
+.album-delete-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.album-delete-icon {
+  width: 40rpx;
+  height: 40rpx;
 }
 
 .album-meta {

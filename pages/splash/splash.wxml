@@ -1,0 +1,9 @@
+<view class="splash-container">
+  <image src="/static/images/splash-logo.png" class="splash-logo" mode="aspectFit" />
+
+  <view class="welcome-section">
+    <view class="welcome-line"></view>
+    <text class="welcome-text">WELCOME</text>
+    <view class="welcome-line"></view>
+  </view>
+</view>

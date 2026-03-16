@@ -13,7 +13,12 @@
   <!-- 内容区域 -->
   <scroll-view scroll-y class="detail-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
     <view class="album-info" wx:if="{{album}}">
-      <text class="album-title">{{album.title}}</text>
+      <view class="album-info-header">
+        <text class="album-title">{{album.title}}</text>
+        <view class="album-delete-btn" bindtap="onDeleteAlbum">
+          <image src="/static/icons/delete.svg" class="album-delete-icon" />
+        </view>
+      </view>
       <view class="album-meta">
         <text class="meta-item">{{album.date}}</text>
         <text class="meta-divider">·</text>

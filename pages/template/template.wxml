@@ -171,23 +171,27 @@
 
 <!-- 旅拍相册弹窗 -->
 <view class="album-dialog-mask" wx:if="{{albumDialogVisible}}" bindtap="onAlbumDialogClose">
-  <view class="album-dialog" catchtap="">
-    <view class="album-dialog-title">您有一份旅拍相册</view>
-    <view class="album-dialog-photos" wx:if="{{!albumLoading && albumPhotos.length > 0}}">
+  <view class="album-dialog-content" catchtap="">
+    <!-- 只显示第一张照片 -->
+    <view class="album-dialog-photo-single" wx:if="{{!albumLoading && albumPhotos.length > 0}}">
       <image
-        wx:for="{{albumPhotos}}"
-        wx:key="index"
-        wx:if="{{index < 4}}"
-        src="{{item.url || item}}"
-        class="album-dialog-photo"
-        mode="aspectFill"
+        src="{{albumPhotos[0].url || albumPhotos[0]}}"
+        class="album-dialog-photo-main"
+        mode="widthFix"
       />
     </view>
-    <view class="album-dialog-loading" wx:if="{{albumLoading}}">加载中...</view>
-    <view class="album-dialog-desc">共 {{albumPhotos.length}} 张照片</view>
-    <view class="album-dialog-btns">
-      <view class="album-dialog-btn-cancel" bindtap="onAlbumDialogClose">稍后查看</view>
-      <view class="album-dialog-btn-confirm" bindtap="onSaveAlbum">保存到旅拍相册</view>
+    <view class="album-dialog-loading" wx:if="{{albumLoading}}">保存中...</view>
+    <text class="album-dialog-tip" wx:if="{{!albumLoading}}">请点击下方保存您的旅拍照片</text>
+    <view class="album-dialog-location" wx:if="{{!albumLoading && albumLocationName}}">{{albumLocationName}}</view>
+    <view class="album-dialog-time" wx:if="{{!albumLoading && albumPhotoTime}}">拍摄时间：{{albumPhotoTime}}</view>
+    <view class="album-dialog-btn-save" wx:if="{{!albumLoading}}" bindtap="onSaveAlbum">
+      <text class="btn-save-text">保存图片</text>
     </view>
   </view>
+</view>
+
+<!-- 保存成功提示 -->
+<view class="success-overlay" wx:if="{{showSaveSuccess}}">
+  <view class="success-icon"></view>
+  <text class="success-text">照片已保存至您的电子相册！</text>
 </view>

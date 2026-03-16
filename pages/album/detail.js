@@ -86,8 +86,8 @@ Page({
             this.setData({
               album: {
                 title: album.title,
-                date: this.formatDate(album.createTime),
-                location: album.location || '未知地点'
+                date: album.photoTime || this.formatDate(album.createTime),
+                location: album.locationName || '未知地点'
               },
               photos: photosWithUrl,
               loading: false
@@ -98,8 +98,8 @@ Page({
             this.setData({
               album: {
                 title: album.title,
-                date: this.formatDate(album.createTime),
-                location: album.location || '未知地点'
+                date: album.photoTime || this.formatDate(album.createTime),
+                location: album.locationName || '未知地点'
               },
               photos: photos,
               loading: false
@@ -161,9 +161,9 @@ Page({
     // 将照片列表存入缓存
     wx.setStorageSync('albumPreviewPhotos', photos);
 
-    // 跳转到照片预览页面
+    // 跳转到照片预览页面，传 albumId
     wx.navigateTo({
-      url: `/pages/album/photo-preview?index=${index}`
+      url: `/pages/album/photo-preview?index=${index}&albumId=${this.data.albumId}`
     });
   },
 
@@ -206,5 +206,50 @@ Page({
         });
       }
     });
+  },
+
+  /**
+   * 删除整个相册
+   */
+  onDeleteAlbum() {
+    wx.showModal({
+      title: '删除相册',
+      content: '确定要删除这个相册吗？相册中的所有照片都将被删除，此操作不可恢复。',
+      confirmColor: '#e53935',
+      success: (res) => {
+        if (!res.confirm) return;
+
+        wx.showLoading({ title: '删除中...' });
+        const db = wx.cloud.database();
+
+        db.collection('user_albums')
+          .where({
+            _id: this.data.albumId,
+            _openid: '{openid}'
+          })
+          .remove()
+          .then(() => {
+            wx.hideLoading();
+            wx.showToast({ title: '相册已删除', icon: 'success' });
+            setTimeout(() => {
+              wx.navigateBack();
+            }, 1500);
+          })
+          .catch(err => {
+            console.error('删除相册失败:', err);
+            wx.hideLoading();
+            wx.showToast({ title: '删除失败', icon: 'none' });
+          });
+      }
+    });
+  },
+
+  /**
+   * 从预览页返回时刷新数据
+   */
+  onShow() {
+    if (this.data.albumId && !this.data.loading) {
+      this.loadAlbumDetail();
+    }
   }
 });

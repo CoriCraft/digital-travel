@@ -2,7 +2,7 @@
   <!-- 顶部工具栏 -->
   <view class="top-toolbar" style="padding-top: {{statusBarHeight}}px;">
     <view class="toolbar-left" bindtap="onBack">
-      <image src="/static/icons/arrow-left.svg" class="back-icon-white" />
+      <image src="/static/icons/arrow-left.svg" class="back-icon" />
     </view>
     <view class="toolbar-center">
       <text class="photo-counter">{{currentIndex + 1}} / {{photos.length}}</text>
@@ -10,26 +10,53 @@
     <view class="toolbar-right"></view>
   </view>
 
-  <!-- 照片轮播 -->
-  <swiper
-    class="photo-swiper"
-    current="{{currentIndex}}"
-    bindchange="onSwiperChange"
+  <!-- 占位，撑开 fixed 工具栏的高度 -->
+  <view style="height: {{toolbarHeight}}px;"></view>
+
+  <!-- 照片展示（三张：前一张 + 当前 + 后一张） -->
+  <view
+    class="photo-area"
+    catchtouchstart="onTouchStart"
+    catchtouchmove="onTouchMove"
+    catchtouchend="onTouchEnd"
   >
-    <swiper-item wx:for="{{photos}}" wx:key="index">
-      <image
-        src="{{item.url}}"
-        mode="widthFix"
-        class="preview-image"
-        style="width: 750rpx;"
-      />
-    </swiper-item>
-  </swiper>
+    <view
+      class="photo-slider {{animating ? 'slide-animate' : ''}}"
+      style="transform: translateX({{offsetX}}px);"
+    >
+      <!-- 上一张 -->
+      <view class="photo-slide">
+        <image
+          wx:if="{{currentIndex > 0}}"
+          src="{{photos[currentIndex - 1].url}}"
+          mode="widthFix"
+          class="preview-image"
+        />
+      </view>
+      <!-- 当前 -->
+      <view class="photo-slide">
+        <image
+          src="{{photos[currentIndex].url}}"
+          mode="widthFix"
+          class="preview-image"
+        />
+      </view>
+      <!-- 下一张 -->
+      <view class="photo-slide">
+        <image
+          wx:if="{{currentIndex < photos.length - 1}}"
+          src="{{photos[currentIndex + 1].url}}"
+          mode="widthFix"
+          class="preview-image"
+        />
+      </view>
+    </view>
+  </view>
 
   <!-- 操作区 -->
   <view class="action-bar">
     <view class="action-item" bindtap="onDownload">
-      <image src="/static/icons/download.svg" class="action-icon" />
+      <image src="/static/icons/download.svg" class="action-icon action-icon-download" />
       <text class="action-text">下载</text>
     </view>
 

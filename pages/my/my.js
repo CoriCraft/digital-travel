@@ -139,6 +139,17 @@ Page({
   },
 
   onEditNickname() {
+    const canChange = checkOperationLimit('lastNicknameChangeTime', 1440);
+    if (!canChange) {
+      const remaining = getRemainingTime('lastNicknameChangeTime', 1440);
+      wx.showModal({
+        title: '暂时不能修改',
+        content: `24 小时内仅可修改一次昵称，请 ${remaining} 后再试。`,
+        showCancel: false
+      });
+      return;
+    }
+
     wx.showModal({
       title: '修改昵称',
       editable: true,
@@ -157,6 +168,8 @@ Page({
         try {
           const userInfo = await app.ensureUserInfo();
           await app.updateUserProfile(newName, userInfo?.avatarUrl || '');
+          recordOperationTime('lastNicknameChangeTime');
+
           this.setData({
             userName: newName
           });

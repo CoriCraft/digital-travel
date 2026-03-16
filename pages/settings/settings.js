@@ -5,8 +5,7 @@ Page({
   data: {
     statusBarHeight: 0,
     navBarHeight: 0,
-    cacheSize: '0 MB',
-    version: '1.0.0' // 手动维护版本号，每次发布时更新
+    version: '1.0.8' // 手动维护版本号，每次发布时更新
   },
 
   onLoad(options) {
@@ -14,9 +13,6 @@ Page({
       statusBarHeight: app.globalData.statusBarHeight,
       navBarHeight: app.globalData.navBarHeight
     })
-
-    // 计算缓存大小
-    this.calculateCacheSize()
   },
 
   /**
@@ -49,78 +45,12 @@ Page({
   },
 
   /**
-   * 计算缓存大小
-   */
-  calculateCacheSize() {
-    try {
-      const info = wx.getStorageInfoSync()
-      const sizeKB = info.currentSize
-      const sizeMB = (sizeKB / 1024).toFixed(2)
-      this.setData({
-        cacheSize: `${sizeMB} MB`
-      })
-    } catch (err) {
-      console.error('获取缓存大小失败:', err)
-    }
-  },
-
-  /**
-   * 清除缓存
-   */
-  onClearCache() {
-    wx.showModal({
-      title: '清除缓存',
-      content: '清除缓存后，部分数据需要重新加载。确定要清除吗？',
-      confirmText: '清除',
-      confirmColor: '#FF4444',
-      success: res => {
-        if (res.confirm) {
-          wx.showLoading({ title: '清除中...' })
-
-          // 保留重要数据
-          const userProfile = wx.getStorageSync('userProfile')
-          const firstLoginTime = wx.getStorageSync('firstLoginTime')
-
-          // 清除所有缓存
-          wx.clearStorage({
-            success: () => {
-              // 恢复重要数据
-              if (userProfile) {
-                wx.setStorageSync('userProfile', userProfile)
-              }
-              if (firstLoginTime) {
-                wx.setStorageSync('firstLoginTime', firstLoginTime)
-              }
-
-              wx.hideLoading()
-              wx.showToast({
-                title: '清除成功',
-                icon: 'success'
-              })
-
-              // 重新计算缓存大小
-              this.calculateCacheSize()
-            },
-            fail: () => {
-              wx.hideLoading()
-              wx.showToast({
-                title: '清除失败',
-                icon: 'none'
-              })
-            }
-          })
-        }
-      }
-    })
-  },
-
-  /**
    * 关于我们
    */
   onAboutTap() {
     wx.showModal({
       title: '关于我们',
-      content: '数字文旅小程序\n版本：1.0.0\n\n致力于为用户提供优质的旅游体验和创意模板服务。\n\n如有问题，请联系客服：\n电话：400-123-4567\n邮箱：support@example.com',
+      content: '智见方境\n版本：1.0.8\n\n致力于为用户提供优质的旅游体验和创意模板服务。',
       showCancel: false
     })
   },
@@ -175,38 +105,6 @@ Page({
         title: '更新失败',
         icon: 'none'
       })
-    })
-  },
-
-  /**
-   * 退出登录
-   */
-  onLogout() {
-    wx.showModal({
-      title: '退出登录',
-      content: '确定要退出登录吗？',
-      confirmText: '退出',
-      confirmColor: '#FF4444',
-      success: res => {
-        if (res.confirm) {
-          // 清除用户信息
-          wx.removeStorageSync('userInfo')
-          app.globalData.userInfo = null
-          app.globalData.userInfoPromise = null
-
-          wx.showToast({
-            title: '已退出登录',
-            icon: 'success'
-          })
-
-          // 返回首页
-          setTimeout(() => {
-            wx.reLaunch({
-              url: '/pages/template/template'
-            })
-          }, 1500)
-        }
-      }
     })
   }
 })

@@ -1,0 +1,38 @@
+.splash-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.splash-logo {
+  width: 240rpx;
+  height: 250rpx;
+  margin-bottom: 500rpx;
+}
+
+.welcome-section {
+  position: absolute;
+  bottom: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.welcome-text {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #757575;
+  padding: 0 32rpx;
+}
+
+.welcome-line {
+  width: 104rpx;
+  height: 2rpx;
+  background: rgba(0, 0, 0, 0.4);
+}

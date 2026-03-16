@@ -1,21 +1,22 @@
 /* pages/my/my.wxss */
 
-/* --- 全局锁死：禁止滚动 --- */
 page {
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
-  overflow: hidden; /* 物理禁止滚动 */
+  overflow-y: auto; /* 允许垂直滚动 */
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif;
   box-sizing: border-box;
 }
 
 .container {
-  height: 100%;
+  min-height: 100%;
   width: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
   padding: 0; /* 覆盖全局的 padding: 200rpx 0 */
+  align-items: stretch; /* 覆盖全局的 align-items: center */
+  justify-content: flex-start; /* 覆盖全局的 justify-content: space-between */
 }
 
 /* --- 导航栏 --- */
@@ -62,7 +63,7 @@ page {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding-bottom: 40rpx; /* 增加底部留白 */
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom) + 100rpx); /* 底部留白 + 安全区域 + tab bar高度 */
   align-items: stretch; /* 关键：强制子元素拉伸填满横向空间 */
 }
 
@@ -89,21 +90,33 @@ page {
 .user-header {
   display: flex;
   align-items: center;
+  justify-content: flex-start; /* 明确左对齐 */
   margin-bottom: 36rpx; /* 加大与分割线的间距 */
+  width: 100%; /* 确保占满宽度 */
 }
 
 .avatar-btn {
-  padding: 0;
+  padding: 0 !important;
   margin: 0;
+  margin-right: 24rpx !important; /* 头像与文字的间距 - 必须在 margin: 0 之后 */
   border: none;
   background: transparent;
   line-height: 1;
-  margin-right: 32rpx; /* 头像与文字的间距 */
   flex-shrink: 0;
+  width: 152rpx !important; /* 明确宽度 */
+  height: 152rpx; /* 明确高度 */
+  min-width: 152rpx; /* 覆盖button默认最小宽度 */
+  max-width: 152rpx; /* 限制最大宽度 */
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .avatar-btn::after {
   border: none;
+  display: none; /* 完全隐藏伪元素 */
 }
 
 .avatar {
@@ -118,6 +131,9 @@ page {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
+  flex: 1; /* 占据剩余空间 */
+  min-width: 0; /* 防止flex子元素溢出 */
 }
 
 .nickname-row {

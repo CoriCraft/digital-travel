@@ -36,6 +36,7 @@
     ]
   },
   "pages": [
+    "pages/splash/splash",
     "pages/template/template",
     "pages/user-info/user-info",
     "pages/template-detail/template-detail",

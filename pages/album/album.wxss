@@ -91,9 +91,33 @@
   justify-content: space-between;
 }
 
+.card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+}
+
+.card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
 .card-meta {
   font-size: 26rpx;
   color: #666666;
+}
+
+.card-location {
+  font-size: 26rpx;
+  color: #82F45F;
+  font-weight: 500;
 }
 
 .card-right {

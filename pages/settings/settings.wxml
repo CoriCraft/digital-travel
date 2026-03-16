@@ -39,23 +39,6 @@
       </view>
     </view>
 
-    <!-- 缓存管理 -->
-    <view class="section">
-      <view class="section-title">缓存管理</view>
-      <view class="setting-card">
-        <view class="setting-item" bindtap="onClearCache">
-          <view class="setting-left">
-            <t-icon name="delete" size="40rpx" color="#3ECE79" />
-            <view class="setting-info">
-              <text class="setting-label">清除缓存</text>
-              <text class="setting-desc">当前缓存：{{cacheSize}}</text>
-            </view>
-          </view>
-          <t-icon name="chevron-right" size="32rpx" color="#999" />
-        </view>
-      </view>
-    </view>
-
     <!-- 关于 -->
     <view class="section">
       <view class="section-title">关于</view>
@@ -76,22 +59,6 @@
             <t-icon name="refresh" size="40rpx" color="#3ECE79" />
             <view class="setting-info">
               <text class="setting-label">检查更新</text>
-            </view>
-          </view>
-          <t-icon name="chevron-right" size="32rpx" color="#999" />
-        </view>
-      </view>
-    </view>
-
-    <!-- 账号管理 -->
-    <view class="section">
-      <view class="section-title">账号管理</view>
-      <view class="setting-card">
-        <view class="setting-item" bindtap="onLogout">
-          <view class="setting-left">
-            <t-icon name="logout" size="40rpx" color="#FF4444" />
-            <view class="setting-info">
-              <text class="setting-label" style="color: #FF4444;">退出登录</text>
             </view>
           </view>
           <t-icon name="chevron-right" size="32rpx" color="#999" />

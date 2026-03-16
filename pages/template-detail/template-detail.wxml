@@ -86,7 +86,7 @@
     <view class="photo-list waterfall-container">
       <!-- 左列 -->
       <view class="waterfall-column">
-        <view class="photo-card" wx:for="{{leftColumnPhotos}}" wx:key="_id">
+        <view class="photo-card" wx:for="{{leftColumnPhotos}}" wx:key="_id" wx:for-index="leftIndex">
           <image
             class="photo-image"
             src="{{item.thumbnailUrl || item.photoUrl}}"
@@ -94,7 +94,7 @@
             lazy-load="{{true}}"
             webp="{{true}}"
             show-menu-by-longpress="{{true}}"
-            data-index="{{item.originalIndex}}"
+            data-index="{{leftIndex * 2}}"
             bindtap="onPhotoTap"
             bindlongpress="onPhotoLongPress"
             data-photo-id="{{item._id}}"
@@ -125,7 +125,7 @@
 
       <!-- 右列 -->
       <view class="waterfall-column">
-        <view class="photo-card" wx:for="{{rightColumnPhotos}}" wx:key="_id">
+        <view class="photo-card" wx:for="{{rightColumnPhotos}}" wx:key="_id" wx:for-index="rightIndex">
           <image
             class="photo-image"
             src="{{item.thumbnailUrl || item.photoUrl}}"
@@ -133,7 +133,7 @@
             lazy-load="{{true}}"
             webp="{{true}}"
             show-menu-by-longpress="{{true}}"
-            data-index="{{item.originalIndex}}"
+            data-index="{{rightIndex * 2 + 1}}"
             bindtap="onPhotoTap"
             bindlongpress="onPhotoLongPress"
             data-photo-id="{{item._id}}"

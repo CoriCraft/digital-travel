@@ -76,10 +76,11 @@ Page({
             id: album._id,
             orderId: album.orderId,
             title: album.title,
-            date: this.formatDate(album.createTime),
+            date: album.photoTime || this.formatDate(album.createTime), // 优先使用拍摄时间
             photoCount: album.totalCount || album.photos?.length || 0,
             coverImage: coverImage,
-            photos: album.photos
+            photos: album.photos,
+            locationName: album.locationName || ''
           };
         });
 

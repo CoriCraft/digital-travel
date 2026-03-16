@@ -89,21 +89,5 @@ Page({
         icon: 'none'
       });
     }
-  },
-
-  onSkip() {
-    wx.showModal({
-      title: '确认跳过',
-      content: '跳过后仍可在“我的”页面继续完善头像和昵称。',
-      confirmText: '确认跳过',
-      cancelText: '继续填写',
-      success: res => {
-        if (res.confirm) {
-          wx.switchTab({
-            url: '/pages/template/template'
-          });
-        }
-      }
-    });
   }
 });

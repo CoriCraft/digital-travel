@@ -40,6 +40,9 @@ Page({
     albumOrderId: '',
     albumPhotos: [],
     albumLoading: false,
+    albumLocationName: '', // 地点名称
+    albumPhotoTime: null, // 拍摄时间
+    showSaveSuccess: false, // 保存成功提示
   },
 
   /**
@@ -75,7 +78,14 @@ Page({
         }).then(res => {
           console.log('云函数返回:', res)
           const photos = res.result?.data?.photos || []
-          this.setData({ albumPhotos: photos, albumLoading: false })
+          const locationName = res.result?.data?.locationName || ''
+          const photoTime = res.result?.data?.photoTime || null
+          this.setData({
+            albumPhotos: photos,
+            albumLocationName: locationName,
+            albumPhotoTime: photoTime ? this.formatPhotoTime(photoTime) : '',
+            albumLoading: false
+          })
         }).catch(err => {
           console.error('云函数调用失败:', err)
           this.setData({ albumLoading: false })
@@ -926,6 +936,18 @@ Page({
   },
 
   /**
+   * 格式化时间戳为日期字符串
+   */
+  formatPhotoTime(timestamp) {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}.${month}.${day}`;
+  },
+
+  /**
    * 关闭旅拍相册弹窗
    */
   onAlbumDialogClose() {
@@ -936,14 +958,15 @@ Page({
    * 保存相册到用户相册
    */
   async onSaveAlbum() {
-    const { albumOrderId, albumPhotos } = this.data
+    const { albumOrderId, albumPhotos, albumLocationName, albumPhotoTime } = this.data
 
     if (!albumPhotos || albumPhotos.length === 0) {
       wx.showToast({ title: '没有照片可保存', icon: 'none' })
       return
     }
 
-    wx.showLoading({ title: '保存中...' })
+    // 显示保存中状态
+    this.setData({ albumLoading: true })
 
     try {
       const db = wx.cloud.database()
@@ -990,22 +1013,27 @@ Page({
           photos: uploadedPhotos,
           coverPhoto: uploadedPhotos[0].fileID,
           totalCount: uploadedPhotos.length,
+          locationName: albumLocationName || '',
+          photoTime: albumPhotoTime || '',
           createTime: new Date()
         }
       })
 
-      wx.hideLoading()
-      wx.showToast({ title: '保存成功', icon: 'success' })
+      // 关闭弹窗，显示成功提示
+      this.setData({
+        albumDialogVisible: false,
+        albumLoading: false,
+        showSaveSuccess: true
+      })
 
-      this.setData({ albumDialogVisible: false })
-
-      // 跳转到旅拍相册页面
+      // 2秒后隐藏成功提示并跳转
       setTimeout(() => {
+        this.setData({ showSaveSuccess: false })
         wx.switchTab({ url: '/pages/album/album' })
-      }, 1500)
+      }, 2000)
 
     } catch (err) {
-      wx.hideLoading()
+      this.setData({ albumLoading: false })
       console.error('保存相册失败:', err)
       wx.showToast({ title: err.message || '保存失败', icon: 'none' })
     }
