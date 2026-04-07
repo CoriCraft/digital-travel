@@ -7,7 +7,7 @@ cloud.init({
 const db = cloud.database()
 
 exports.main = async (event, context) => {
-  const { adminId, photoName, templateId, photoUrl, sortOrder = 0, status = 'approved' } = event
+  const { adminId, photoName, templateId, photoUrl, thumbnailUrl, sortOrder = 0, status = 'approved' } = event
 
   try {
     // 验证管理员权限
@@ -32,6 +32,7 @@ exports.main = async (event, context) => {
     const photoData = {
       photoName: photoName,
       photoUrl: photoUrl,
+      thumbnailUrl: thumbnailUrl || photoUrl, // 如果没有传thumbnailUrl，使用photoUrl
       templateId: templateId,
       isOfficial: true,
       status: status,
