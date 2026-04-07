@@ -1,0 +1,9 @@
+{
+  "name": "getUnreadCount",
+  "version": "1.0.0",
+  "description": "获取未读消息数量",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

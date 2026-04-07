@@ -1,0 +1,7 @@
+{
+  "name": "bitLogin",
+  "version": "1.0.0",
+  "description": "BIT CAS REST API login, returns TGT/ST/Cookie",
+  "main": "index.js",
+  "dependencies": {}
+}

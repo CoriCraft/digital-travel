@@ -384,6 +384,7 @@
 .template-card {
   position: relative;
   width: 100%;
+  box-sizing: border-box;
   background-color: transparent;
   padding: 28rpx 10rpx 16rpx 10rpx;
   break-inside: avoid;
@@ -395,7 +396,7 @@
   position: absolute;
   top: 4rpx;
   left: 0rpx;
-  right: 8rpx;
+  right: 0rpx;
   bottom: 4rpx;
   /* 将第一段 SVG 注入，保留了 fill-opacity */
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='100%25' height='100%25' preserveAspectRatio='none' viewBox='0 0 181 255' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M83.6308 0H167.81C174.855 0 180.567 5.7117 180.567 12.7575V241.41C180.567 248.456 174.855 254.168 167.81 254.168H12.7575C5.71172 254.168 0 248.456 0 241.41V43.375C0 36.3293 5.7117 30.6176 12.7575 30.6176H53.0304C58.3239 30.6176 63.0675 27.3486 64.952 22.402L69.8752 9.47957C72.0496 3.77189 77.523 0 83.6308 0Z' fill='%239FF4C1' fill-opacity='0.4'/%3E%3C/svg%3E");

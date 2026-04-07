@@ -1,0 +1,9 @@
+{
+  "name": "deleteOfficialPhotoSet",
+  "version": "1.0.0",
+  "description": "删除官方照片集",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

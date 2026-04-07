@@ -1,0 +1,26 @@
+<view class="container">
+  <!-- 导航栏 -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px; height: {{navBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-left" bindtap="onBack">
+        <view class="back-icon"></view>
+      </view>
+      <text class="nav-title">{{title}}</text>
+      <view class="nav-right-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- 正文 -->
+  <scroll-view
+    scroll-y
+    class="main-scroll"
+    style="height: calc(100vh - {{statusBarHeight + navBarHeight}}px); margin-top: {{statusBarHeight + navBarHeight}}px;"
+  >
+    <view class="content-wrap">
+      <block wx:for="{{paragraphs}}" wx:key="index">
+        <text class="heading" wx:if="{{item.isHeading}}">{{item.text}}</text>
+        <text class="paragraph" wx:else>{{item.text}}</text>
+      </block>
+    </view>
+  </scroll-view>
+</view>

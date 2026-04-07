@@ -1,0 +1,10 @@
+{
+  "name": "checkSensitiveWords",
+  "version": "1.0.0",
+  "description": "检测敏感词",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "tencentcloud-sdk-nodejs": "^4.0.3"
+  }
+}

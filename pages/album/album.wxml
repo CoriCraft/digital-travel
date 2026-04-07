@@ -12,6 +12,34 @@
   </view>
 
   <scroll-view scroll-y class="album-scroll" style="padding-top: {{statusBarHeight + navBarHeight}}px;">
+
+    <!-- 旅拍机订单号查询 -->
+    <view class="search-bar">
+      <view class="search-input-wrapper">
+        <view class="search-icon">
+          <image src="/static/icons/search.svg" style="width:36rpx;height:36rpx;" />
+        </view>
+        <input
+          class="search-input-inner"
+          placeholder="输入旅拍机订单号查询照片"
+          value="{{orderIdInput}}"
+          bindinput="onOrderIdInput"
+          confirm-type="search"
+          bindconfirm="fetchOrderPhotos"
+          placeholder-class="input-placeholder"
+        />
+        <view class="search-btn {{orderLoading ? 'search-btn-loading' : ''}}" bindtap="fetchOrderPhotos">
+          <text wx:if="{{!orderLoading}}">查询</text>
+          <text wx:else>···</text>
+        </view>
+      </view>
+
+      <!-- 错误提示 -->
+      <view class="order-error" wx:if="{{orderError}}">
+        <text>{{orderError}}</text>
+      </view>
+    </view>
+
     <view class="album-list" wx:if="{{albumList.length > 0}}">
       <view class="album-card" wx:for="{{albumList}}" wx:key="id" bindtap="viewAlbum" data-id="{{item.id}}">
         <view class="card-stack-bg"></view>
@@ -40,6 +68,32 @@
       <text class="empty-hint">扫描旅拍机二维码保存相册</text>
     </view>
   </scroll-view>
+
+  <!-- 旅拍照片弹窗 -->
+  <view class="album-dialog-mask" wx:if="{{albumDialogVisible}}" bindtap="onAlbumDialogClose">
+    <view class="album-dialog-content" catchtap="">
+      <view class="album-dialog-photo-single" wx:if="{{!albumLoading && albumPhotos.length > 0}}">
+        <image
+          src="{{albumPhotos[0]}}"
+          class="album-dialog-photo-main"
+          mode="widthFix"
+          bindtap="previewOrderPhoto"
+          data-index="0"
+        />
+      </view>
+      <view class="album-dialog-loading" wx:if="{{albumLoading}}">保存中...</view>
+      <text class="album-dialog-tip" wx:if="{{!albumLoading}}">共 {{albumPhotos.length}} 张照片，点击图片查看全部</text>
+      <view class="album-dialog-btn-save" wx:if="{{!albumLoading}}" bindtap="onSaveAlbum">
+        <text class="btn-save-text">保存到我的相册</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 保存成功提示 -->
+  <view class="success-overlay" wx:if="{{showSaveSuccess}}">
+    <view class="success-icon"></view>
+    <text class="success-text">照片已保存至您的电子相册！</text>
+  </view>
 
   <view class="float-help" bindtap="onHelpTap">
     <image src="/static/icons/help.svg" class="help-icon"></image>

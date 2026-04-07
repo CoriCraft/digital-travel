@@ -58,7 +58,8 @@
     "pages/album/detail",
     "pages/album/photo-preview",
     "pages/my/my",
-    "pages/good-info/good-info"
+    "pages/good-info/good-info",
+    "pages/legal/legal"
   ],
   "window": {
     "navigationStyle": "custom",

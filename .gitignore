@@ -11,7 +11,7 @@ log/
 .claude
 rules
 PROJECT_GOALS.md
-cloudfunctions/
+cloudfunctions/*/node_modules/
 
 # AI编辑器配置（保留 .github/, .vscode/）
 .mcp.json

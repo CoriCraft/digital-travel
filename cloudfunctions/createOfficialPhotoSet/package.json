@@ -1,0 +1,9 @@
+{
+  "name": "createOfficialPhotoSet",
+  "version": "1.0.0",
+  "description": "创建官方照片集",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "toggleAdminStatus",
+  "version": "1.0.0",
+  "description": "切换管理员状态",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

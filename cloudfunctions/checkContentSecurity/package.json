@@ -1,0 +1,9 @@
+{
+  "name": "checkContentSecurity",
+  "version": "1.0.0",
+  "description": "检测内容安全（敏感词）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "saveAlbumToUser",
+  "version": "1.0.0",
+  "description": "保存电子相册到用户相册",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

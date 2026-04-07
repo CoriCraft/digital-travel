@@ -165,6 +165,62 @@
   color: #82F45F;
 }
 
+/* 订单号查询 - 搜索栏样式 */
+.search-bar {
+  padding: 16rpx 32rpx 24rpx 32rpx;
+  background: transparent;
+}
+
+.search-input-wrapper {
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 40rpx;
+  padding: 0 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.search-icon {
+  margin-right: 12rpx;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-inner {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.input-placeholder {
+  color: #999;
+}
+
+.search-btn {
+  width: 98rpx;
+  height: 54rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(98.63deg, #7BDE3A 2.44%, #CFDF17 95.85%);
+  color: #fff;
+  font-size: 26rpx;
+  font-weight: 600;
+  border-radius: 27rpx;
+  margin-left: 16rpx;
+}
+
+.search-btn.search-btn-loading {
+  opacity: 0.6;
+}
+
+.order-error {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #ff4d4f;
+}
+
 /* 空状态 */
 .empty-state {
   display: flex;
@@ -192,4 +248,105 @@
   color: #333;
   margin-bottom: 8rpx;
   display: block;
+}
+
+/* 旅拍照片弹窗 */
+.album-dialog-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.album-dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.album-dialog-photo-single {
+  width: 560rpx;
+  margin-bottom: 24rpx;
+}
+
+.album-dialog-photo-main {
+  width: 100%;
+  max-height: 80vh;
+  border-radius: 24rpx;
+  display: block;
+}
+
+.album-dialog-loading {
+  font-size: 52rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+  margin-bottom: 24rpx;
+}
+
+.album-dialog-tip {
+  font-weight: 500;
+  font-size: 30rpx;
+  line-height: 40rpx;
+  text-align: center;
+  letter-spacing: 2rpx;
+  color: #FFFFFF;
+  margin-bottom: 16rpx;
+}
+
+.album-dialog-btn-save {
+  width: 390rpx;
+  height: 98rpx;
+  background: linear-gradient(90deg, #86D93E 0%, #C0EC44 100%);
+  box-shadow: 2rpx 4rpx 10rpx rgba(0, 0, 0, 0.08);
+  border-radius: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-save-text {
+  font-weight: 500;
+  font-size: 36rpx;
+  line-height: 40rpx;
+  text-align: center;
+  letter-spacing: 2rpx;
+  color: #323232;
+}
+
+/* 保存成功提示 */
+.success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(34, 34, 34, 0.7);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-icon {
+  width: 148rpx;
+  height: 148rpx;
+  background-image: url("data:image/svg+xml,%3Csvg width='74' height='74' viewBox='0 0 74 74' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='37' cy='37' r='37' fill='%2388DA3E'/%3E%3Cpath d='M49.9832 25.8936C49.5096 25.8936 49.0156 26.049 48.6549 26.4042L32.5469 42.303C32.0714 42.7711 31.5941 42.6842 31.2204 42.1329L25.6778 33.9559C25.1117 33.1215 23.9277 32.8884 23.0786 33.4453C22.2313 34.0021 21.9945 35.1658 22.5606 36.0001L28.1013 44.1771C29.77 46.6357 33.0205 46.9484 35.1461 44.8579L51.3114 29.0163C52.0311 28.3059 52.0311 27.1146 51.3114 26.4042C50.9507 26.049 50.4549 25.8936 49.9832 25.8936Z' fill='%23FAFAFA'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.success-text {
+  margin-top: 36rpx;
+  font-weight: 500;
+  font-size: 32rpx;
+  line-height: 40rpx;
+  text-align: center;
+  color: #FFFFFF;
 }

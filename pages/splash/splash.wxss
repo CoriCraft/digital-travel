@@ -10,8 +10,8 @@
 }
 
 .splash-logo {
-  width: 240rpx;
-  height: 250rpx;
+  width: 620rpx;
+  height: 646rpx;
   margin-bottom: 500rpx;
 }
 

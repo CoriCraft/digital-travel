@@ -1,0 +1,9 @@
+{
+  "name": "updateLocation",
+  "version": "1.0.0",
+  "description": "更新地点",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

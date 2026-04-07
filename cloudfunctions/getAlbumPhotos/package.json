@@ -1,0 +1,9 @@
+{
+  "name": "getAlbumPhotos",
+  "version": "1.0.0",
+  "description": "根据订单号获取电子相册照片",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

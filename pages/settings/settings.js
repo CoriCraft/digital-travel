@@ -26,22 +26,14 @@ Page({
    * 隐私政策
    */
   onPrivacyTap() {
-    wx.showModal({
-      title: '隐私政策',
-      content: '我们非常重视您的隐私保护。本应用仅收集必要的用户信息用于提供服务，不会将您的个人信息用于其他用途或与第三方共享。详细内容请访问我们的官网查看完整隐私政策。',
-      showCancel: false
-    })
+    wx.navigateTo({ url: '/pages/legal/legal?type=privacy' })
   },
 
   /**
    * 用户协议
    */
   onUserAgreementTap() {
-    wx.showModal({
-      title: '用户协议',
-      content: '欢迎使用数字文旅小程序。使用本应用即表示您同意遵守我们的用户协议。详细内容请访问我们的官网查看完整用户协议。',
-      showCancel: false
-    })
+    wx.navigateTo({ url: '/pages/legal/legal?type=agreement' })
   },
 
   /**
@@ -50,7 +42,7 @@ Page({
   onAboutTap() {
     wx.showModal({
       title: '关于我们',
-      content: '智见方境\n版本：1.0.8\n\n致力于为用户提供优质的旅游体验和创意模板服务。',
+      content: '"智见方境"小程序——你的文旅记忆共创平台\n\n以AI旅拍为入口，打造专属你的数字文旅体验。在线下旅拍机拍摄后，扫码即可获取高清电子写真，支持创意模板二次创作、一键下载与分享。平台汇聚景区服务推荐、文创电商推荐、电子相册等功能，记录每一次旅行的独特瞬间。我们致力于将乡村美景与文化转化为可留存、可传播的数字记忆，助力智慧文旅新体验。\n\n版本：1.0.8',
       showCancel: false
     })
   },

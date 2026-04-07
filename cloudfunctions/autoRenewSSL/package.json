@@ -1,0 +1,9 @@
+{
+  "name": "autoRenewSSL",
+  "version": "1.0.0",
+  "description": "已废弃的云函数（占位）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

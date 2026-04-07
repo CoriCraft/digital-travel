@@ -4,10 +4,20 @@ Page({
    * 页面的初始数据
    */
   data: {
-    statusBarHeight: 20, // 状态栏高度
-    navBarHeight: 44,    // 导航栏内容高度
+    statusBarHeight: 20,
+    navBarHeight: 44,
     albumList: [],
-    loading: false
+    loading: false,
+    orderIdInput: '',
+    orderLoading: false,
+    orderError: '',
+    albumDialogVisible: false,
+    albumPhotos: [],
+    albumFileIDs: [],
+    albumOrderId: '',
+    albumPayTime: '',
+    albumLoading: false,
+    showSaveSuccess: false
   },
 
   /**
@@ -181,6 +191,104 @@ Page({
         console.log('点击了第' + (res.tapIndex + 1) + '个按钮');
       }
     });
+  },
+
+  onOrderIdInput(e) {
+    this.setData({ orderIdInput: e.detail.value, orderError: '' });
+  },
+
+  fetchOrderPhotos() {
+    const orderId = this.data.orderIdInput.trim();
+    if (!orderId) {
+      this.setData({ orderError: '请输入订单号' });
+      return;
+    }
+    if (this.data.orderLoading) return;
+
+    this.setData({ orderLoading: true, orderError: '' });
+
+    wx.cloud.callFunction({
+      name: 'kadaya-fetch-order',
+      data: { businessOrderId: orderId }
+    }).then(res => {
+      const result = res.result;
+      if (!result.success) {
+        this.setData({ orderError: result.message || '查询失败', orderLoading: false });
+        return;
+      }
+
+      const order = result.order;
+      const allFileIDs = (order.photos || []).filter(Boolean);
+
+      if (allFileIDs.length === 0) {
+        this.setData({ orderError: '该订单暂无照片', orderLoading: false });
+        return;
+      }
+
+      wx.cloud.getTempFileURL({ fileList: allFileIDs }).then(tempRes => {
+        const urlMap = {};
+        tempRes.fileList.forEach(f => { urlMap[f.fileID] = f.tempFileURL; });
+
+        this.setData({
+          albumDialogVisible: true,
+          albumPhotos: allFileIDs.map(id => urlMap[id] || id),
+          albumFileIDs: allFileIDs,
+          albumOrderId: orderId,
+          albumPayTime: result.order.payTime || '',
+          orderLoading: false
+        });
+      });
+    }).catch(err => {
+      console.error('查询失败:', err);
+      this.setData({ orderError: '查询失败，请稍后重试', orderLoading: false });
+    });
+  },
+
+  onAlbumDialogClose() {
+    this.setData({ albumDialogVisible: false });
+  },
+
+  async onSaveAlbum() {
+    const { albumOrderId, albumFileIDs, albumPayTime } = this.data;
+    if (!albumFileIDs || albumFileIDs.length === 0) {
+      wx.showToast({ title: '没有照片可保存', icon: 'none' });
+      return;
+    }
+
+    this.setData({ albumLoading: true });
+
+    try {
+      const db = wx.cloud.database();
+      const existing = await db.collection('user_albums').where({ orderId: albumOrderId, _openid: '{openid}' }).get();
+      if (existing.data.length === 0) {
+        await db.collection('user_albums').add({
+          data: {
+            orderId: albumOrderId,
+            title: '旅拍照片',
+            photos: albumFileIDs.map(id => ({ fileID: id })),
+            coverPhoto: albumFileIDs[0],
+            totalCount: albumFileIDs.length,
+            createTime: albumPayTime ? new Date(albumPayTime) : new Date()
+          }
+        });
+      }
+
+      this.setData({ albumLoading: false, albumDialogVisible: false, showSaveSuccess: true });
+      setTimeout(() => {
+        this.setData({ showSaveSuccess: false });
+        this.loadUserAlbums();
+      }, 2000);
+    } catch (err) {
+      this.setData({ albumLoading: false });
+      console.error('保存相册失败:', err);
+      wx.showToast({ title: err.message || '保存失败', icon: 'none' });
+    }
+  },
+
+  previewOrderPhoto(e) {
+    const index = e.currentTarget.dataset.index;
+    const photos = this.data.albumPhotos;
+    wx.previewImage({ current: photos[index], urls: photos });
   },
 
   /**

@@ -1,0 +1,9 @@
+{
+  "name": "reviewUserTemplate",
+  "version": "1.0.0",
+  "description": "审核用户模板",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

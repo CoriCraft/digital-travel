@@ -1,0 +1,9 @@
+{
+  "name": "createAdmin",
+  "version": "1.0.0",
+  "description": "创建管理员账户云函数（仅超级管理员可用）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
