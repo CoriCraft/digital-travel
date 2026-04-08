@@ -61,18 +61,28 @@ exports.main = async (event, context) => {
       }
     }
 
-    // 检查是否有关联的照片集
-    const photoSetCount = await db.collection('photosets')
+    // 检查是否有关联的照片
+    const photoCount = await db.collection('photos')
       .where({
-        templateId: templateId
+        templateId: templateId,
+        isOfficial: true
       })
       .count()
 
-    if (photoSetCount.total > 0) {
-      return {
-        success: false,
-        message: `该模板下有 ${photoSetCount.total} 个照片集，无法删除`
-      }
+    // 如果有照片，先删除所有关联照片
+    if (photoCount.total > 0) {
+      const photosResult = await db.collection('photos')
+        .where({
+          templateId: templateId,
+          isOfficial: true
+        })
+        .get()
+
+      // 批量删除照片
+      const deletePromises = photosResult.data.map(photo =>
+        db.collection('photos').doc(photo._id).remove()
+      )
+      await Promise.all(deletePromises)
     }
 
     // 删除模板
@@ -82,7 +92,9 @@ exports.main = async (event, context) => {
 
     return {
       success: true,
-      message: '删除成功'
+      message: photoCount.total > 0
+        ? `删除成功，已同时删除 ${photoCount.total} 张关联照片`
+        : '删除成功'
     }
   } catch (error) {
     console.error('删除官方模板失败:', error)
