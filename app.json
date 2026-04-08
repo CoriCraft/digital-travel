@@ -19,7 +19,7 @@
         "pagePath": "pages/experience/experience"
       },
       {
-        "text": "产品购买",
+        "text": "甄选好物",
         "iconPath": "/static/images/default-avatar.png",
         "pagePath": "pages/purchase/purchase"
       },

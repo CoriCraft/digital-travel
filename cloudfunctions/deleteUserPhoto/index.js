@@ -29,11 +29,19 @@ exports.main = async (event, context) => {
     }
 
     // 获取要删除的照片信息
-    const photoRes = await db.collection('photos').doc(photoId).get()
+    let photoRes
+    try {
+      photoRes = await db.collection('photos').doc(photoId).get()
+    } catch (e) {
+      return {
+        success: true,
+        message: '照片已不存在，无需删除'
+      }
+    }
     if (!photoRes.data) {
       return {
-        success: false,
-        message: '照片不存在'
+        success: true,
+        message: '照片已不存在，无需删除'
       }
     }
 

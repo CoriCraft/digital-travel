@@ -6,7 +6,7 @@
       <view class="nav-left" bindtap="onHomeTap">
         <t-icon name="home" size="48rpx" color="#333" />
       </view>
-      <view class="nav-title">产品购买</view>
+      <view class="nav-title">甄选好物</view>
       <view class="nav-right-placeholder"></view>
     </view>
   </view>

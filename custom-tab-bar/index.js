@@ -16,7 +16,7 @@ Component({
       },
       {
         value: 'purchase',
-        label: '产品购买',
+        label: '甄选好物',
         icon: '/static/tab-purchase.png',
         url: '/pages/purchase/purchase',
       },
