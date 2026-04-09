@@ -66,30 +66,42 @@ Page({
       console.log('检测到 scene 参数')
       const scene = decodeURIComponent(options.scene)
       console.log('解码后的 scene:', scene)
-      const match = scene.match(/orderId=([^&]+)/)
+      const match = scene.match(/code=([^&]+)/)
       console.log('正则匹配结果:', match)
       if (match) {
-        const orderId = match[1]
-        console.log('提取到 orderId:', orderId)
-        this.setData({ albumOrderId: orderId, albumDialogVisible: true, albumLoading: true })
-        wx.cloud.callFunction({
-          name: 'getAlbumPhotos',
-          data: { orderId }
-        }).then(res => {
-          console.log('云函数返回:', res)
-          const photos = res.result?.data?.photos || []
-          const locationName = res.result?.data?.locationName || ''
-          const photoTime = res.result?.data?.photoTime || null
-          this.setData({
-            albumPhotos: photos,
-            albumLocationName: locationName,
-            albumPhotoTime: photoTime ? this.formatPhotoTime(photoTime) : '',
-            albumLoading: false
+        const albumId = match[1]
+        console.log('提取到 albumId:', albumId)
+        this.setData({ albumOrderId: albumId, albumDialogVisible: true, albumLoading: true })
+
+        // 直接查询数据库
+        const db = getDB()
+        db.collection('albums')
+          .where({
+            albumId: albumId,
+            status: 'active'
           })
-        }).catch(err => {
-          console.error('云函数调用失败:', err)
-          this.setData({ albumLoading: false })
-        })
+          .get()
+          .then(res => {
+            console.log('数据库查询返回:', res)
+            if (res.data.length > 0) {
+              const album = res.data[0]
+              this.setData({
+                albumPhotos: album.photos || [],
+                albumLocationName: album.locationName || '',
+                albumPhotoTime: album.photoTime ? this.formatPhotoTime(album.photoTime) : '',
+                albumLoading: false
+              })
+            } else {
+              console.error('未找到相册')
+              this.setData({ albumLoading: false })
+              wx.showToast({ title: '相册不存在', icon: 'none' })
+            }
+          })
+          .catch(err => {
+            console.error('数据库查询失败:', err)
+            this.setData({ albumLoading: false })
+            wx.showToast({ title: '加载失败', icon: 'none' })
+          })
       }
     } else {
       console.log('未检测到 scene 参数')
@@ -965,68 +977,31 @@ Page({
       return
     }
 
-    // 显示保存中状态
     this.setData({ albumLoading: true })
 
     try {
       const db = wx.cloud.database()
 
-      // 1. 下载并上传照片到云存储
-      const uploadedPhotos = []
-      for (let i = 0; i < albumPhotos.length; i++) {
-        const photo = albumPhotos[i]
-        const photoUrl = photo.url || photo
-
-        try {
-          // 提取原始文件扩展名
-          const urlMatch = photoUrl.match(/\.([^./?#]+)(?:[?#]|$)/)
-          const ext = urlMatch ? urlMatch[1] : 'jpg'
-
-          // 下载照片
-          const downloadRes = await wx.cloud.downloadFile({ fileID: photoUrl })
-
-          // 上传到用户云存储，保留原始扩展名
-          const uploadRes = await wx.cloud.uploadFile({
-            cloudPath: `user_albums/${albumOrderId}/${Date.now()}_${i}.${ext}`,
-            filePath: downloadRes.tempFilePath
-          })
-
-          uploadedPhotos.push({
-            fileID: uploadRes.fileID,
-            originalUrl: photoUrl,
-            uploadTime: new Date()
-          })
-        } catch (err) {
-          console.error(`照片 ${i} 处理失败:`, err)
-        }
-      }
-
-      if (uploadedPhotos.length === 0) {
-        throw new Error('照片上传失败')
-      }
-
-      // 2. 写入 user_albums 集合
+      // 直接将 fileID 数组写入 user_albums
       await db.collection('user_albums').add({
         data: {
-          orderId: albumOrderId,
+          albumId: albumOrderId,
           title: `旅拍相册 ${albumOrderId}`,
-          photos: uploadedPhotos,
-          coverPhoto: uploadedPhotos[0].fileID,
-          totalCount: uploadedPhotos.length,
+          photos: albumPhotos.map(fileID => ({ fileID })),
+          coverPhoto: albumPhotos[0],
+          totalCount: albumPhotos.length,
           locationName: albumLocationName || '',
           photoTime: albumPhotoTime || '',
           createTime: new Date()
         }
       })
 
-      // 关闭弹窗，显示成功提示
       this.setData({
         albumDialogVisible: false,
         albumLoading: false,
         showSaveSuccess: true
       })
 
-      // 2秒后隐藏成功提示并跳转
       setTimeout(() => {
         this.setData({ showSaveSuccess: false })
         wx.switchTab({ url: '/pages/album/album' })

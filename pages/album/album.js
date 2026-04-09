@@ -84,7 +84,7 @@ Page({
 
           return {
             id: album._id,
-            orderId: album.orderId,
+            orderId: album.albumId || album.orderId,
             title: album.title,
             date: album.photoTime || this.formatDate(album.createTime), // 优先使用拍摄时间
             photoCount: album.totalCount || album.photos?.length || 0,

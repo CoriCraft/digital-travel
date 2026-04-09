@@ -19,10 +19,10 @@ async function getAccessToken() {
 }
 
 exports.main = async (event, context) => {
-  const { orderId } = event
+  const { albumId } = event
 
-  if (!orderId) {
-    return { success: false, message: '缺少订单号参数' }
+  if (!albumId) {
+    return { success: false, message: '缺少相册ID参数' }
   }
 
   try {
@@ -31,7 +31,7 @@ exports.main = async (event, context) => {
     const result = await axios.post(
       `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=${accessToken}`,
       {
-        scene: `orderId=${orderId}`,
+        scene: `code=${albumId}`,
         page: 'pages/template/template',
         check_path: false,
         width: 280,

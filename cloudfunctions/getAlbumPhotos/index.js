@@ -1,4 +1,4 @@
-// 云函数：根据订单号获取电子相册照片
+// 云函数：根据相册ID获取电子相册照片
 const cloud = require('wx-server-sdk')
 
 cloud.init({
@@ -8,29 +8,30 @@ cloud.init({
 const db = cloud.database()
 
 exports.main = async (event, context) => {
-  const { orderId } = event
+  const { albumId, shortCode } = event
 
   // 参数验证
-  if (!orderId) {
+  if (!albumId && !shortCode) {
     return {
       code: 400,
-      message: '缺少订单号参数'
+      message: '缺少相册ID或短码参数'
     }
   }
 
   try {
-    // 查询相册数据
+    // 查询相册数据（支持 albumId 或 shortCode）
+    const whereCondition = shortCode
+      ? { shortCode: shortCode, status: 'active' }
+      : { albumId: albumId, status: 'active' }
+
     const result = await db.collection('albums')
-      .where({
-        orderId: orderId,
-        status: 'active'
-      })
+      .where(whereCondition)
       .get()
 
     if (result.data.length === 0) {
       return {
         code: 404,
-        message: '未找到该订单的相册'
+        message: '未找到该相册'
       }
     }
 
@@ -40,7 +41,7 @@ exports.main = async (event, context) => {
       code: 0,
       message: '获取成功',
       data: {
-        orderId: album.orderId,
+        albumId: album.albumId,
         photos: album.photos || [],
         totalCount: album.photos?.length || 0,
         createTime: album.createTime,
