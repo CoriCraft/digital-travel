@@ -177,7 +177,7 @@
       <image
         src="{{albumPhotos[0].url || albumPhotos[0]}}"
         class="album-dialog-photo-main"
-        mode="widthFix"
+        mode="aspectFit"
       />
     </view>
     <view class="album-dialog-loading" wx:if="{{albumLoading}}">保存中...</view>
