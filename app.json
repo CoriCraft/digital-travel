@@ -1,10 +1,4 @@
 {
-  "plugins": {
-    "mini-shop-plugin": {
-      "version": "latest",
-      "provider": "wx34345ae5855f892d"
-    }
-  },
   "tabBar": {
     "custom": true,
     "list": [

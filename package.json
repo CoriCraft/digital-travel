@@ -11,6 +11,6 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "tdesign-miniprogram": "^1.12.2"
+    "tdesign-miniprogram": "^1.5.0"
   }
 }

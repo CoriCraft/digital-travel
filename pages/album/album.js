@@ -17,7 +17,10 @@ Page({
     albumOrderId: '',
     albumPayTime: '',
     albumLoading: false,
-    showSaveSuccess: false
+    showSaveSuccess: false,
+    editDialogVisible: false,
+    editingAlbumId: '',
+    editingTitle: ''
   },
 
   /**
@@ -298,5 +301,68 @@ Page({
     wx.navigateTo({
       url: '/pages/help-center/help-center'
     });
+  },
+
+  /**
+   * 编辑相册名称
+   */
+  editAlbumName: function(e) {
+    const { id, title } = e.currentTarget.dataset;
+    this.setData({
+      editDialogVisible: true,
+      editingAlbumId: id,
+      editingTitle: title
+    });
+  },
+
+  /**
+   * 输入相册名称
+   */
+  onEditTitleInput: function(e) {
+    this.setData({ editingTitle: e.detail.value });
+  },
+
+  /**
+   * 关闭编辑弹窗
+   */
+  closeEditDialog: function() {
+    this.setData({
+      editDialogVisible: false,
+      editingAlbumId: '',
+      editingTitle: ''
+    });
+  },
+
+  /**
+   * 确认修改相册名称
+   */
+  confirmEditTitle: function() {
+    const { editingAlbumId, editingTitle } = this.data;
+    const title = editingTitle.trim();
+
+    if (!title) {
+      wx.showToast({ title: '请输入相册名称', icon: 'none' });
+      return;
+    }
+
+    wx.showLoading({ title: '保存中...' });
+
+    const db = wx.cloud.database();
+    db.collection('user_albums')
+      .doc(editingAlbumId)
+      .update({
+        data: { title: title }
+      })
+      .then(() => {
+        wx.hideLoading();
+        wx.showToast({ title: '修改成功', icon: 'success' });
+        this.closeEditDialog();
+        this.loadUserAlbums();
+      })
+      .catch(err => {
+        wx.hideLoading();
+        console.error('修改相册名称失败:', err);
+        wx.showToast({ title: '修改失败', icon: 'none' });
+      });
   }
 })

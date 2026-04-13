@@ -1,11 +1,8 @@
 // app.js
-const miniShopPlugin = requirePlugin('mini-shop-plugin');
 const migration = require('./utils/migration.js');
 
 App({
   onLaunch() {
-    miniShopPlugin.initApp(this, wx);
-
     wx.cloud.init({
       env: 'cultural-tourism-7fb138kf77a2cb2',
       traceUser: true

@@ -40,6 +40,7 @@ Page({
     albumOrderId: '',
     albumPhotos: [],
     albumLoading: false,
+    albumName: '', // 相册名称
     albumLocationName: '', // 地点名称
     albumPhotoTime: null, // 拍摄时间
     showSaveSuccess: false, // 保存成功提示
@@ -87,6 +88,7 @@ Page({
               const album = res.data[0]
               this.setData({
                 albumPhotos: album.photos || [],
+                albumName: album.title || '',
                 albumLocationName: album.locationName || '',
                 albumPhotoTime: album.photoTime ? this.formatPhotoTime(album.photoTime) : '',
                 albumLoading: false
@@ -970,7 +972,7 @@ Page({
    * 保存相册到用户相册
    */
   async onSaveAlbum() {
-    const { albumOrderId, albumPhotos, albumLocationName, albumPhotoTime } = this.data
+    const { albumOrderId, albumPhotos, albumName, albumLocationName, albumPhotoTime } = this.data
 
     if (!albumPhotos || albumPhotos.length === 0) {
       wx.showToast({ title: '没有照片可保存', icon: 'none' })
@@ -986,7 +988,7 @@ Page({
       await db.collection('user_albums').add({
         data: {
           albumId: albumOrderId,
-          title: `旅拍相册 ${albumOrderId}`,
+          title: albumName || `旅拍相册 ${albumOrderId}`,
           photos: albumPhotos.map(fileID => ({ fileID })),
           coverPhoto: albumPhotos[0],
           totalCount: albumPhotos.length,

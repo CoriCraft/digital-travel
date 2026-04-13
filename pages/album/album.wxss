@@ -241,13 +241,92 @@
   color: #ccc;
 }
 
+/* 编辑相册名称弹窗 */
+.edit-dialog-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-dialog-content {
+  width: 600rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 48rpx 40rpx 32rpx;
+}
+
+.edit-dialog-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+
+.edit-dialog-input {
+  width: 100%;
+  height: 88rpx;
+  background: #F5F5F5;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 32rpx;
+}
+
+.edit-dialog-buttons {
+  display: flex;
+  gap: 24rpx;
+}
+
+.edit-dialog-btn {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+}
+
+.edit-dialog-btn-cancel {
+  background: #F5F5F5;
+  color: #666;
+}
+
+.edit-dialog-btn-confirm {
+  background: linear-gradient(90deg, #86D93E 0%, #C0EC44 100%);
+  color: #323232;
+}
+
 /* 卡片标题 */
+.card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 8rpx;
+}
+
 .card-title {
   font-size: 30rpx;
   font-weight: 600;
   color: #333;
-  margin-bottom: 8rpx;
-  display: block;
+  flex: 1;
+}
+
+.edit-icon {
+  padding: 4rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 旅拍照片弹窗 */

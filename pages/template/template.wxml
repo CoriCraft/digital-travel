@@ -181,9 +181,7 @@
       />
     </view>
     <view class="album-dialog-loading" wx:if="{{albumLoading}}">保存中...</view>
-    <text class="album-dialog-tip" wx:if="{{!albumLoading}}">请点击下方保存您的旅拍照片</text>
-    <view class="album-dialog-location" wx:if="{{!albumLoading && albumLocationName}}">{{albumLocationName}}</view>
-    <view class="album-dialog-time" wx:if="{{!albumLoading && albumPhotoTime}}">拍摄时间：{{albumPhotoTime}}</view>
+    <text class="album-dialog-tip" wx:if="{{!albumLoading}}">点击下方保存图片至旅拍相册</text>
     <view class="album-dialog-btn-save" wx:if="{{!albumLoading}}" bindtap="onSaveAlbum">
       <text class="btn-save-text">保存图片</text>
     </view>

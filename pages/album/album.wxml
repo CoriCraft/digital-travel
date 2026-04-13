@@ -49,7 +49,12 @@
           </view>
           <view class="card-footer">
             <view class="card-info">
-              <text class="card-title">{{item.title}}</text>
+              <view class="card-title-row">
+                <text class="card-title">{{item.title}}</text>
+                <view class="edit-icon" catchtap="editAlbumName" data-id="{{item.id}}" data-title="{{item.title}}">
+                  <t-icon name="edit" size="32rpx" color="#999" />
+                </view>
+              </view>
               <view class="card-meta-row">
                 <text class="card-meta">{{item.date}}</text>
                 <text class="card-location" wx:if="{{item.locationName}}">· {{item.locationName}}</text>
@@ -98,5 +103,24 @@
   <view class="float-help" bindtap="onHelpTap">
     <image src="/static/icons/help.svg" class="help-icon"></image>
     <text>帮助</text>
+  </view>
+
+  <!-- 编辑相册名称弹窗 -->
+  <view class="edit-dialog-mask" wx:if="{{editDialogVisible}}" bindtap="closeEditDialog">
+    <view class="edit-dialog-content" catchtap="">
+      <view class="edit-dialog-title">修改相册名称</view>
+      <input
+        class="edit-dialog-input"
+        value="{{editingTitle}}"
+        bindinput="onEditTitleInput"
+        placeholder="请输入相册名称"
+        maxlength="20"
+        focus="{{editDialogVisible}}"
+      />
+      <view class="edit-dialog-buttons">
+        <view class="edit-dialog-btn edit-dialog-btn-cancel" bindtap="closeEditDialog">取消</view>
+        <view class="edit-dialog-btn edit-dialog-btn-confirm" bindtap="confirmEditTitle">确定</view>
+      </view>
+    </view>
   </view>
 </view>

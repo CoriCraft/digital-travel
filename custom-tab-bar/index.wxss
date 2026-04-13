@@ -6,11 +6,34 @@
   align-items: center;
   justify-content: center;
   margin-bottom: -6rpx;
+  overflow: visible;
 }
 
 /* 旅拍相册和我的图标向上调整 */
 .icon-adjust-up {
-  margin-top: -12rpx;
+  margin-top: -18rpx;
+}
+
+/* 视觉中心对齐调整 */
+.icon-align-template {
+  transform: translateY(2rpx);
+  position: relative;
+}
+
+.icon-align-experience {
+  transform: translateY(5rpx);
+}
+
+.icon-align-purchase {
+  transform: translateY(2.5rpx);
+}
+
+.icon-align-album {
+  transform: translateY(-10rpx) scale(1.2);
+}
+
+.icon-align-my {
+  transform: translateY(-9rpx) scale(1.3);
 }
 
 /* icon 尺寸 */
@@ -26,9 +49,10 @@
   line-height: 1.2;
   color: #666;
   transition: opacity 0.1s ease, font-size 0.1s ease, color 0.1s ease;
-  margin-top: -2rpx;
+  margin-top: 18rpx;
   text-align: center;
   white-space: nowrap;
+  position: relative;
 }
 
 /* 选中态（icon + text 共用） */
