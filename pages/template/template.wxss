@@ -149,14 +149,27 @@
   flex-shrink: 0;
   transition: all 0.3s;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
 }
 
 .filter-tag.active {
-  background: linear-gradient(90deg, #7BDE3E 0%, #D9E817 100%); /* 使用渐变背景 */
   color: #fff;
-  border-color: transparent; /* 选中时去掉边框 */
+  border-color: transparent;
   font-weight: 600;
   box-shadow: 0 4rpx 12rpx rgba(123, 222, 62, 0.3);
+}
+
+.filter-tag.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #7BDE3E 0%, #D9E817 100%);
+  border-radius: 32rpx;
+  z-index: -1;
 }
 
 /* 创作模板卡片 */
